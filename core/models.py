@@ -17,13 +17,7 @@ class BudgetRange(models.TextChoices):
         RANGE_800K_1M = "800000-1000000", "$800,000 - $1,000,000"
         RANGE_1M_PLUS = "1000000+", "$1,000,000+"
 
-class PropertyType(models.TextChoices):
-    HOUSE = "HOUSE", "house"
-    CONDO = "CONDO", "condo"
-    TOWNHOUSE = "TOWNHOUSE", "townhouse"
-    APARTMENT = "APARTMENT", "apartment"
-    LAND = "LAND", "land"
-    COMMERCIAL = "COMMERCIAL", "commercial"
+
 
 class BaseModel(models.Model):
     created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
@@ -34,14 +28,12 @@ class BaseModel(models.Model):
 
 class BaseUserDetails(AbstractUser, BaseModel):
     role = models.CharField(max_length=255, choices=Role.choices, default=Role.BUYER)
-    first_name = models.CharField(max_length=255)
-    last_name = models.CharField(max_length=255)
-    email = models.EmailField(unique=True)
-    password = models.CharField(max_length=255)
     phone_number = models.CharField(max_length=255)
-    is_active = models.BooleanField(default=True)
     is_updated = models.BooleanField(default=False)
     is_verified = models.BooleanField(default=False)
+
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = ['first_name', 'last_name']
 
     def __str__(self):
         return f"{self.first_name} {self.last_name}"
@@ -70,14 +62,3 @@ class Address(BaseModel):
         verbose_name = "Address"
         verbose_name_plural = "Addresses"
         ordering = ["-created_at"]
-
-
-
-
-
-    
-
-
-
-        
-
