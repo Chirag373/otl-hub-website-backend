@@ -1,1 +1,0 @@
-# LoginViewSet, RegisterView, etc.
