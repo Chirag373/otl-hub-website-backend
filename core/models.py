@@ -9,6 +9,22 @@ class Role(models.TextChoices):
         REALTOR = "REALTOR", "realtor"
         PARTNER = "PARTNER", "partner"
 
+class BudgetRange(models.TextChoices):
+        RANGE_0_200K = "0-200000", "$0 - $200,000"
+        RANGE_200K_400K = "200000-400000", "$200,000 - $400,000"
+        RANGE_400K_600K = "400000-600000", "$400,000 - $600,000"
+        RANGE_600K_800K = "600000-800000", "$600,000 - $800,000"
+        RANGE_800K_1M = "800000-1000000", "$800,000 - $1,000,000"
+        RANGE_1M_PLUS = "1000000+", "$1,000,000+"
+
+class PropertyType(models.TextChoices):
+    HOUSE = "HOUSE", "house"
+    CONDO = "CONDO", "condo"
+    TOWNHOUSE = "TOWNHOUSE", "townhouse"
+    APARTMENT = "APARTMENT", "apartment"
+    LAND = "LAND", "land"
+    COMMERCIAL = "COMMERCIAL", "commercial"
+
 class BaseModel(models.Model):
     created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     updated_at = models.DateTimeField(auto_now=True, null=True, blank=True)
@@ -55,20 +71,7 @@ class Address(BaseModel):
         verbose_name_plural = "Addresses"
         ordering = ["-created_at"]
 
-class MembershipStatus(BaseModel):
-    user = models.ForeignKey(BaseUserDetails, on_delete=models.CASCADE)
-    partner_since = models.DateField(null=True, blank=True)
-    partner_until = models.DateField(null=True, blank=True)
-    fee_paid = models.BooleanField(default=False)
-    fee_amount = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
 
-    def __str__(self):
-        return f"{self.user.get_full_name()}"
-    
-    class Meta:
-        verbose_name = "Membership Status"
-        verbose_name_plural = "Membership Statuses"
-        ordering = ["-created_at"]
 
 
 

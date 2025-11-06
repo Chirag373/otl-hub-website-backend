@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from .models import BaseUserDetails, Address, MembershipStatus
+from .models import BaseUserDetails, Address, MembershipStatus, BuyerProfile
 
 # Register your models here.
 
