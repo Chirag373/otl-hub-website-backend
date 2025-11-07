@@ -1,7 +1,9 @@
 from rest_framework import serializers
+from django.db import transaction
+from core.models import BaseUserDetails, Role, BudgetRange
 from django.contrib.auth.password_validation import validate_password
-from core.models import BaseUserDetails, BudgetRange, Role
 from api.models import BuyerProfile
+
 
 class BuyerSignupSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, required=True, validators=[validate_password])
@@ -25,26 +27,34 @@ class BuyerSignupSerializer(serializers.ModelSerializer):
         if attrs['password'] != attrs['confirm_password']:
             raise serializers.ValidationError({"password": "Password fields didn't match."})
         return attrs
+
+    def validate_email(self, value):
+        if BaseUserDetails.objects.filter(email=value).exists():
+            raise serializers.ValidationError("Email already exists.")
+        return value
     
     def create(self, validated_data):
-
-        user = BaseUserDetails.objects.create_user(
-            username=validated_data['email'], 
-            first_name=validated_data['first_name'],
-            last_name=validated_data['last_name'],
-            email=validated_data['email'],
-            password=validated_data['password'],
-            phone_number=validated_data.get('phone_number', ''),
-            role=Role.BUYER
-        )
-        
-        BuyerProfile.objects.create(
-            user=user,
-            budget_range=validated_data.get('budget_range'),
-            preferred_locations=validated_data.get('preferred_location', '')
-        )
-        
-        return user
+        with transaction.atomic():
+            # Remove non-user fields
+            budget_range = validated_data.pop('budget_range')
+            preferred_location = validated_data.pop('preferred_location', '')
+            property_type = validated_data.pop('property_type', '')
+            validated_data.pop('confirm_password')
+            
+            user = BaseUserDetails.objects.create_user(
+                username=validated_data['email'],
+                role=Role.BUYER,
+                **validated_data
+            )       
+            
+            BuyerProfile.objects.create(
+                user=user,
+                budget_range=budget_range,
+                preferred_locations=preferred_location,
+                property_type=property_type
+            )
+            
+            return user  # Return user instance, not dict
 
 
 class BuyerListSerializer(serializers.ModelSerializer):
@@ -62,12 +72,27 @@ class BuyerListSerializer(serializers.ModelSerializer):
 
     def get_preferred_location(self, obj):
         try:
-            return obj.buyer_profile.first().preferred_locations
-        except:
+            return obj.buyer_profile.preferred_locations
+        except BuyerProfile.DoesNotExist:
             return ""
 
     def get_budget_range(self, obj):
         try:
-            return obj.buyer_profile.first().budget_range
+            return obj.buyer_profile.budget_range
+        except BuyerProfile.DoesNotExist:
+            return ""
+
+class BuyerDashboardSerializer(serializers.ModelSerializer):
+    preferred_location = serializers.SerializerMethodField()
+
+    class Meta:
+        model = BaseUserDetails
+        fields = ['uuid', 'first_name', 'last_name', 'email',
+            'preferred_location'
+        ]
+
+    def get_preferred_location(self, obj):
+        try:
+            return obj.buyer_profile.preferred_locations
         except:
             return ""
