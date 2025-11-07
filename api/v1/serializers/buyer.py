@@ -46,3 +46,28 @@ class BuyerSignupSerializer(serializers.ModelSerializer):
         )
         
         return user
+
+
+class BuyerListSerializer(serializers.ModelSerializer):
+    phone_number = serializers.CharField(read_only=True)
+    preferred_location = serializers.SerializerMethodField()
+    budget_range = serializers.SerializerMethodField()
+
+    class Meta:
+        model = BaseUserDetails
+        fields = [
+            'first_name', 'last_name', 'email', 'phone_number',
+            'preferred_location', 'budget_range'
+        ]
+
+    def get_preferred_location(self, obj):
+        try:
+            return obj.buyer_profile.first().preferred_locations
+        except:
+            return ""
+
+    def get_budget_range(self, obj):
+        try:
+            return obj.buyer_profile.first().budget_range
+        except:
+            return ""
