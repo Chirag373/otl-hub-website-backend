@@ -1,7 +1,6 @@
 from django.db import models
 
-from core.models import BaseModel, BaseUserDetails, BudgetRange, PropertyType
-
+from core.models import BaseModel, BaseUserDetails, BudgetRange
 # Create your models here.
 class BuyerProfile(BaseModel):
     user = models.ForeignKey(BaseUserDetails, on_delete=models.CASCADE, related_name='buyer_profile')

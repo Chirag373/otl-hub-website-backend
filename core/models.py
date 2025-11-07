@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from django.utils.translation import gettext_lazy as _
 
 # Create your models here.
 class Role(models.TextChoices):
@@ -27,6 +28,7 @@ class BaseModel(models.Model):
         abstract = True
 
 class BaseUserDetails(AbstractUser, BaseModel):
+    email = models.EmailField(_('email address'), unique=True)
     role = models.CharField(max_length=255, choices=Role.choices, default=Role.BUYER)
     phone_number = models.CharField(max_length=255)
     is_updated = models.BooleanField(default=False)
