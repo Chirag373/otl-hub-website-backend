@@ -48,7 +48,7 @@ class BuyerSignupSerializer(serializers.ModelSerializer):
 
 
 class BuyerListSerializer(serializers.ModelSerializer):
-    uuid = serializers.CharField(source='id', read_only=True)
+    uuid = serializers.UUIDField(read_only=True)
     phone_number = serializers.CharField(read_only=True)
     preferred_location = serializers.SerializerMethodField()
     budget_range = serializers.SerializerMethodField()

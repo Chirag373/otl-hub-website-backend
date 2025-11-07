@@ -1,3 +1,4 @@
+import uuid
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.utils.translation import gettext_lazy as _
@@ -28,6 +29,7 @@ class BaseModel(models.Model):
         abstract = True
 
 class BaseUserDetails(AbstractUser, BaseModel):
+    uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
     email = models.EmailField(_('email address'), unique=True)
     role = models.CharField(max_length=255, choices=Role.choices, default=Role.BUYER)
     phone_number = models.CharField(max_length=255)
