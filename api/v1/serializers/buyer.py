@@ -6,7 +6,6 @@ from api.models import BuyerProfile
 class BuyerSignupSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, required=True, validators=[validate_password])
     confirm_password = serializers.CharField(write_only=True, required=True)
-    phone_number = serializers.CharField(required=False, allow_blank=True)
     preferred_location = serializers.CharField(required=False, allow_blank=True, write_only=True)
     budget_range = serializers.ChoiceField(choices=BudgetRange.choices, required=True, write_only=True)
 
@@ -14,7 +13,7 @@ class BuyerSignupSerializer(serializers.ModelSerializer):
         model = BaseUserDetails
         fields = [
             'first_name', 'last_name', 'email', 'password',
-            'confirm_password', 'phone_number', 'preferred_location', 'budget_range'
+            'confirm_password', 'preferred_location', 'budget_range'
         ]
         extra_kwargs = {
             'first_name': {'required': True},
@@ -49,6 +48,7 @@ class BuyerSignupSerializer(serializers.ModelSerializer):
 
 
 class BuyerListSerializer(serializers.ModelSerializer):
+    uuid = serializers.CharField(source='id', read_only=True)
     phone_number = serializers.CharField(read_only=True)
     preferred_location = serializers.SerializerMethodField()
     budget_range = serializers.SerializerMethodField()
@@ -56,7 +56,7 @@ class BuyerListSerializer(serializers.ModelSerializer):
     class Meta:
         model = BaseUserDetails
         fields = [
-            'first_name', 'last_name', 'email', 'phone_number',
+            'uuid', 'first_name', 'last_name', 'email', 'phone_number',
             'preferred_location', 'budget_range'
         ]
 
