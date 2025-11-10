@@ -2,9 +2,14 @@ from rest_framework import serializers
 from django.db import transaction
 from core.models import User, Subscription
 from api.models import BuyerProfile, RealtorProfile, SellerProfile, PartnerProfile
+from django.contrib.auth import authenticate
+from django.utils.translation import gettext_lazy as _
 
 
 class SignupSerializer(serializers.ModelSerializer):
+    '''
+    Serializer for user signup
+    '''
     password = serializers.CharField(write_only=True, min_length=8)
     role = serializers.ChoiceField(choices=User.UserRole.choices)
     license_number = serializers.CharField(required=False, allow_blank=True)
@@ -129,3 +134,30 @@ class SignupSerializer(serializers.ModelSerializer):
             )
 
         return user
+
+
+class LoginSerializer(serializers.Serializer):
+    """
+    Serializer for user login
+    """
+    email = serializers.EmailField()
+    password = serializers.CharField(write_only=True, min_length=8)
+
+    def validate(self, attrs):
+        email = attrs.get('email')
+        password = attrs.get('password')
+
+        if not email or not password:
+            raise serializers.ValidationError(_("Both email and password are required."))
+
+        # authenticate() uses AUTHENTICATION_BACKENDS; works because USERNAME_FIELD = 'email'
+        user = authenticate(username=email, password=password)
+
+        if user is None:
+            raise serializers.ValidationError(_("Invalid email or password."))
+
+        if not user.is_active:
+            raise serializers.ValidationError(_("User account is disabled."))
+
+        attrs['user'] = user
+        return attrs
