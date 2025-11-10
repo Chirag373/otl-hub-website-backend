@@ -1,1 +1,23 @@
 # Project-wide custom permissions
+from rest_framework.permissions import BasePermission
+from core.models import User
+
+class IsBuyer(BasePermission):
+    """
+    Allows access only to users with role == User.UserRole.BUYER.
+
+    Intended to be used in combination with IsAuthenticated:
+        permission_classes = [IsAuthenticated, IsBuyer]
+
+    This keeps role logic centralized and easy to reuse.
+    """
+
+    message = "Only buyers can access this resource."
+
+    def has_permission(self, request, view):
+        user = getattr(request, "user", None)
+        if not user or not user.is_authenticated:
+            return False
+
+        role = getattr(user, "role", None)
+        return role == User.UserRole.BUYER

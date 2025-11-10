@@ -161,3 +161,40 @@ class LoginSerializer(serializers.Serializer):
 
         attrs['user'] = user
         return attrs
+
+
+class BuyerprofileSerializer(serializers.ModelSerializer):
+    """
+    Serializer for Buyer profile
+    """
+    first_name = serializers.CharField(required=False)
+    last_name = serializers.CharField(source='user.last_name')
+    email = serializers.EmailField(source='user.email', read_only=True)
+    phone_number = serializers.CharField(source='user.phone_number')
+    role = serializers.CharField(source='user.role', read_only=True)
+    member_since = serializers.DateTimeField(source='user.date_joined', read_only=True, format='%B %Y')
+    location = serializers.CharField(source='preferred_location', required=False, allow_blank=True)
+
+
+    class Meta:
+        model = BuyerProfile
+        fields = ['first_name', 'last_name', 'email', 'phone_number', 'role', 'member_since', 'location']
+
+    def update(self, instance, validated_data):
+        # Handle nested user data
+        user_data = validated_data.pop('user', {})
+        user = instance.user
+        
+        # Update user fields
+        user.first_name = user_data.get('first_name', user.first_name)
+        user.last_name = user_data.get('last_name', user.last_name)
+        user.phone_number = user_data.get('phone_number', user.phone_number)
+        user.save()
+        
+        # Update profile fields
+        instance.preferred_location = validated_data.get('preferred_location', instance.preferred_location)
+        instance.budget_range = validated_data.get('budget_range', instance.budget_range)
+        instance.save()
+        
+        return instance
+    
