@@ -6,8 +6,9 @@ from api.models import BuyerProfile
 from rest_framework.response import Response
 from rest_framework import status
 # Create your views here.
+
 class BuyerProfileView(RetrieveUpdateAPIView):
-    permission_classes = [IsBuyer]
+    permission_classes = [IsAuthenticated, IsBuyer]
     serializer_class = BuyerprofileSerializer
 
     def get_object(self):
