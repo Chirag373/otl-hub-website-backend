@@ -1,15 +1,20 @@
 from rest_framework.generics import RetrieveUpdateAPIView
 from rest_framework.permissions import IsAuthenticated
-from api.v1.serializer import BuyerprofileSerializer
+from api.v1.serializer import BuyerProfileSerializer
 from core.permissions import IsBuyer
 from api.models import BuyerProfile
 from rest_framework.response import Response
 from rest_framework import status
 # Create your views here.
 
+
+
 class BuyerProfileView(RetrieveUpdateAPIView):
+    '''
+    View for Buyer profile
+    '''
     permission_classes = [IsAuthenticated, IsBuyer]
-    serializer_class = BuyerprofileSerializer
+    serializer_class = BuyerProfileSerializer
 
     def get_object(self):
         user = self.request.user
@@ -31,4 +36,7 @@ class BuyerProfileView(RetrieveUpdateAPIView):
             'message': 'Buyer profile updated successfully',
             'data': serializer.data
         }, status=status.HTTP_200_OK)
+
+
         
+

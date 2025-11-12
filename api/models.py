@@ -32,7 +32,18 @@ class BuyerProfile(models.Model):
         choices=BudgetRange.choices,
         help_text=_("Budget range for property purchase")
     )
-    
+
+    # Assigned realtor/agent
+    assigned_agent = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='assigned_buyers',
+        limit_choices_to={'role': User.UserRole.REALTOR},
+        help_text=_("Assigned realtor/agent for this buyer")
+    )
+
     # Subscription details
     subscription_plan = models.CharField(
         max_length=50,

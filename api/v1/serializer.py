@@ -1,9 +1,11 @@
 from rest_framework import serializers
 from django.db import transaction
-from core.models import User, Subscription
+from core.models import User
 from api.models import BuyerProfile, RealtorProfile, SellerProfile, PartnerProfile
 from django.contrib.auth import authenticate
 from django.utils.translation import gettext_lazy as _
+from api.models import RealtorProfile
+from core.models import Subscription
 
 
 class SignupSerializer(serializers.ModelSerializer):
@@ -163,23 +165,111 @@ class LoginSerializer(serializers.Serializer):
         return attrs
 
 
-class BuyerprofileSerializer(serializers.ModelSerializer):
-    """
-    Serializer for Buyer profile
-    """
-    first_name = serializers.CharField(required=False)
+class AgentSerializer(serializers.ModelSerializer):
+    """Serializer for assigned realtor/agent information"""
+    name = serializers.SerializerMethodField()
+    phone = serializers.CharField(source='user.phone_number', read_only=True)
+    email = serializers.EmailField(source='user.email', read_only=True)
+    brokerage_company = serializers.CharField(source='company_brokerage', read_only=True)
+
+    class Meta:
+        model = RealtorProfile
+        fields = ['name', 'phone', 'email', 'brokerage_company']
+    
+    def get_name(self, obj):
+        return f"{obj.user.first_name} {obj.user.last_name}"
+
+
+class SubscriptionSerializer(serializers.ModelSerializer):
+    """Serializer for membership subscription information"""
+    member_since = serializers.DateTimeField(source='start_date', read_only=True, format='%B %Y')
+    expiration_date = serializers.DateTimeField(source='end_date', read_only=True, format='%B %Y')
+    fee_paid = serializers.DecimalField(source='amount', max_digits=10, decimal_places=2, read_only=True)
+    property_access = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Subscription
+        fields = ['member_since', 'expiration_date', 'fee_paid', 'property_access']
+    
+    def get_property_access(self, obj):
+        # Map subscription type to access level
+        access_map = {
+            'BUYER_BASIC': 'Basic Access',
+            'BUYER_PRO': 'Premium Access',
+            'REALTOR_PROFESSIONAL': 'Professional Access',
+            'SELLER_LISTING': 'Listing Access',
+            'PARTNER_BUSINESS': 'Business Access'
+        }
+        return access_map.get(obj.subscription_type, 'Basic Access')
+
+
+class BuyerProfileSerializer(serializers.ModelSerializer):
+    """Serializer for Buyer Profile data"""
+    first_name = serializers.CharField(source='user.first_name')
     last_name = serializers.CharField(source='user.last_name')
     email = serializers.EmailField(source='user.email', read_only=True)
     phone_number = serializers.CharField(source='user.phone_number')
     role = serializers.CharField(source='user.role', read_only=True)
     member_since = serializers.DateTimeField(source='user.date_joined', read_only=True, format='%B %Y')
     location = serializers.CharField(source='preferred_location', required=False, allow_blank=True)
+    budget_range = serializers.SerializerMethodField()
 
-
+    # Nested serializers for agent and subscription
+    agent = serializers.SerializerMethodField()
+    subscription = serializers.SerializerMethodField()
+    
     class Meta:
         model = BuyerProfile
-        fields = ['first_name', 'last_name', 'email', 'phone_number', 'role', 'member_since', 'location']
+        fields = [
+            'first_name',
+            'last_name', 
+            'email',
+            'phone_number',
+            'role',
+            'member_since',
+            'location',
+            'budget_range',
+            'agent',
+            'subscription'
+        ]
+    
+    def get_agent(self, obj):
+        """Get assigned agent/realtor information"""
+        # Assuming there's a relationship between BuyerProfile and RealtorProfile
+        # You may need to adjust this based on your actual model relationships
+        if hasattr(obj, 'assigned_agent') and obj.assigned_agent:
+            
+            try:
+                realtor = RealtorProfile.objects.get(user=obj.assigned_agent)
+                return AgentSerializer(realtor).data
+            except RealtorProfile.DoesNotExist:
+                return None
+        return None
 
+    def get_budget_range(self, obj):
+        """Get formatted budget range display"""
+        if obj.budget_range:
+            # Get the display value from the choices
+            for choice_value, choice_display in BuyerProfile.BudgetRange.choices:
+                if choice_value == obj.budget_range:
+                    return choice_display
+        return obj.budget_range  # Return raw value if no match found
+
+    def get_subscription(self, obj):
+        """Get active subscription information"""
+        try:
+            # Get the most recent completed subscription for the user
+            subscription = Subscription.objects.filter(
+                user=obj.user,
+                payment_status='COMPLETED'
+            ).order_by('-start_date').first()
+
+            if subscription:
+                return SubscriptionSerializer(subscription).data
+            return None
+        except Subscription.DoesNotExist:
+            return None
+    
     def update(self, instance, validated_data):
         # Handle nested user data
         user_data = validated_data.pop('user', {})
@@ -197,4 +287,5 @@ class BuyerprofileSerializer(serializers.ModelSerializer):
         instance.save()
         
         return instance
-    
+
+
