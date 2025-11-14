@@ -6,28 +6,56 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('api', '0002_initial'),
+        ("api", "0002_initial"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='partnerprofile',
-            name='business_license_number',
-            field=models.CharField(default='', help_text='Business license number', max_length=100, unique=True),
+            model_name="partnerprofile",
+            name="business_license_number",
+            field=models.CharField(
+                default="",
+                help_text="Business license number",
+                max_length=100,
+                unique=True,
+            ),
         ),
         migrations.AddField(
-            model_name='partnerprofile',
-            name='website_url',
-            field=models.URLField(blank=True, help_text='Website URL', max_length=255),
+            model_name="partnerprofile",
+            name="website_url",
+            field=models.URLField(blank=True, help_text="Website URL", max_length=255),
         ),
         migrations.AlterField(
-            model_name='buyerprofile',
-            name='budget_range',
-            field=models.CharField(blank=True, choices=[('0-200000', '$0 - $200,000'), ('200000-400000', '$200,000 - $400,000'), ('400000-600000', '$400,000 - $600,000'), ('600000-800000', '$600,000 - $800,000'), ('800000-1000000', '$800,000 - $1,000,000'), ('1000000+', '$1,000,000+')], help_text='Budget range for property purchase', max_length=100),
+            model_name="buyerprofile",
+            name="budget_range",
+            field=models.CharField(
+                blank=True,
+                choices=[
+                    ("0-200000", "$0 - $200,000"),
+                    ("200000-400000", "$200,000 - $400,000"),
+                    ("400000-600000", "$400,000 - $600,000"),
+                    ("600000-800000", "$600,000 - $800,000"),
+                    ("800000-1000000", "$800,000 - $1,000,000"),
+                    ("1000000+", "$1,000,000+"),
+                ],
+                help_text="Budget range for property purchase",
+                max_length=100,
+            ),
         ),
         migrations.AlterField(
-            model_name='partnerprofile',
-            name='partnership_type',
-            field=models.CharField(choices=[('REAL_ESTATE_AGENT', 'Real Estate Agent'), ('MORTGAGE', 'Mortgage Lender'), ('HOME_INSPECTION', 'Home Inspection'), ('PROPERTY_APPRAISER', 'Property Appraiser'), ('CONTRACTOR', 'Contractor'), ('MOVING_COMPANY', 'Moving Company'), ('OTHER', 'Other Services')], max_length=50),
+            model_name="partnerprofile",
+            name="partnership_type",
+            field=models.CharField(
+                choices=[
+                    ("REAL_ESTATE_AGENT", "Real Estate Agent"),
+                    ("MORTGAGE", "Mortgage Lender"),
+                    ("HOME_INSPECTION", "Home Inspection"),
+                    ("PROPERTY_APPRAISER", "Property Appraiser"),
+                    ("CONTRACTOR", "Contractor"),
+                    ("MOVING_COMPANY", "Moving Company"),
+                    ("OTHER", "Other Services"),
+                ],
+                max_length=50,
+            ),
         ),
     ]

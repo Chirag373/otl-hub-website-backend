@@ -9,13 +9,21 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('api', '0003_partnerprofile_business_license_number_and_more'),
+        ("api", "0003_partnerprofile_business_license_number_and_more"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='buyerprofile',
-            name='assigned_agent',
-            field=models.ForeignKey(blank=True, help_text='Assigned realtor/agent for this buyer', limit_choices_to={'role': 'REALTOR'}, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='assigned_buyers', to=settings.AUTH_USER_MODEL),
+            model_name="buyerprofile",
+            name="assigned_agent",
+            field=models.ForeignKey(
+                blank=True,
+                help_text="Assigned realtor/agent for this buyer",
+                limit_choices_to={"role": "REALTOR"},
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                related_name="assigned_buyers",
+                to=settings.AUTH_USER_MODEL,
+            ),
         ),
     ]

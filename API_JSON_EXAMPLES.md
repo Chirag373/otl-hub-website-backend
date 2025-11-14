@@ -100,6 +100,18 @@
 }
 ```
 
+### User Logout (Request)
+```json
+{
+  "refresh": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9..."
+}
+```
+
+### User Logout (Response)
+```json
+{}
+```
+
 ---
 
 ## 2. Buyer Profile
@@ -219,7 +231,7 @@
 ### Create/Update Seller Profile (Request)
 ```json
 {
-  "property_type": "RESIDENTIAL",
+  "property_type": "SINGLE_FAMILY",
   "property_location": "San Francisco, CA",
   "estimated_value": "850000.00",
   "has_active_listing": true,
@@ -232,8 +244,8 @@
 {
   "id": 1,
   "user": 3,
-  "property_type": "RESIDENTIAL",
-  "property_type_display": "Residential",
+  "property_type": "SINGLE_FAMILY",
+  "property_type_display": "Single family",
   "property_location": "San Francisco, CA",
   "estimated_value": "850000.00",
   "has_active_listing": true,
@@ -257,8 +269,8 @@
   "updated_at": "2024-11-09T10:30:00Z",
   "seller_profile": {
     "id": 1,
-    "property_type": "RESIDENTIAL",
-    "property_type_display": "Residential",
+    "property_type": "SINGLE_FAMILY",
+    "property_type_display": "Single family",
     "property_location": "San Francisco, CA",
     "estimated_value": "850000.00",
     "has_active_listing": true,
@@ -636,10 +648,10 @@
 - `EXPERT` - 10+ years
 
 ### Seller Property Types
-- `RESIDENTIAL` - Residential
-- `COMMERCIAL` - Commercial
-- `LAND` - Land
-- `MULTI_FAMILY` - Multi-Family
+- `SINGLE_FAMILY` - Single family
+- `CONDO` - Condo
+- `TOWNHOME` - Townhome
+- `APARTMENT_UNIT` - Apartment unit
 
 ### Partner Partnership Types
 - `MORTGAGE` - Mortgage Lender
@@ -661,6 +673,7 @@
 - `COMPLETED` - Completed
 - `FAILED` - Failed
 - `REFUNDED` - Refunded
+
 
 
 
