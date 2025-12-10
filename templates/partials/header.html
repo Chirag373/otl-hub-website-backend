@@ -60,3 +60,26 @@
         </div>
     </div>
 </header>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+        const closeMenuBtn = document.getElementById('close-menu-btn');
+
+        if (mobileMenuBtn && mobileMenu && closeMenuBtn) {
+            const toggleMenu = () => {
+                mobileMenu.classList.toggle('hidden');
+            };
+
+            mobileMenuBtn.addEventListener('click', toggleMenu);
+            closeMenuBtn.addEventListener('click', toggleMenu);
+
+            // Close menu when clicking outside
+            mobileMenu.addEventListener('click', (e) => {
+                if (e.target === mobileMenu) {
+                    toggleMenu();
+                }
+            });
+        }
+    });
+</script>
