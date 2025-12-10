@@ -1,0 +1,468 @@
+{% extends 'base.html' %}
+
+{% block title %}Sign Up | OTL Platform{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-[var(--bg)] flex items-center justify-center p-4 sm:p-6">
+    <div class="w-full max-w-7xl space-y-8">
+
+        <div class="text-center space-y-2 mt-4 sm:mt-0">
+            <h1 class="font-heading text-2xl sm:text-3xl text-[var(--foreground)]">
+                Join OTL Platform
+            </h1>
+            <p class="font-body text-sm sm:text-base text-[var(--muted-foreground)]">
+                Choose your account type to get started
+            </p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
+
+            <div class="bg-[var(--card)] rounded-lg border border-[var(--border)] p-4 sm:p-6 lg:p-8 shadow-lg">
+                <form id="signup-form" class="space-y-6">
+
+                    <div class="space-y-4">
+                        <label class="text-[var(--foreground)] font-medium">I am a:</label>
+                        <div class="grid grid-cols-2 gap-3 sm:gap-4">
+                            <button type="button" onclick="selectUserType('buyer')" id="btn-buyer"
+                                class="user-type-btn p-3 sm:p-4 rounded-lg border-2 text-left transition-all border-[var(--accent)] bg-[var(--accent)]/10 h-full">
+                                <div class="font-heading text-base sm:text-lg text-[var(--foreground)] mb-1">Buyer</div>
+                                <div class="text-xs sm:text-sm text-[var(--muted-foreground)]">Looking to purchase
+                                    properties</div>
+                            </button>
+                            <button type="button" onclick="selectUserType('realtor')" id="btn-realtor"
+                                class="user-type-btn p-3 sm:p-4 rounded-lg border-2 border-[var(--border)] hover:border-[var(--accent)]/50 text-left transition-all h-full">
+                                <div class="font-heading text-base sm:text-lg text-[var(--foreground)] mb-1">Realtor
+                                </div>
+                                <div class="text-xs sm:text-sm text-[var(--muted-foreground)]">Licensed real estate
+                                    professional</div>
+                            </button>
+                            <button type="button" onclick="selectUserType('seller')" id="btn-seller"
+                                class="user-type-btn p-3 sm:p-4 rounded-lg border-2 border-[var(--border)] hover:border-[var(--accent)]/50 text-left transition-all h-full">
+                                <div class="font-heading text-base sm:text-lg text-[var(--foreground)] mb-1">Seller
+                                </div>
+                                <div class="text-xs sm:text-sm text-[var(--muted-foreground)]">Want to sell your
+                                    property</div>
+                            </button>
+                            <button type="button" onclick="selectUserType('partner')" id="btn-partner"
+                                class="user-type-btn p-3 sm:p-4 rounded-lg border-2 border-[var(--border)] hover:border-[var(--accent)]/50 text-left transition-all h-full">
+                                <div class="font-heading text-base sm:text-lg text-[var(--foreground)] mb-1">Partner
+                                </div>
+                                <div class="text-xs sm:text-sm text-[var(--muted-foreground)]">Business partner or
+                                    service provider</div>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="space-y-2">
+                            <label class="text-[var(--foreground)] text-sm font-medium">First Name *</label>
+                            <input type="text" placeholder="Enter your first name" required
+                                class="w-full px-3 py-2 bg-[var(--input)] border border-[var(--border)] rounded-md text-[var(--foreground)] focus:outline-none focus:border-[var(--accent)] text-base">
+                        </div>
+                        <div class="space-y-2">
+                            <label class="text-[var(--foreground)] text-sm font-medium">Last Name *</label>
+                            <input type="text" placeholder="Enter your last name" required
+                                class="w-full px-3 py-2 bg-[var(--input)] border border-[var(--border)] rounded-md text-[var(--foreground)] focus:outline-none focus:border-[var(--accent)] text-base">
+                        </div>
+                    </div>
+
+                    <div class="space-y-2">
+                        <label class="text-[var(--foreground)] text-sm font-medium">Email Address *</label>
+                        <input type="email" placeholder="Enter your email address" required
+                            class="w-full px-3 py-2 bg-[var(--input)] border border-[var(--border)] rounded-md text-[var(--foreground)] focus:outline-none focus:border-[var(--accent)] text-base">
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="space-y-2">
+                            <label class="text-[var(--foreground)] text-sm font-medium">Password *</label>
+                            <input type="password" placeholder="Create a password" required
+                                class="w-full px-3 py-2 bg-[var(--input)] border border-[var(--border)] rounded-md text-[var(--foreground)] focus:outline-none focus:border-[var(--accent)] text-base">
+                        </div>
+                        <div class="space-y-2">
+                            <label class="text-[var(--foreground)] text-sm font-medium">Confirm Password *</label>
+                            <input type="password" placeholder="Confirm your password" required
+                                class="w-full px-3 py-2 bg-[var(--input)] border border-[var(--border)] rounded-md text-[var(--foreground)] focus:outline-none focus:border-[var(--accent)] text-base">
+                        </div>
+                    </div>
+
+                    <div class="space-y-2">
+                        <label class="text-[var(--foreground)] text-sm font-medium">Phone Number *</label>
+                        <input type="tel" placeholder="Enter your phone number" required
+                            class="w-full px-3 py-2 bg-[var(--input)] border border-[var(--border)] rounded-md text-[var(--foreground)] focus:outline-none focus:border-[var(--accent)] text-base">
+                    </div>
+
+                    <div id="dynamic-fields-container">
+                    </div>
+
+                    <button type="submit" id="submit-btn"
+                        class="w-full font-heading text-base px-6 py-3 bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-[var(--bg)] rounded transition-all font-semibold cursor-pointer">
+                        Create Account
+                    </button>
+
+                    <div class="text-center text-sm text-[var(--muted-foreground)]">
+                        Already have an account?
+                        <a href="login.html"
+                            class="text-[var(--accent)] hover:text-[var(--accent-hover)] transition-colors font-medium">
+                            Sign in here
+                        </a>
+                    </div>
+                </form>
+            </div>
+
+            <div class="flex flex-col">
+                <div class="mb-4 text-center lg:text-left">
+                    <h2 class="font-heading text-2xl sm:text-3xl text-[var(--foreground)] mb-2">Pricing Plan</h2>
+                    <p class="text-sm text-[var(--muted-foreground)]">
+                        See what you'll pay for your <span id="pricing-user-type-label">buyer</span> account
+                    </p>
+                </div>
+                <div class="relative w-full" id="pricing-plan-container">
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    // --- STATE ---
+    let currentUserType = 'buyer';
+
+    // --- DOM ELEMENTS ---
+    const dynamicFieldsContainer = document.getElementById('dynamic-fields-container');
+    const pricingPlanContainer = document.getElementById('pricing-plan-container');
+    const pricingUserTypeLabel = document.getElementById('pricing-user-type-label');
+    const userTypeButtons = document.querySelectorAll('.user-type-btn');
+
+    // --- TEMPLATES (HTML Strings) ---
+    // Added text-base to inputs to prevent iOS zoom
+    // Added grid-cols-1 md:grid-cols-2 to ensure stacking on mobile
+
+    const formTemplates = {
+        buyer: `
+            <div class="space-y-4 p-4 bg-[var(--muted)]/30 rounded-lg border border-[var(--border)]">
+                <h3 class="font-heading text-lg text-[var(--foreground)]">Buyer Preferences</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="space-y-2">
+                        <label class="text-[var(--foreground)] text-sm font-medium">Preferred Location</label>
+                        <input type="text" placeholder="City, State" class="w-full px-3 py-2 bg-[var(--input)] border border-[var(--border)] rounded-md text-[var(--foreground)] focus:outline-none focus:border-[var(--accent)] text-base">
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-[var(--foreground)] text-sm font-medium">Budget Range</label>
+                        <select class="w-full px-3 py-2 bg-[var(--input)] border border-[var(--border)] rounded-md text-[var(--foreground)] focus:outline-none focus:border-[var(--accent)] text-base">
+                            <option value="">Select budget range</option>
+                            <option value="0-200k">$0 - $200,000</option>
+                            <option value="200k-400k">$200,000 - $400,000</option>
+                            <option value="400k-600k">$400,000 - $600,000</option>
+                            <option value="600k-800k">$600,000 - $800,000</option>
+                            <option value="800k-1m">$800,000 - $1,000,000</option>
+                            <option value="1m+">$1,000,000+</option>
+                        </select>
+                    </div>
+                </div>
+            </div>`,
+        realtor: `
+            <div class="space-y-4 p-4 bg-[var(--muted)]/30 rounded-lg border border-[var(--border)]">
+                <h3 class="font-heading text-lg text-[var(--foreground)]">Professional Information</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="space-y-2">
+                        <label class="text-[var(--foreground)] text-sm font-medium">License Number *</label>
+                        <input type="text" placeholder="Real estate license number" required class="w-full px-3 py-2 bg-[var(--input)] border border-[var(--border)] rounded-md text-[var(--foreground)] focus:outline-none focus:border-[var(--accent)] text-base">
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-[var(--foreground)] text-sm font-medium">Company/Brokerage</label>
+                        <input type="text" placeholder="Company or brokerage name" class="w-full px-3 py-2 bg-[var(--input)] border border-[var(--border)] rounded-md text-[var(--foreground)] focus:outline-none focus:border-[var(--accent)] text-base">
+                    </div>
+                </div>
+                <div class="space-y-2">
+                    <label class="text-[var(--foreground)] text-sm font-medium">Years of Experience</label>
+                    <select class="w-full px-3 py-2 bg-[var(--input)] border border-[var(--border)] rounded-md text-[var(--foreground)] focus:outline-none focus:border-[var(--accent)] text-base">
+                        <option value="">Select experience level</option>
+                        <option value="0-2">0-2 years</option>
+                        <option value="3-5">3-5 years</option>
+                        <option value="6-10">6-10 years</option>
+                        <option value="11-20">11-20 years</option>
+                        <option value="20+">20+ years</option>
+                    </select>
+                </div>
+            </div>`,
+        seller: `
+            <div class="space-y-4 p-4 bg-[var(--muted)]/30 rounded-lg border border-[var(--border)]">
+                <h3 class="font-heading text-lg text-[var(--foreground)]">Property Information</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="space-y-2">
+                        <label class="text-[var(--foreground)] text-sm font-medium">Property Type</label>
+                        <select class="w-full px-3 py-2 bg-[var(--input)] border border-[var(--border)] rounded-md text-[var(--foreground)] focus:outline-none focus:border-[var(--accent)] text-base">
+                            <option value="">Select property type</option>
+                            <option value="single_family">Single family</option>
+                            <option value="condo">Condo</option>
+                            <option value="townhome">Townhome</option>
+                            <option value="apartment_unit">Apartment unit</option>
+                        </select>
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-[var(--foreground)] text-sm font-medium">Estimated Value</label>
+                        <input type="text" placeholder="Property value estimate" class="w-full px-3 py-2 bg-[var(--input)] border border-[var(--border)] rounded-md text-[var(--foreground)] focus:outline-none focus:border-[var(--accent)] text-base">
+                    </div>
+                </div>
+                <div class="space-y-2">
+                    <label class="text-[var(--foreground)] text-sm font-medium">Property Location</label>
+                    <input type="text" placeholder="City, State where property is located" class="w-full px-3 py-2 bg-[var(--input)] border border-[var(--border)] rounded-md text-[var(--foreground)] focus:outline-none focus:border-[var(--accent)] text-base">
+                </div>
+            </div>`,
+        partner: `
+            <div class="space-y-4 p-4 bg-[var(--muted)]/30 rounded-lg border border-[var(--border)]">
+                <h3 class="font-heading text-lg text-[var(--foreground)]">Business Partnership Information</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="space-y-2">
+                        <label class="text-[var(--foreground)] text-sm font-medium">Company/Business Name *</label>
+                        <input type="text" placeholder="Your business or company name" required class="w-full px-3 py-2 bg-[var(--input)] border border-[var(--border)] rounded-md text-[var(--foreground)] focus:outline-none focus:border-[var(--accent)] text-base">
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-[var(--foreground)] text-sm font-medium">Partnership Type *</label>
+                        <select required class="w-full px-3 py-2 bg-[var(--input)] border border-[var(--border)] rounded-md text-[var(--foreground)] focus:outline-none focus:border-[var(--accent)] text-base">
+                            <option value="">Select partnership type</option>
+                            <option value="real-estate-agency">Real Estate Agency</option>
+                            <option value="mortgage-lender">Mortgage Lender</option>
+                            <option value="home-inspector">Home Inspector</option>
+                            <option value="contractor">Contractor</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="space-y-2">
+                    <label class="text-[var(--foreground)] text-sm font-medium">Service Areas *</label>
+                    <input type="text" placeholder="Cities or regions you serve" required class="w-full px-3 py-2 bg-[var(--input)] border border-[var(--border)] rounded-md text-[var(--foreground)] focus:outline-none focus:border-[var(--accent)] text-base">
+                </div>
+            </div>`
+    };
+
+    // --- PRICING RENDERERS ---
+
+    function renderPricingPlan(type) {
+        // Changed padding from p-6 to p-4 sm:p-6 for better mobile view
+        let html = `<div class="bg-[var(--card)] rounded-lg border border-[var(--border)] p-4 sm:p-6 shadow-lg overflow-visible">`;
+
+        // Header
+        html += `
+            <div class="text-center mb-6">
+                <h3 class="font-heading text-2xl sm:text-3xl text-[var(--foreground)] mb-2 capitalize">${type} Plan</h3>
+                <p class="text-sm text-[var(--muted-foreground)]">
+                    ${getPlanSubtitle(type)}
+                </p>
+            </div>
+        `;
+
+        // Setup Fee Notice
+        const setupFee = type === 'partner' ? '$199' : '$99';
+        let noticeText = '';
+
+        if (type === 'buyer') {
+            noticeText = `<span class="font-bold text-[var(--foreground)]">$99</span> one-time account setup fee + property access fee + monthly subscription`;
+        } else if (type === 'realtor' || type === 'partner') {
+            noticeText = `<span class="font-bold text-[var(--foreground)]">${setupFee}</span> one-time setup fee + subscription (no property access fees)`;
+        } else if (type === 'seller') {
+            noticeText = `<span class="font-bold text-[var(--foreground)]">$99</span> one-time setup fee + <span class="font-bold text-[var(--foreground)]">$199</span> listing fee (no monthly subscriptions)`;
+        }
+
+        html += `
+            <div class="mb-6 p-3 bg-[var(--muted)]/30 rounded-lg border border-[var(--border)] text-center">
+                <p class="text-xs sm:text-sm text-[var(--muted-foreground)]">${noticeText}</p>
+            </div>
+        `;
+
+        // Plans Grid or Single Plan
+        if (type === 'buyer') {
+            html += renderBuyerPlans();
+        } else {
+            html += renderSinglePlan(type);
+        }
+
+        // Features List
+        html += renderFeaturesList(type);
+
+        html += `</div>`;
+        pricingPlanContainer.innerHTML = html;
+
+        // Re-init icons for the new content
+        lucide.createIcons();
+    }
+
+    function getPlanSubtitle(type) {
+        const subtitles = {
+            buyer: "Access to premium property listings and tools",
+            realtor: "Professional tools for licensed real estate agents",
+            seller: "List and sell your property with maximum exposure",
+            partner: "Business partnership and service provider tools"
+        };
+        return subtitles[type];
+    }
+
+    function renderBuyerPlans() {
+        // CHANGED: grid-cols-2 -> grid-cols-1 sm:grid-cols-2
+        // This ensures cards stack on mobile but side-by-side on tablet+
+        // Also adjusted margin top on "Recommended" badge for mobile spacing
+        return `
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6 mt-2">
+                <button class="relative text-center p-4 rounded-lg border-2 transition-all cursor-pointer bg-[var(--muted)]/30 border-[var(--border)] hover:border-[var(--accent)]/30 hover:scale-105">
+                    <div class="font-bold text-[var(--foreground)] text-lg mb-1">Basic</div>
+                    <div class="text-sm text-[var(--muted-foreground)] mb-2">1 Property Access</div>
+                    <div class="space-y-1">
+                        <div class="text-lg font-bold text-[var(--accent)]">$25</div>
+                        <div class="text-sm font-medium text-[var(--accent)]">3 months validity</div>
+                    </div>
+                </button>
+
+                <button class="relative mt-4 sm:mt-0 text-center p-4 rounded-lg border-2 transition-all cursor-pointer bg-gradient-to-br from-[var(--accent)]/20 to-[var(--accent)]/10 border-[var(--accent)] shadow-lg sm:scale-105 hover:scale-105">
+                    <div class="absolute -top-4 left-1/2 transform -translate-x-1/2 z-10 w-max">
+                        <div class="bg-[var(--accent)] text-white px-3 py-1 rounded-full text-xs font-bold shadow-lg">RECOMMENDED</div>
+                    </div>
+                    <div class="absolute -top-2 -right-2 bg-green-500 text-white rounded-full p-1">
+                        <i data-lucide="check" class="w-4 h-4"></i>
+                    </div>
+                    <div class="font-bold text-[var(--foreground)] text-lg mb-1">Pro</div>
+                    <div class="text-sm text-[var(--muted-foreground)] mb-2">3 Properties Access</div>
+                    <div class="space-y-1">
+                        <div class="text-lg font-bold text-[var(--accent)]">$50</div>
+                        <div class="text-sm font-medium text-[var(--accent)]">6 months validity</div>
+                    </div>
+                </button>
+            </div>
+            
+            <div class="mb-6 p-3 bg-[var(--accent)]/10 rounded-lg border border-[var(--accent)]/20 text-center">
+                <p class="text-sm text-[var(--foreground)]">
+                    <span class="font-semibold text-[var(--accent)]">Selected:</span> Pro - $50 + $99 setup fee
+                </p>
+            </div>
+        `;
+    }
+
+    function renderSinglePlan(type) {
+        let planName, sub, fee, desc;
+
+        if (type === 'realtor') {
+            planName = "Professional Subscription";
+            sub = "Unlimited access";
+            fee = `<div class="text-lg font-bold text-[var(--accent)]">$99<span class="text-sm"> + $49/mo</span></div>`;
+            desc = "one-time access + monthly subscription";
+        } else if (type === 'seller') {
+            planName = "Property Listing Plan";
+            sub = "List your property";
+            fee = `<div class="text-3xl font-bold text-[var(--accent)]">$298</div>`;
+            desc = "one-time fees (no monthly subscriptions)";
+        } else { // partner
+            planName = "Business Partner Subscription";
+            sub = "Full platform access";
+            fee = `<div class="text-lg font-bold text-[var(--accent)]">$299<span class="text-sm"> + $99/mo</span></div>`;
+            desc = "one-time access + monthly subscription";
+        }
+
+        return `
+            <div class="mb-6 mt-2">
+                <div class="bg-gradient-to-br from-[var(--accent)]/20 to-[var(--accent)]/10 rounded-lg border-2 border-[var(--accent)] p-6 text-center shadow-lg">
+                    <div class="mb-4">
+                        <div class="text-xl sm:text-2xl font-bold text-[var(--foreground)] mb-2">${planName}</div>
+                        <div class="text-sm text-[var(--muted-foreground)] mb-2">${sub}</div>
+                        <div class="space-y-1">
+                            ${fee}
+                            <div class="text-xs text-[var(--muted-foreground)]">${desc}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    function renderFeaturesList(type) {
+        const featuresMap = {
+            buyer: ["Access to detailed property info", "Virtual tours & media", "Direct seller communication", "Saved favorites & alerts", "Market analysis tools", "Priority support"],
+            realtor: ["Professional realtor dashboard", "Advanced property search", "Client CRM", "Lead generation tools", "Market analysis reports", "Commission tools"],
+            seller: ["Professional listing creation", "High-quality photo uploads", "Virtual tour creation", "Market analysis & pricing", "Direct buyer connection", "Marketing exposure"],
+            partner: ["Partner dashboard & analytics", "Lead generation tools", "Client referral system", "Service booking", "Business profile page", "Marketing tools"]
+        };
+
+        const features = featuresMap[type] || [];
+
+        // Only show first 3, then blur the 4th
+        let listHtml = features.slice(0, 3).map(f => `<li>• ${f}</li>`).join('');
+
+        if (features.length > 3) {
+            listHtml += `
+                <li class="relative">
+                    <span class="blur-text">• ${features[3]}</span>
+                    <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-white/10"></div>
+                </li>
+                <li class="pt-2">
+                    <button class="flex items-center gap-2 text-[var(--accent)] hover:text-[var(--accent-hover)] transition-colors font-medium text-sm">
+                        <span>Show ${features.length - 3} More</span>
+                        <i data-lucide="chevron-down" class="w-4 h-4"></i>
+                    </button>
+                </li>
+            `;
+        }
+
+        return `
+            <div class="mt-6 space-y-2">
+                <h4 class="font-medium text-[var(--foreground)] text-lg">What's Included:</h4>
+                <ul class="text-sm text-[var(--muted-foreground)] space-y-1">
+                    ${listHtml}
+                </ul>
+            </div>
+        `;
+    }
+
+    // --- ACTIONS ---
+
+    function selectUserType(type) {
+        currentUserType = type;
+
+        // Update User Type Buttons Styles
+        userTypeButtons.forEach(btn => {
+            if (btn.id === `btn-${type}`) {
+                btn.classList.add('border-[var(--accent)]', 'bg-[var(--accent)]/10');
+                btn.classList.remove('border-[var(--border)]');
+            } else {
+                btn.classList.remove('border-[var(--accent)]', 'bg-[var(--accent)]/10');
+                btn.classList.add('border-[var(--border)]');
+            }
+        });
+
+        // Update Dynamic Form Section
+        dynamicFieldsContainer.innerHTML = formTemplates[type];
+
+        // Update Pricing Section
+        pricingUserTypeLabel.textContent = type;
+        renderPricingPlan(type);
+    }
+
+    // --- INIT & EVENT LISTENERS ---
+
+    // Mobile Menu
+    const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+    const mobileMenu = document.getElementById('mobile-menu');
+    const closeMenuBtn = document.getElementById('close-menu-btn');
+    const toggleMenu = () => mobileMenu.classList.toggle('hidden');
+    if (mobileMenuBtn) mobileMenuBtn.addEventListener('click', toggleMenu);
+    if (closeMenuBtn) closeMenuBtn.addEventListener('click', toggleMenu);
+
+    // Form Submit Simulation
+    document.getElementById('signup-form').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const btn = document.getElementById('submit-btn');
+        btn.disabled = true;
+        btn.textContent = "Creating Account...";
+        btn.classList.add('opacity-70');
+
+        setTimeout(() => {
+            // Simulate success redirection
+            window.location.href = "login.html?message=signup-success";
+        }, 1500);
+    });
+
+    // Initialize with default 'buyer'
+    selectUserType('buyer');
+
+</script>
+{% endblock %}

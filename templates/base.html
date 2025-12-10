@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>{% block title %}OTL Platform{% endblock %}</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Arima:wght@100..700&display=swap" rel="stylesheet">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Arima', 'system-ui', 'sans-serif'],
+                        heading: ['Arima', 'system-ui', 'sans-serif'],
+                        body: ['Arima', 'system-ui', 'sans-serif'],
+                    },
+                    colors: {
+                        border: "var(--border)",
+                        input: "var(--input)",
+                        ring: "var(--ring)",
+                        background: "var(--background)",
+                        foreground: "var(--foreground)",
+                        primary: {
+                            DEFAULT: "var(--primary)",
+                            foreground: "var(--primary-foreground)",
+                        },
+                        secondary: {
+                            DEFAULT: "var(--secondary)",
+                            foreground: "var(--secondary-foreground)",
+                        },
+                        muted: {
+                            DEFAULT: "var(--muted)",
+                            foreground: "var(--muted-foreground)",
+                        },
+                        accent: {
+                            DEFAULT: "var(--accent)",
+                            foreground: "var(--accent-foreground)",
+                            hover: "var(--accent-hover)",
+                        },
+                        card: {
+                            DEFAULT: "var(--card)",
+                            foreground: "var(--card-foreground)",
+                        },
+                        destructive: {
+                            DEFAULT: "var(--destructive)",
+                            foreground: "var(--destructive-foreground)",
+                        },
+                    },
+                    borderRadius: {
+                        lg: "var(--radius)",
+                        md: "calc(var(--radius) - 2px)",
+                        sm: "calc(var(--radius) - 4px)",
+                    },
+                }
+            }
+        }
+    </script>
+
+    <style>
+        :root {
+            --radius: 0.625rem;
+            --bg: #2a2a2a;
+            --card: #3a3a3a;
+            --muted: #c0c0c0;
+            --accent: #d4af37;
+            --accent-hover: #e0c066;
+            --border: #4a4a4a;
+
+            /* Dark theme mappings */
+            --background: #2a2a2a;
+            --foreground: #f3f4f6;
+            --card-foreground: #f3f4f6;
+            --popover: #3a3a3a;
+            --popover-foreground: #f3f4f6;
+            --primary: #d4af37;
+            --primary-foreground: #2a2a2a;
+            --secondary: #464646;
+            --secondary-foreground: #f3f4f6;
+            --muted: #464646;
+            --muted-foreground: #c0c0c0;
+            --accent-foreground: #2a2a2a;
+            --destructive: #dc2626;
+            --input: #464646;
+            --ring: #d4af37;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--foreground);
+            font-family: 'Arima', sans-serif;
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .font-heading {
+            font-family: "Arima", sans-serif;
+            font-weight: 600;
+        }
+
+        /* Blur effect for features list */
+        .blur-text {
+            filter: blur(2px);
+            user-select: none;
+            opacity: 0.6;
+        }
+    </style>
+    {% block extra_head %}{% endblock %}
+</head>
+
+<body class="min-h-screen flex flex-col">
+
+    {% include 'partials/header.html' %}
+
+    <main class="pt-16 flex-1">
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    {% include 'partials/footer.html' %}
+
+    <script>
+        lucide.createIcons();
+    </script>
+    {% block extra_scripts %}{% endblock %}
+</body>
+
+</html>
