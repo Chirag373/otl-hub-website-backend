@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 
 <head>
     <meta charset="UTF-8">
@@ -10,8 +10,9 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Arima:wght@100..700&display=swap" rel="stylesheet">
 
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.23/dist/full.min.css" rel="stylesheet" type="text/css" />
     <script src="https://cdn.tailwindcss.com"></script>
-
+    <script src="https://unpkg.com/htmx.org@2.0.4"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
 
     <script>
@@ -100,7 +101,7 @@
         class="lg:hidden fixed top-0 left-0 right-0 z-50 bg-[var(--card)] border-b border-[var(--border)] px-4 py-3 flex items-center justify-between">
         <span class="font-bold text-lg text-[var(--foreground)]">OTL Dashboard</span>
         <button id="mobile-menu-btn"
-            class="p-2 rounded-md border border-[var(--border)] text-[var(--foreground)] hover:bg-[var(--accent)] hover:text-black transition-colors">
+            class="btn btn-square btn-ghost btn-sm text-[var(--foreground)]">
             <i data-lucide="menu" class="w-5 h-5"></i>
         </button>
     </div>
@@ -115,8 +116,10 @@
 
         <div class="px-6 py-4 border-b border-[var(--border)]">
             <div class="flex items-center space-x-3">
-                <div class="w-10 h-10 bg-[var(--accent)] rounded-full flex items-center justify-center">
-                    <span id="sidebar-avatar-initials" class="text-[var(--bg)] font-semibold text-sm">AS</span>
+                <div class="avatar placeholder">
+                    <div class="bg-[var(--accent)] text-[var(--bg)] rounded-full w-10">
+                        <span id="sidebar-avatar-initials" class="text-sm font-semibold">AS</span>
+                    </div>
                 </div>
                 <div class="flex-1 min-w-0">
                     <p id="sidebar-user-name" class="text-sm font-medium text-[var(--foreground)] truncate">Alice Smith
@@ -128,26 +131,26 @@
 
         <nav class="flex-1 px-4 py-6 space-y-2">
             <a href="#"
-                class="flex items-center w-full px-4 py-2 text-sm font-medium rounded-md bg-[var(--accent)] text-[var(--bg)]">
+                class="btn btn-ghost w-full justify-start bg-[var(--accent)] text-[var(--bg)] hover:bg-[var(--accent-hover)]">
                 <i data-lucide="home" class="mr-3 h-4 w-4"></i> Dashboard
             </a>
             <a href="#"
-                class="flex items-center w-full px-4 py-2 text-sm font-medium rounded-md text-[var(--foreground)] hover:bg-[var(--accent)] hover:text-black transition-colors">
+                class="btn btn-ghost w-full justify-start text-[var(--foreground)] hover:bg-[var(--accent)] hover:text-black">
                 <i data-lucide="building" class="mr-3 h-4 w-4"></i> My Properties
             </a>
             <a href="#"
-                class="flex items-center w-full px-4 py-2 text-sm font-medium rounded-md text-[var(--foreground)] hover:bg-[var(--accent)] hover:text-black transition-colors">
+                class="btn btn-ghost w-full justify-start text-[var(--foreground)] hover:bg-[var(--accent)] hover:text-black">
                 <i data-lucide="message-square" class="mr-3 h-4 w-4"></i> Messages
             </a>
             <a href="#"
-                class="flex items-center w-full px-4 py-2 text-sm font-medium rounded-md text-[var(--foreground)] hover:bg-[var(--accent)] hover:text-black transition-colors">
+                class="btn btn-ghost w-full justify-start text-[var(--foreground)] hover:bg-[var(--accent)] hover:text-black">
                 <i data-lucide="settings" class="mr-3 h-4 w-4"></i> Settings
             </a>
         </nav>
 
         <div class="p-4 border-t border-[var(--border)]">
             <button onclick="window.location.href='login.html'"
-                class="flex items-center w-full px-4 py-2 text-sm font-medium rounded-md text-[var(--foreground)] hover:bg-yellow-500 hover:text-black transition-colors">
+                class="btn btn-ghost w-full justify-start text-[var(--foreground)] hover:bg-yellow-500 hover:text-black">
                 <i data-lucide="log-out" class="mr-3 h-4 w-4"></i> Sign Out
             </button>
         </div>
@@ -165,10 +168,10 @@
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div class="bg-[var(--card)] rounded-lg border border-[var(--border)] p-6">
-                        <div class="flex items-center space-x-3">
-                            <div class="p-2 bg-green-100/10 rounded-lg">
-                                <i data-lucide="eye" class="h-5 w-5 text-green-400"></i>
+                    <div class="card bg-[var(--card)] border border-[var(--border)] shadow-sm">
+                        <div class="card-body p-6 flex-row items-center space-x-4">
+                            <div class="p-3 bg-green-100/10 rounded-lg text-green-400">
+                                <i data-lucide="eye" class="h-6 w-6"></i>
                             </div>
                             <div>
                                 <p class="text-sm text-[var(--muted-foreground)]">Total Views</p>
@@ -177,10 +180,10 @@
                         </div>
                     </div>
 
-                    <div class="bg-[var(--card)] rounded-lg border border-[var(--border)] p-6">
-                        <div class="flex items-center space-x-3">
-                            <div class="p-2 bg-yellow-100/10 rounded-lg">
-                                <i data-lucide="clock" class="h-5 w-5 text-yellow-400"></i>
+                    <div class="card bg-[var(--card)] border border-[var(--border)] shadow-sm">
+                        <div class="card-body p-6 flex-row items-center space-x-4">
+                            <div class="p-3 bg-yellow-100/10 rounded-lg text-yellow-400">
+                                <i data-lucide="clock" class="h-6 w-6"></i>
                             </div>
                             <div>
                                 <p class="text-sm text-[var(--muted-foreground)]">Avg Days on Market</p>
@@ -190,248 +193,278 @@
                     </div>
                 </div>
 
-                <div class="bg-[var(--card)] rounded-lg border border-[var(--border)] p-6">
-                    <div class="flex items-center justify-between mb-6">
-                        <div class="flex items-center space-x-4">
-                            <div class="relative w-16 h-16">
-                                <div
-                                    class="w-full h-full bg-[var(--accent)] rounded-full flex items-center justify-center">
-                                    <span id="profile-avatar-initials"
-                                        class="text-[var(--bg)] font-bold text-lg">AS</span>
-                                </div>
-                                <button
-                                    class="absolute -bottom-1 -right-1 h-6 w-6 rounded-full bg-[var(--card)] border border-[var(--border)] flex items-center justify-center hover:bg-[var(--muted)]">
-                                    <i data-lucide="camera" class="h-3 w-3 text-[var(--foreground)]"></i>
-                                </button>
-                            </div>
-                            <div>
-                                <h3 id="profile-display-name" class="font-semibold text-[var(--foreground)] text-lg">
-                                    Alice Smith</h3>
-                                <p class="text-sm text-[var(--muted-foreground)]">Property Seller</p>
-                                <div class="flex items-center space-x-1 text-xs text-[var(--muted-foreground)] mt-1">
-                                    <i data-lucide="calendar" class="h-3 w-3"></i>
-                                    <span id="profile-member-since">Member since Jan 2025</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="flex items-center space-x-2">
-                            <button id="btn-edit-profile"
-                                class="flex items-center px-3 py-2 text-sm font-medium bg-transparent border border-[var(--border)] rounded-md text-[var(--foreground)] hover:bg-[var(--muted)] transition-colors">
-                                <i data-lucide="edit" class="mr-2 h-4 w-4"></i> Edit Profile
-                            </button>
-                            <div id="edit-actions" class="hidden flex space-x-2">
-                                <button id="btn-cancel-profile"
-                                    class="flex items-center px-3 py-2 text-sm font-medium bg-transparent border border-[var(--border)] rounded-md text-[var(--foreground)] hover:bg-[var(--muted)] transition-colors">
-                                    <i data-lucide="x" class="mr-2 h-4 w-4"></i> Cancel
-                                </button>
-                                <button id="btn-save-profile"
-                                    class="flex items-center px-3 py-2 text-sm font-medium bg-[var(--accent)] text-[var(--bg)] rounded-md hover:bg-[var(--accent-hover)] transition-colors">
-                                    <i data-lucide="save" class="mr-2 h-4 w-4"></i> Save
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <h3 class="text-lg font-semibold text-[var(--foreground)] mb-4">Personal Information</h3>
-
-                    <form id="profile-form" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div class="space-y-2">
-                            <label class="text-sm font-medium text-[var(--foreground)]">First Name</label>
-                            <input type="text" id="input-first-name"
-                                class="w-full px-3 py-2 bg-[var(--input)] border border-[var(--border)] rounded-md text-[var(--foreground)] disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:border-[var(--accent)]"
-                                disabled>
-                        </div>
-                        <div class="space-y-2">
-                            <label class="text-sm font-medium text-[var(--foreground)]">Last Name</label>
-                            <input type="text" id="input-last-name"
-                                class="w-full px-3 py-2 bg-[var(--input)] border border-[var(--border)] rounded-md text-[var(--foreground)] disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:border-[var(--accent)]"
-                                disabled>
-                        </div>
-                        <div class="space-y-2">
-                            <label class="text-sm font-medium text-[var(--foreground)]">Email Address</label>
-                            <input type="email" id="input-email"
-                                class="w-full px-3 py-2 bg-[var(--input)] border border-[var(--border)] rounded-md text-[var(--foreground)] disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:border-[var(--accent)]"
-                                disabled>
-                        </div>
-                        <div class="space-y-2">
-                            <label class="text-sm font-medium text-[var(--foreground)]">Phone Number</label>
-                            <input type="tel" id="input-phone"
-                                class="w-full px-3 py-2 bg-[var(--input)] border border-[var(--border)] rounded-md text-[var(--foreground)] disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:border-[var(--accent)]"
-                                disabled>
-                        </div>
-
-                        <div class="space-y-2">
-                            <label class="text-sm font-medium text-[var(--foreground)]">Address Number</label>
-                            <input type="text" id="input-addr-number"
-                                class="w-full px-3 py-2 bg-[var(--input)] border border-[var(--border)] rounded-md text-[var(--foreground)] disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:border-[var(--accent)]"
-                                disabled>
-                        </div>
-                        <div class="space-y-2">
-                            <label class="text-sm font-medium text-[var(--foreground)]">Street Address</label>
-                            <input type="text" id="input-street"
-                                class="w-full px-3 py-2 bg-[var(--input)] border border-[var(--border)] rounded-md text-[var(--foreground)] disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:border-[var(--accent)]"
-                                disabled>
-                        </div>
-                        <div class="space-y-2">
-                            <label class="text-sm font-medium text-[var(--foreground)]">City</label>
-                            <input type="text" id="input-city"
-                                class="w-full px-3 py-2 bg-[var(--input)] border border-[var(--border)] rounded-md text-[var(--foreground)] disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:border-[var(--accent)]"
-                                disabled>
-                        </div>
-                        <div class="space-y-2">
-                            <label class="text-sm font-medium text-[var(--foreground)]">State</label>
-                            <input type="text" id="input-state"
-                                class="w-full px-3 py-2 bg-[var(--input)] border border-[var(--border)] rounded-md text-[var(--foreground)] disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:border-[var(--accent)]"
-                                disabled>
-                        </div>
-                        <div class="space-y-2">
-                            <label class="text-sm font-medium text-[var(--foreground)]">ZIP Code</label>
-                            <input type="text" id="input-zip"
-                                class="w-full px-3 py-2 bg-[var(--input)] border border-[var(--border)] rounded-md text-[var(--foreground)] disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:border-[var(--accent)]"
-                                disabled>
-                        </div>
-                        <div class="space-y-2">
-                            <label class="text-sm font-medium text-[var(--foreground)]">County</label>
-                            <input type="text" id="input-county"
-                                class="w-full px-3 py-2 bg-[var(--input)] border border-[var(--border)] rounded-md text-[var(--foreground)] disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:border-[var(--accent)]"
-                                disabled>
-                        </div>
-
-                        <div class="space-y-2">
-                            <label class="text-sm font-medium text-[var(--foreground)]">Property Type</label>
-                            <input type="text" id="input-prop-type"
-                                class="w-full px-3 py-2 bg-[var(--input)] border border-[var(--border)] rounded-md text-[var(--foreground)] disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:border-[var(--accent)]"
-                                disabled>
-                        </div>
-                        <div class="space-y-2">
-                            <label class="text-sm font-medium text-[var(--foreground)]">Estimated Value</label>
-                            <input type="text" id="input-est-value"
-                                class="w-full px-3 py-2 bg-[var(--input)] border border-[var(--border)] rounded-md text-[var(--foreground)] disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:border-[var(--accent)]"
-                                disabled>
-                        </div>
-
-                        <div class="space-y-2">
-                            <label class="text-sm font-medium text-[var(--foreground)]">Reason for Selling</label>
-                            <select id="input-reason"
-                                class="w-full px-3 py-2 bg-[var(--input)] border border-[var(--border)] rounded-md text-[var(--foreground)] disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:border-[var(--accent)]"
-                                disabled>
-                                <option value="Foreclosure">Foreclosure</option>
-                                <option value="Retirement">Retirement</option>
-                                <option value="Relocation">Relocation</option>
-                                <option value="Leisure">Leisure</option>
-                                <option value="Investment">Investment</option>
-                            </select>
-                        </div>
-
-                        <div class="space-y-2">
-                            <label class="text-sm font-medium text-[var(--foreground)]">Selling Type</label>
-                            <select id="input-selling-type"
-                                class="w-full px-3 py-2 bg-[var(--input)] border border-[var(--border)] rounded-md text-[var(--foreground)] disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:border-[var(--accent)]"
-                                disabled>
-                                <option value="With Real Estate Agent">With Real Estate Agent</option>
-                                <option value="For Sale By Owner">For Sale By Owner</option>
-                                <option value="Short Sale">Short Sale</option>
-                                <option value="Foreclosure">Foreclosure</option>
-                                <option value="Auction">Auction</option>
-                            </select>
-                        </div>
-
-                        <div class="space-y-2 md:col-span-2">
-                            <label class="text-sm font-medium text-[var(--foreground)]">Property Description</label>
-                            <textarea id="input-description" rows="4"
-                                class="w-full px-3 py-2 bg-[var(--input)] border border-[var(--border)] rounded-md text-[var(--foreground)] disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:border-[var(--accent)] resize-none"
-                                disabled></textarea>
-                        </div>
-
-                        <div class="space-y-2 md:col-span-2">
-                            <div class="bg-[var(--muted)]/20 rounded-lg p-4 border border-[var(--border)]">
-                                <div class="flex items-start space-x-3">
-                                    <div id="leaseback-icon-container"
-                                        class="p-2 rounded-lg bg-gray-100 transition-colors">
-                                        <i data-lucide="home" id="leaseback-icon"
-                                            class="h-5 w-5 text-gray-500 transition-colors"></i>
+                <div class="card bg-[var(--card)] border border-[var(--border)] shadow-xl">
+                    <div class="card-body p-6">
+                        <div class="flex items-center justify-between mb-6">
+                            <div class="flex items-center space-x-4">
+                                <div class="avatar placeholder">
+                                    <div class="bg-[var(--accent)] text-[var(--bg)] rounded-full w-16">
+                                        <span id="profile-avatar-initials" class="text-xl font-bold">AS</span>
                                     </div>
-                                    <div class="flex-1">
-                                        <div class="flex items-center justify-between mb-2">
-                                            <label class="flex items-center cursor-pointer">
-                                                <input type="checkbox" id="input-leaseback" class="sr-only peer"
-                                                    disabled>
-                                                <div
-                                                    class="w-5 h-5 border-2 border-[var(--border)] rounded mr-3 peer-checked:bg-[var(--accent)] peer-checked:border-[var(--accent)] transition-all flex items-center justify-center">
-                                                    <div
-                                                        class="w-2 h-2 bg-white rounded-full opacity-0 peer-checked:opacity-100 transition-opacity">
-                                                    </div>
-                                                </div>
-                                                <span class="text-sm font-medium text-[var(--foreground)]">Leaseback
-                                                    Required</span>
-                                            </label>
+                                    <button
+                                        class="absolute -bottom-1 -right-1 btn btn-circle btn-xs border border-[var(--border)] bg-[var(--card)] hover:bg-[var(--muted)]">
+                                        <i data-lucide="camera" class="h-3 w-3 text-[var(--foreground)]"></i>
+                                    </button>
+                                </div>
+                                <div>
+                                    <h3 id="profile-display-name" class="font-semibold text-[var(--foreground)] text-lg">
+                                        Alice Smith</h3>
+                                    <p class="text-sm text-[var(--muted-foreground)]">Property Seller</p>
+                                    <div class="flex items-center space-x-1 text-xs text-[var(--muted-foreground)] mt-1">
+                                        <i data-lucide="calendar" class="h-3 w-3"></i>
+                                        <span id="profile-member-since">Member since Jan 2025</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="flex items-center space-x-2">
+                                <button id="btn-edit-profile"
+                                    class="btn btn-outline border-[var(--border)] text-[var(--foreground)] hover:bg-[var(--muted)] hover:text-[var(--foreground)] btn-sm">
+                                    <i data-lucide="edit" class="mr-2 h-4 w-4"></i> Edit Profile
+                                </button>
+                                <div id="edit-actions" class="hidden flex space-x-2">
+                                    <button id="btn-cancel-profile"
+                                        class="btn btn-ghost btn-sm text-[var(--foreground)]">
+                                        <i data-lucide="x" class="mr-2 h-4 w-4"></i> Cancel
+                                    </button>
+                                    <button id="btn-save-profile"
+                                        class="btn btn-primary btn-sm bg-[var(--accent)] text-[var(--bg)] border-none hover:bg-[var(--accent-hover)]">
+                                        <i data-lucide="save" class="mr-2 h-4 w-4"></i> Save
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <h3 class="text-lg font-semibold text-[var(--foreground)] mb-4">Personal Information</h3>
+
+                        <form id="profile-form" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="form-control w-full">
+                                <label class="label">
+                                    <span class="label-text text-[var(--foreground)] font-medium">First Name</span>
+                                </label>
+                                <input type="text" id="input-first-name"
+                                    class="input input-bordered w-full bg-[var(--input)] border-[var(--border)] text-[var(--foreground)] disabled:opacity-50 disabled:bg-[var(--input)] disabled:text-[var(--muted-foreground)] focus:outline-none focus:border-[var(--accent)]"
+                                    disabled>
+                            </div>
+                            <div class="form-control w-full">
+                                <label class="label">
+                                    <span class="label-text text-[var(--foreground)] font-medium">Last Name</span>
+                                </label>
+                                <input type="text" id="input-last-name"
+                                    class="input input-bordered w-full bg-[var(--input)] border-[var(--border)] text-[var(--foreground)] disabled:opacity-50 disabled:bg-[var(--input)] disabled:text-[var(--muted-foreground)] focus:outline-none focus:border-[var(--accent)]"
+                                    disabled>
+                            </div>
+                            <div class="form-control w-full">
+                                <label class="label">
+                                    <span class="label-text text-[var(--foreground)] font-medium">Email Address</span>
+                                </label>
+                                <input type="email" id="input-email"
+                                    class="input input-bordered w-full bg-[var(--input)] border-[var(--border)] text-[var(--foreground)] disabled:opacity-50 disabled:bg-[var(--input)] disabled:text-[var(--muted-foreground)] focus:outline-none focus:border-[var(--accent)]"
+                                    disabled>
+                            </div>
+                            <div class="form-control w-full">
+                                <label class="label">
+                                    <span class="label-text text-[var(--foreground)] font-medium">Phone Number</span>
+                                </label>
+                                <input type="tel" id="input-phone"
+                                    class="input input-bordered w-full bg-[var(--input)] border-[var(--border)] text-[var(--foreground)] disabled:opacity-50 disabled:bg-[var(--input)] disabled:text-[var(--muted-foreground)] focus:outline-none focus:border-[var(--accent)]"
+                                    disabled>
+                            </div>
+
+                            <div class="form-control w-full">
+                                <label class="label">
+                                    <span class="label-text text-[var(--foreground)] font-medium">Address Number</span>
+                                </label>
+                                <input type="text" id="input-addr-number"
+                                    class="input input-bordered w-full bg-[var(--input)] border-[var(--border)] text-[var(--foreground)] disabled:opacity-50 disabled:bg-[var(--input)] disabled:text-[var(--muted-foreground)] focus:outline-none focus:border-[var(--accent)]"
+                                    disabled>
+                            </div>
+                            <div class="form-control w-full">
+                                <label class="label">
+                                    <span class="label-text text-[var(--foreground)] font-medium">Street Address</span>
+                                </label>
+                                <input type="text" id="input-street"
+                                    class="input input-bordered w-full bg-[var(--input)] border-[var(--border)] text-[var(--foreground)] disabled:opacity-50 disabled:bg-[var(--input)] disabled:text-[var(--muted-foreground)] focus:outline-none focus:border-[var(--accent)]"
+                                    disabled>
+                            </div>
+                            <div class="form-control w-full">
+                                <label class="label">
+                                    <span class="label-text text-[var(--foreground)] font-medium">City</span>
+                                </label>
+                                <input type="text" id="input-city"
+                                    class="input input-bordered w-full bg-[var(--input)] border-[var(--border)] text-[var(--foreground)] disabled:opacity-50 disabled:bg-[var(--input)] disabled:text-[var(--muted-foreground)] focus:outline-none focus:border-[var(--accent)]"
+                                    disabled>
+                            </div>
+                            <div class="form-control w-full">
+                                <label class="label">
+                                    <span class="label-text text-[var(--foreground)] font-medium">State</span>
+                                </label>
+                                <input type="text" id="input-state"
+                                    class="input input-bordered w-full bg-[var(--input)] border-[var(--border)] text-[var(--foreground)] disabled:opacity-50 disabled:bg-[var(--input)] disabled:text-[var(--muted-foreground)] focus:outline-none focus:border-[var(--accent)]"
+                                    disabled>
+                            </div>
+                            <div class="form-control w-full">
+                                <label class="label">
+                                    <span class="label-text text-[var(--foreground)] font-medium">ZIP Code</span>
+                                </label>
+                                <input type="text" id="input-zip"
+                                    class="input input-bordered w-full bg-[var(--input)] border-[var(--border)] text-[var(--foreground)] disabled:opacity-50 disabled:bg-[var(--input)] disabled:text-[var(--muted-foreground)] focus:outline-none focus:border-[var(--accent)]"
+                                    disabled>
+                            </div>
+                            <div class="form-control w-full">
+                                <label class="label">
+                                    <span class="label-text text-[var(--foreground)] font-medium">County</span>
+                                </label>
+                                <input type="text" id="input-county"
+                                    class="input input-bordered w-full bg-[var(--input)] border-[var(--border)] text-[var(--foreground)] disabled:opacity-50 disabled:bg-[var(--input)] disabled:text-[var(--muted-foreground)] focus:outline-none focus:border-[var(--accent)]"
+                                    disabled>
+                            </div>
+
+                            <div class="form-control w-full">
+                                <label class="label">
+                                    <span class="label-text text-[var(--foreground)] font-medium">Property Type</span>
+                                </label>
+                                <input type="text" id="input-prop-type"
+                                    class="input input-bordered w-full bg-[var(--input)] border-[var(--border)] text-[var(--foreground)] disabled:opacity-50 disabled:bg-[var(--input)] disabled:text-[var(--muted-foreground)] focus:outline-none focus:border-[var(--accent)]"
+                                    disabled>
+                            </div>
+                            <div class="form-control w-full">
+                                <label class="label">
+                                    <span class="label-text text-[var(--foreground)] font-medium">Estimated Value</span>
+                                </label>
+                                <input type="text" id="input-est-value"
+                                    class="input input-bordered w-full bg-[var(--input)] border-[var(--border)] text-[var(--foreground)] disabled:opacity-50 disabled:bg-[var(--input)] disabled:text-[var(--muted-foreground)] focus:outline-none focus:border-[var(--accent)]"
+                                    disabled>
+                            </div>
+
+                            <div class="form-control w-full">
+                                <label class="label">
+                                    <span class="label-text text-[var(--foreground)] font-medium">Reason for Selling</span>
+                                </label>
+                                <select id="input-reason"
+                                    class="select select-bordered w-full bg-[var(--input)] border-[var(--border)] text-[var(--foreground)] disabled:opacity-50 disabled:bg-[var(--input)] disabled:text-[var(--muted-foreground)] focus:outline-none focus:border-[var(--accent)]"
+                                    disabled>
+                                    <option value="Foreclosure">Foreclosure</option>
+                                    <option value="Retirement">Retirement</option>
+                                    <option value="Relocation">Relocation</option>
+                                    <option value="Leisure">Leisure</option>
+                                    <option value="Investment">Investment</option>
+                                </select>
+                            </div>
+
+                            <div class="form-control w-full">
+                                <label class="label">
+                                    <span class="label-text text-[var(--foreground)] font-medium">Selling Type</span>
+                                </label>
+                                <select id="input-selling-type"
+                                    class="select select-bordered w-full bg-[var(--input)] border-[var(--border)] text-[var(--foreground)] disabled:opacity-50 disabled:bg-[var(--input)] disabled:text-[var(--muted-foreground)] focus:outline-none focus:border-[var(--accent)]"
+                                    disabled>
+                                    <option value="With Real Estate Agent">With Real Estate Agent</option>
+                                    <option value="For Sale By Owner">For Sale By Owner</option>
+                                    <option value="Short Sale">Short Sale</option>
+                                    <option value="Foreclosure">Foreclosure</option>
+                                    <option value="Auction">Auction</option>
+                                </select>
+                            </div>
+
+                            <div class="form-control w-full md:col-span-2">
+                                <label class="label">
+                                    <span class="label-text text-[var(--foreground)] font-medium">Property Description</span>
+                                </label>
+                                <textarea id="input-description" rows="4"
+                                    class="textarea textarea-bordered w-full bg-[var(--input)] border-[var(--border)] text-[var(--foreground)] disabled:opacity-50 disabled:bg-[var(--input)] disabled:text-[var(--muted-foreground)] focus:outline-none focus:border-[var(--accent)] resize-none"
+                                    disabled></textarea>
+                            </div>
+
+                            <div class="form-control w-full md:col-span-2">
+                                <div class="bg-[var(--muted)]/20 rounded-lg p-4 border border-[var(--border)]">
+                                    <div class="flex items-start space-x-3">
+                                        <div id="leaseback-icon-container"
+                                            class="p-2 rounded-lg bg-gray-100 transition-colors">
+                                            <i data-lucide="home" id="leaseback-icon"
+                                                class="h-5 w-5 text-gray-500 transition-colors"></i>
                                         </div>
-                                        <p class="text-xs text-[var(--muted-foreground)] mb-3">
-                                            Request to continue living in the property after closing for a specified
-                                            period
-                                        </p>
-                                        <div id="leaseback-alert"
-                                            class="hidden bg-[var(--accent)]/5 rounded-lg p-3 border border-[var(--accent)]/10">
-                                            <div class="flex items-center space-x-2 text-xs text-[var(--accent)]">
+                                        <div class="flex-1">
+                                            <div class="flex items-center justify-between mb-2">
+                                                <label class="label cursor-pointer justify-start gap-3 p-0">
+                                                    <input type="checkbox" id="input-leaseback" class="checkbox checkbox-accent checkbox-sm"
+                                                        disabled>
+                                                    <span class="text-sm font-medium text-[var(--foreground)]">Leaseback Required</span>
+                                                </label>
+                                            </div>
+                                            <p class="text-xs text-[var(--muted-foreground)] mb-3">
+                                                Request to continue living in the property after closing for a specified
+                                                period
+                                            </p>
+                                            <div id="leaseback-alert"
+                                                class="hidden alert bg-[var(--accent)]/5 border-[var(--accent)]/10 text-[var(--accent)] p-2 text-xs flex-row">
                                                 <i data-lucide="alert-circle" class="h-4 w-4"></i>
-                                                <span class="font-medium">Leaseback terms will be negotiated with the
-                                                    buyer</span>
+                                                <span class="font-medium">Leaseback terms will be negotiated with the buyer</span>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    </form>
+                        </form>
 
-                    <div id="save-notification" class="hidden mt-4 p-4 rounded-lg border"></div>
-                </div>
-
-                <div class="bg-[var(--card)] rounded-lg border border-[var(--border)] p-6">
-                    <h3 class="text-lg font-semibold text-[var(--foreground)] mb-4">Membership Subscription</h3>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div class="space-y-4">
-                            <div class="space-y-2">
-                                <label class="text-sm font-medium text-[var(--foreground)]">Member Since</label>
-                                <div
-                                    class="flex items-center space-x-2 px-3 py-2 bg-[var(--muted)]/30 rounded-md border border-[var(--border)]">
-                                    <i data-lucide="calendar" class="h-4 w-4 text-[var(--muted-foreground)]"></i>
-                                    <span id="sub-member-since" class="text-[var(--foreground)]">--</span>
-                                </div>
-                            </div>
-                            <div class="space-y-2">
-                                <label class="text-sm font-medium text-[var(--foreground)]">Expiration Date</label>
-                                <input type="text" id="sub-expiration" disabled
-                                    class="w-full px-3 py-2 bg-[var(--muted)]/30 border border-[var(--border)] rounded-md text-[var(--foreground)] opacity-70">
-                            </div>
-                        </div>
-                        <div class="space-y-4">
-                            <div class="space-y-2">
-                                <label class="text-sm font-medium text-[var(--foreground)]">Fee Paid</label>
-                                <input type="text" id="sub-fee" disabled
-                                    class="w-full px-3 py-2 bg-[var(--muted)]/30 border border-[var(--border)] rounded-md text-[var(--foreground)] font-semibold opacity-70">
-                            </div>
-                            <div class="space-y-2">
-                                <label class="text-sm font-medium text-[var(--foreground)]">Property Access</label>
-                                <div
-                                    class="flex items-center space-x-2 px-3 py-2 bg-[var(--muted)]/30 rounded-md border border-[var(--border)]">
-                                    <span id="sub-access" class="text-[var(--foreground)] font-semibold">--</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="mt-6 p-4 bg-blue-50/10 rounded-lg border border-blue-500/30">
-                        <p class="text-sm text-blue-300">
-                            <strong>Your membership</strong> gives you access to listing your property and connecting
-                            with potential buyers.
-                        </p>
+                        <div id="save-notification" class="hidden mt-4 p-4 rounded-lg border"></div>
                     </div>
                 </div>
 
-                <div class="bg-[var(--card)] rounded-lg border border-[var(--border)] p-6">
-                    <h2 class="text-xl font-semibold text-[var(--foreground)] mb-4">Recent Contact</h2>
-                    <div id="contact-list" class="space-y-3">
+                <div class="card bg-[var(--card)] border border-[var(--border)] shadow-xl">
+                    <div class="card-body p-6">
+                        <h3 class="text-lg font-semibold text-[var(--foreground)] mb-4">Membership Subscription</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="space-y-4">
+                                <div class="form-control w-full">
+                                    <label class="label">
+                                        <span class="label-text text-[var(--foreground)] font-medium">Member Since</span>
+                                    </label>
+                                    <div
+                                        class="flex items-center space-x-2 px-3 py-3 bg-[var(--muted)]/30 rounded-lg border border-[var(--border)]">
+                                        <i data-lucide="calendar" class="h-4 w-4 text-[var(--muted-foreground)]"></i>
+                                        <span id="sub-member-since" class="text-[var(--foreground)] text-sm">--</span>
+                                    </div>
+                                </div>
+                                <div class="form-control w-full">
+                                    <label class="label">
+                                        <span class="label-text text-[var(--foreground)] font-medium">Expiration Date</span>
+                                    </label>
+                                    <input type="text" id="sub-expiration" disabled
+                                        class="input input-bordered w-full bg-[var(--muted)]/30 border-[var(--border)] text-[var(--foreground)] opacity-70">
+                                </div>
+                            </div>
+                            <div class="space-y-4">
+                                <div class="form-control w-full">
+                                    <label class="label">
+                                        <span class="label-text text-[var(--foreground)] font-medium">Fee Paid</span>
+                                    </label>
+                                    <input type="text" id="sub-fee" disabled
+                                        class="input input-bordered w-full bg-[var(--muted)]/30 border-[var(--border)] text-[var(--foreground)] font-semibold opacity-70">
+                                </div>
+                                <div class="form-control w-full">
+                                    <label class="label">
+                                        <span class="label-text text-[var(--foreground)] font-medium">Property Access</span>
+                                    </label>
+                                    <div
+                                        class="flex items-center space-x-2 px-3 py-3 bg-[var(--muted)]/30 rounded-lg border border-[var(--border)]">
+                                        <span id="sub-access" class="text-[var(--foreground)] font-semibold text-sm">--</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-6 alert bg-blue-50/10 border-blue-500/30 text-blue-300 text-sm">
+                            <i data-lucide="info" class="h-4 w-4"></i>
+                            <span><strong>Your membership</strong> gives you access to listing your property and connecting with potential buyers.</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card bg-[var(--card)] border border-[var(--border)] shadow-xl">
+                    <div class="card-body p-6">
+                        <h2 class="card-title text-xl font-semibold text-[var(--foreground)] mb-4">Recent Contact</h2>
+                        <div id="contact-list" class="space-y-3">
+                        </div>
                     </div>
                 </div>
 
@@ -591,7 +624,7 @@
 
         function renderContacts() {
             dom.contactList.innerHTML = contacts.map(contact => `
-                <div class="flex items-center justify-between p-3 bg-[var(--muted)]/30 rounded-lg">
+                <div class="flex items-center justify-between p-3 bg-[var(--muted)]/30 rounded-lg border border-[var(--border)]">
                     <div class="flex items-center space-x-3">
                         <div class="w-10 h-10 bg-[var(--accent)] rounded-full flex items-center justify-center">
                             <i data-lucide="users" class="h-5 w-5 text-[var(--bg)]"></i>
@@ -605,10 +638,10 @@
                         </div>
                     </div>
                     <div class="flex items-center space-x-2">
-                        <button class="flex items-center px-3 py-1 text-xs border border-[var(--border)] rounded-md hover:bg-[var(--muted)] transition-colors text-[var(--foreground)]">
+                        <button class="btn btn-xs btn-outline border-[var(--border)] text-[var(--foreground)] hover:bg-[var(--muted)]">
                             <i data-lucide="phone" class="h-3 w-3 mr-1"></i> Call
                         </button>
-                        <button class="flex items-center px-3 py-1 text-xs border border-[var(--border)] rounded-md hover:bg-[var(--muted)] transition-colors text-[var(--foreground)]">
+                        <button class="btn btn-xs btn-outline border-[var(--border)] text-[var(--foreground)] hover:bg-[var(--muted)]">
                             <i data-lucide="mail" class="h-3 w-3 mr-1"></i> Email
                         </button>
                     </div>
@@ -660,9 +693,8 @@
         }
 
         function saveProfile() {
-            dom.btnSave.innerHTML = `<i data-lucide="loader-2" class="mr-2 h-4 w-4 animate-spin"></i> Saving...`;
-            lucide.createIcons();
-
+            dom.btnSave.innerHTML = `<span class="loading loading-spinner loading-xs"></span> Saving...`;
+            
             setTimeout(() => {
                 // Update Local Data
                 profile.first_name = dom.inputFirstName.value;
@@ -690,8 +722,8 @@
                 lucide.createIcons();
 
                 // Success Message
-                dom.saveNotification.className = "mt-4 p-4 rounded-lg border bg-green-500/10 border-green-500/20 text-green-500";
-                dom.saveNotification.innerHTML = `<div class="flex items-center"><i data-lucide="check" class="w-5 h-5 mr-2"></i> <span class="font-medium">Profile updated successfully!</span></div>`;
+                dom.saveNotification.className = "mt-4 alert alert-success text-sm";
+                dom.saveNotification.innerHTML = `<i data-lucide="check-circle" class="w-5 h-5"></i> <span>Profile updated successfully!</span>`;
                 dom.saveNotification.classList.remove('hidden');
                 lucide.createIcons();
 

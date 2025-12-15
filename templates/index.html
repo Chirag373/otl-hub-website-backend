@@ -41,13 +41,13 @@
         <div class="flex gap-4 flex-wrap justify-center">
             <a href="#">
                 <button
-                    class="bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-[var(--bg)] font-heading text-lg px-8 py-3 rounded-lg font-semibold transition-colors">
+                    class="btn btn-lg bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-[var(--bg)] border-none font-heading text-lg px-8 rounded-lg font-semibold transition-colors">
                     Get Started
                 </button>
             </a>
             <a href="#">
                 <button
-                    class="border border-white bg-transparent text-white hover:bg-white/10 font-heading text-lg px-8 py-3 rounded-lg transition-colors">
+                    class="btn btn-lg btn-outline border-white text-white hover:bg-white/10 hover:border-white font-heading text-lg px-8 rounded-lg transition-colors">
                     Learn More
                 </button>
             </a>
@@ -58,29 +58,29 @@
 <section id="search"
     class="bg-[var(--card)] py-12 px-0 border-t border-[var(--border)] border-b border-[var(--border)]">
     <div class="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8">
-        <form class="space-y-6" onsubmit="event.preventDefault();">
+        <form class="space-y-6" hx-get="." hx-trigger="submit" hx-target="#property-grid" hx-select="#property-grid" hx-swap="outerHTML" hx-push-url="true" hx-indicator="#search-indicator">
             <div class="w-full max-w-screen-2xl grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
-                <div>
-                    <label class="font-heading text-lg text-[var(--muted-foreground)] block mb-4">
-                        Enter City
+                <div class="form-control w-full">
+                    <label class="label font-heading text-lg text-[var(--muted-foreground)] mb-1">
+                        <span class="label-text text-[var(--muted-foreground)] text-lg">Enter City</span>
                     </label>
                     <input type="text" placeholder="e.g., San Francisco"
-                        class="w-full px-6 py-4 bg-[#464646] border border-[var(--border)] rounded-lg text-[var(--foreground)] focus:outline-none focus:border-[var(--accent)] font-body text-lg" />
+                        class="input input-bordered w-full px-6 py-4 h-auto bg-[#464646] border-[var(--border)] rounded-lg text-[var(--foreground)] focus:outline-none focus:border-[var(--accent)] font-body text-lg" />
                 </div>
-                <div>
-                    <label class="font-heading text-lg text-[var(--muted-foreground)] block mb-4">
-                        ZIP Code
+                <div class="form-control w-full">
+                    <label class="label font-heading text-lg text-[var(--muted-foreground)] mb-1">
+                        <span class="label-text text-[var(--muted-foreground)] text-lg">ZIP Code</span>
                     </label>
                     <input type="text" placeholder="e.g., 94102"
-                        class="w-full px-6 py-4 bg-[#464646] border border-[var(--border)] rounded-lg text-[var(--foreground)] focus:outline-none focus:border-[var(--accent)] font-body text-lg" />
+                        class="input input-bordered w-full px-6 py-4 h-auto bg-[#464646] border-[var(--border)] rounded-lg text-[var(--foreground)] focus:outline-none focus:border-[var(--accent)] font-body text-lg" />
                 </div>
                 <div class="flex gap-3">
                     <button type="submit"
-                        class="flex-1 font-heading text-lg px-8 py-4 bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-[var(--bg)] rounded-lg shadow-lg transition-colors font-semibold">
+                        class="btn btn-lg flex-1 font-heading text-lg h-auto py-4 bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-[var(--bg)] border-none rounded-lg shadow-lg transition-colors font-semibold">
                         Search
                     </button>
                     <button type="button" id="filter-toggle-btn"
-                        class="font-heading text-lg px-3 py-4 border border-[var(--border)] text-[var(--foreground)] hover:bg-[var(--muted)] rounded-lg flex items-center justify-center transition-colors"
+                        class="btn btn-lg btn-outline font-heading text-lg h-auto py-4 border-[var(--border)] text-[var(--foreground)] hover:bg-[var(--muted)] hover:text-[var(--foreground)] hover:border-[var(--border)] rounded-lg flex items-center justify-center transition-colors"
                         title="Toggle Filters">
                         <i data-lucide="filter" class="w-4 h-4"></i>
                         <i data-lucide="chevron-down" id="filter-chevron" class="w-4 h-4 ml-1 transition-transform"></i>
@@ -90,31 +90,36 @@
 
             <div id="advanced-filters"
                 class="hidden w-full max-w-screen-2xl grid grid-cols-1 md:grid-cols-3 gap-4 pt-6 border-t border-[var(--border)]">
-                <div>
-                    <label class="font-heading text-base text-[var(--muted-foreground)] block mb-2">Property
-                        Type</label>
+                <div class="form-control w-full">
+                    <label class="label font-heading text-base text-[var(--muted-foreground)] mb-1">
+                        <span class="label-text text-[var(--muted-foreground)] text-base">Property Type</span>
+                    </label>
                     <select
-                        class="w-full px-4 py-3 bg-[#464646] border border-[var(--border)] text-[var(--foreground)] focus:border-[var(--accent)] rounded-lg appearance-none focus:outline-none">
+                        class="select select-bordered w-full h-auto px-4 py-3 bg-[#464646] border-[var(--border)] text-[var(--foreground)] focus:border-[var(--accent)] rounded-lg focus:outline-none">
                         <option value="">Any Type</option>
                         <option value="house">House</option>
                         <option value="condo">Condo</option>
                         <option value="townhouse">Townhouse</option>
                     </select>
                 </div>
-                <div>
-                    <label class="font-heading text-base text-[var(--muted-foreground)] block mb-2">Bedrooms</label>
+                <div class="form-control w-full">
+                    <label class="label font-heading text-base text-[var(--muted-foreground)] mb-1">
+                        <span class="label-text text-[var(--muted-foreground)] text-base">Bedrooms</span>
+                    </label>
                     <select
-                        class="w-full px-4 py-3 bg-[#464646] border border-[var(--border)] text-[var(--foreground)] focus:border-[var(--accent)] rounded-lg appearance-none focus:outline-none">
+                        class="select select-bordered w-full h-auto px-4 py-3 bg-[#464646] border-[var(--border)] text-[var(--foreground)] focus:border-[var(--accent)] rounded-lg focus:outline-none">
                         <option value="">Any</option>
                         <option value="1">1+</option>
                         <option value="2">2+</option>
                         <option value="3">3+</option>
                     </select>
                 </div>
-                <div>
-                    <label class="font-heading text-base text-[var(--muted-foreground)] block mb-2">Bathrooms</label>
+                <div class="form-control w-full">
+                    <label class="label font-heading text-base text-[var(--muted-foreground)] mb-1">
+                        <span class="label-text text-[var(--muted-foreground)] text-base">Bathrooms</span>
+                    </label>
                     <select
-                        class="w-full px-4 py-3 bg-[#464646] border border-[var(--border)] text-[var(--foreground)] focus:border-[var(--accent)] rounded-lg appearance-none focus:outline-none">
+                        class="select select-bordered w-full h-auto px-4 py-3 bg-[#464646] border-[var(--border)] text-[var(--foreground)] focus:border-[var(--accent)] rounded-lg focus:outline-none">
                         <option value="">Any</option>
                         <option value="1">1+</option>
                         <option value="2">2+</option>
@@ -131,9 +136,9 @@
             Latest Properties
         </h2>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div id="property-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
 
-            <article class="bg-[var(--card)] overflow-hidden border-0 lg:border lg:border-[var(--border)] shadow-lg">
+            <article class="card card-compact bg-[var(--card)] overflow-hidden border-0 lg:border lg:border-[var(--border)] shadow-lg rounded-lg">
                 <div class="px-3 pt-3 pb-2">
                     <div class="p-2 bg-green-50 border border-green-200 rounded-lg">
                         <div class="flex items-center justify-between">
@@ -141,39 +146,39 @@
                                 <i data-lucide="clock" class="w-4 h-4 text-green-600"></i>
                                 <span class="font-medium">Leaseback</span>
                             </div>
-                            <span class="text-xs font-bold text-green-700 bg-green-100 px-2 py-1 rounded-full">
+                            <span class="badge badge-success bg-green-100 text-green-700 border-none font-bold text-xs px-2 py-3 rounded-full">
                                 6 months
                             </span>
                         </div>
                     </div>
                 </div>
 
-                <div class="relative overflow-hidden mx-3 rounded-lg">
+                <figure class="relative overflow-hidden mx-3 rounded-lg">
                     <div
-                        class="bg-gradient-to-br from-neutral-700 via-neutral-800 to-neutral-900 aspect-[3/2] flex items-center justify-center relative rounded-lg">
+                        class="bg-gradient-to-br from-neutral-700 via-neutral-800 to-neutral-900 aspect-[3/2] flex items-center justify-center relative w-full rounded-lg">
                         <i data-lucide="home" class="w-12 h-12 text-[var(--muted-foreground)] opacity-40"></i>
                     </div>
                     <div class="absolute top-4 left-4">
                         <span
-                            class="bg-white/95 backdrop-blur-md text-neutral-900 text-xs font-bold px-4 py-2 rounded-full shadow-lg">
+                            class="badge bg-white/95 backdrop-blur-md text-neutral-900 border-none font-bold text-xs px-4 py-3 rounded-full shadow-lg h-auto">
                             #PL-10234
                         </span>
                     </div>
                     <div class="absolute top-4 right-4 flex flex-col gap-2">
                         <span
-                            class="backdrop-blur-md text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg bg-green-600">
+                            class="badge bg-green-600 border-none backdrop-blur-md text-white font-bold text-xs px-3 py-3 rounded-full shadow-lg h-auto">
                             For Sale
                         </span>
                         <span
-                            class="bg-black/70 backdrop-blur-md text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg">
+                            class="badge bg-black/70 border-none backdrop-blur-md text-white font-bold text-xs px-3 py-3 rounded-full shadow-lg h-auto">
                             12 days on market
                         </span>
                     </div>
-                </div>
+                </figure>
 
-                <div class="p-7">
+                <div class="card-body p-7">
                     <div class="mb-6 relative">
-                        <h3 class="font-heading text-4xl font-bold text-[var(--accent)] mb-2">
+                        <h3 class="card-title font-heading text-4xl font-bold text-[var(--accent)] mb-2">
                             $450,000
                         </h3>
                         <div class="h-1 w-16 bg-gradient-to-r from-[var(--accent)] to-transparent rounded-full"></div>
@@ -216,7 +221,7 @@
                                 floors, spacious backyard...
                             </div>
                             <button
-                                class="flex items-center gap-1 mt-2 text-xs text-[var(--accent)] hover:text-[var(--accent-hover)] transition-colors font-medium">
+                                class="btn btn-link btn-xs no-underline flex items-center gap-1 mt-2 text-[var(--accent)] hover:text-[var(--accent-hover)] transition-colors font-medium p-0 h-auto min-h-0">
                                 <i data-lucide="file-text" class="w-3 h-3"></i> Show More
                             </button>
                         </div>
@@ -224,27 +229,21 @@
 
                     <div class="mb-4">
                         <div class="flex flex-wrap gap-2">
-                            <span
-                                class="px-2 py-1 bg-[var(--muted)]/30 text-[var(--foreground)] text-xs rounded-md">Single
-                                Family</span>
-                            <span
-                                class="px-2 py-1 bg-[var(--muted)]/30 text-[var(--foreground)] text-xs rounded-md">Hardwood
-                                floor</span>
-                            <span
-                                class="px-2 py-1 bg-[var(--muted)]/30 text-[var(--foreground)] text-xs rounded-md">Granite</span>
-                            <span class="px-2 py-1 bg-[var(--muted)]/30 text-[var(--foreground)] text-xs rounded-md">+5
-                                more</span>
+                            <span class="badge bg-[#464646]/30 text-[var(--foreground)] border-none text-xs rounded-md h-auto py-1">Single Family</span>
+                            <span class="badge bg-[#464646]/30 text-[var(--foreground)] border-none text-xs rounded-md h-auto py-1">Hardwood floor</span>
+                            <span class="badge bg-[#464646]/30 text-[var(--foreground)] border-none text-xs rounded-md h-auto py-1">Granite</span>
+                            <span class="badge bg-[#464646]/30 text-[var(--foreground)] border-none text-xs rounded-md h-auto py-1">+5 more</span>
                         </div>
                     </div>
 
-                    <div class="flex flex-col sm:flex-row gap-3">
+                    <div class="card-actions flex-col sm:flex-row gap-3">
                         <button
-                            class="flex-1 font-heading text-base font-semibold px-4 py-3 bg-gradient-to-r from-[var(--accent)] to-[var(--accent-hover)] text-white rounded-lg shadow-lg flex items-center justify-center gap-2 cursor-pointer transition-opacity hover:opacity-90">
+                            class="btn flex-1 font-heading text-base font-semibold px-4 py-3 bg-gradient-to-r from-[var(--accent)] to-[var(--accent-hover)] text-white border-none rounded-lg shadow-lg flex items-center justify-center gap-2 cursor-pointer transition-opacity hover:opacity-90 h-auto">
                             <span>Contact Seller Agent</span>
                             <i data-lucide="arrow-right" class="w-4 h-4"></i>
                         </button>
                         <button
-                            class="flex-1 font-heading text-base px-4 py-3 bg-[var(--card)] text-[var(--foreground)] rounded-lg border border-[var(--border)] hover:bg-[var(--muted)] hover:text-[var(--foreground)] flex items-center justify-center gap-2 transition-colors">
+                            class="btn btn-outline flex-1 font-heading text-base px-4 py-3 bg-[var(--card)] text-[var(--foreground)] border-[var(--border)] hover:bg-[var(--muted)] hover:text-[var(--foreground)] hover:border-[var(--border)] rounded-lg flex items-center justify-center gap-2 transition-colors h-auto">
                             <i data-lucide="eye" class="w-4 h-4"></i>
                             <span>View Details</span>
                         </button>
@@ -252,37 +251,37 @@
                 </div>
             </article>
 
-            <article class="bg-[var(--card)] overflow-hidden border border-[var(--border)] shadow-lg">
+            <article class="card card-compact bg-[var(--card)] overflow-hidden border border-[var(--border)] shadow-lg rounded-lg">
                 <div class="px-3 pt-3 pb-2">
                     <div class="p-2 h-[34px]"></div>
                 </div>
 
-                <div class="relative overflow-hidden mx-3 rounded-lg">
+                <figure class="relative overflow-hidden mx-3 rounded-lg">
                     <div
-                        class="bg-gradient-to-br from-neutral-700 via-neutral-800 to-neutral-900 aspect-[3/2] flex items-center justify-center relative rounded-lg">
+                        class="bg-gradient-to-br from-neutral-700 via-neutral-800 to-neutral-900 aspect-[3/2] flex items-center justify-center relative w-full rounded-lg">
                         <i data-lucide="home" class="w-12 h-12 text-[var(--muted-foreground)] opacity-40"></i>
                     </div>
                     <div class="absolute top-4 left-4">
                         <span
-                            class="bg-white/95 backdrop-blur-md text-neutral-900 text-xs font-bold px-4 py-2 rounded-full shadow-lg">
+                            class="badge bg-white/95 backdrop-blur-md text-neutral-900 border-none font-bold text-xs px-4 py-3 rounded-full shadow-lg h-auto">
                             #PL-10235
                         </span>
                     </div>
                     <div class="absolute top-4 right-4 flex flex-col gap-2">
                         <span
-                            class="backdrop-blur-md text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg bg-green-600">
+                            class="badge bg-green-600 border-none backdrop-blur-md text-white font-bold text-xs px-3 py-3 rounded-full shadow-lg h-auto">
                             For Sale
                         </span>
                         <span
-                            class="bg-black/70 backdrop-blur-md text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg">
+                            class="badge bg-black/70 border-none backdrop-blur-md text-white font-bold text-xs px-3 py-3 rounded-full shadow-lg h-auto">
                             5 days on market
                         </span>
                     </div>
-                </div>
+                </figure>
 
-                <div class="p-7">
+                <div class="card-body p-7">
                     <div class="mb-6 relative">
-                        <h3 class="font-heading text-4xl font-bold text-[var(--accent)] mb-2">
+                        <h3 class="card-title font-heading text-4xl font-bold text-[var(--accent)] mb-2">
                             $625,000
                         </h3>
                         <div class="h-1 w-16 bg-gradient-to-r from-[var(--accent)] to-transparent rounded-full"></div>
@@ -325,7 +324,7 @@
                                 gourmet kitchen, smart home features...
                             </div>
                             <button
-                                class="flex items-center gap-1 mt-2 text-xs text-[var(--accent)] hover:text-[var(--accent-hover)] transition-colors font-medium">
+                                class="btn btn-link btn-xs no-underline flex items-center gap-1 mt-2 text-[var(--accent)] hover:text-[var(--accent-hover)] transition-colors font-medium p-0 h-auto min-h-0">
                                 <i data-lucide="file-text" class="w-3 h-3"></i> Show More
                             </button>
                         </div>
@@ -333,27 +332,21 @@
 
                     <div class="mb-4">
                         <div class="flex flex-wrap gap-2">
-                            <span
-                                class="px-2 py-1 bg-[var(--muted)]/30 text-[var(--foreground)] text-xs rounded-md">Single
-                                Family</span>
-                            <span
-                                class="px-2 py-1 bg-[var(--muted)]/30 text-[var(--foreground)] text-xs rounded-md">Luxury
-                                vinyl</span>
-                            <span
-                                class="px-2 py-1 bg-[var(--muted)]/30 text-[var(--foreground)] text-xs rounded-md">Granite</span>
-                            <span class="px-2 py-1 bg-[var(--muted)]/30 text-[var(--foreground)] text-xs rounded-md">+4
-                                more</span>
+                            <span class="badge bg-[#464646]/30 text-[var(--foreground)] border-none text-xs rounded-md h-auto py-1">Single Family</span>
+                            <span class="badge bg-[#464646]/30 text-[var(--foreground)] border-none text-xs rounded-md h-auto py-1">Luxury vinyl</span>
+                            <span class="badge bg-[#464646]/30 text-[var(--foreground)] border-none text-xs rounded-md h-auto py-1">Granite</span>
+                            <span class="badge bg-[#464646]/30 text-[var(--foreground)] border-none text-xs rounded-md h-auto py-1">+4 more</span>
                         </div>
                     </div>
 
-                    <div class="flex flex-col sm:flex-row gap-3">
+                    <div class="card-actions flex-col sm:flex-row gap-3">
                         <button
-                            class="flex-1 font-heading text-base font-semibold px-4 py-3 bg-gradient-to-r from-[var(--accent)] to-[var(--accent-hover)] text-white rounded-lg shadow-lg flex items-center justify-center gap-2 cursor-pointer transition-opacity hover:opacity-90">
+                            class="btn flex-1 font-heading text-base font-semibold px-4 py-3 bg-gradient-to-r from-[var(--accent)] to-[var(--accent-hover)] text-white border-none rounded-lg shadow-lg flex items-center justify-center gap-2 cursor-pointer transition-opacity hover:opacity-90 h-auto">
                             <span>Contact The Seller</span>
                             <i data-lucide="arrow-right" class="w-4 h-4"></i>
                         </button>
                         <button
-                            class="flex-1 font-heading text-base px-4 py-3 bg-[var(--card)] text-[var(--foreground)] rounded-lg border border-[var(--border)] hover:bg-[var(--muted)] hover:text-[var(--foreground)] flex items-center justify-center gap-2 transition-colors">
+                            class="btn btn-outline flex-1 font-heading text-base px-4 py-3 bg-[var(--card)] text-[var(--foreground)] border-[var(--border)] hover:bg-[var(--muted)] hover:text-[var(--foreground)] hover:border-[var(--border)] rounded-lg flex items-center justify-center gap-2 transition-colors h-auto">
                             <i data-lucide="eye" class="w-4 h-4"></i>
                             <span>View Details</span>
                         </button>
@@ -361,7 +354,7 @@
                 </div>
             </article>
 
-            <article class="bg-[var(--card)] overflow-hidden border border-[var(--border)] shadow-lg">
+            <article class="card card-compact bg-[var(--card)] overflow-hidden border border-[var(--border)] shadow-lg rounded-lg">
                 <div class="px-3 pt-3 pb-2">
                     <div class="p-2 bg-green-50 border border-green-200 rounded-lg">
                         <div class="flex items-center justify-between">
@@ -369,39 +362,39 @@
                                 <i data-lucide="clock" class="w-4 h-4 text-green-600"></i>
                                 <span class="font-medium">Leaseback</span>
                             </div>
-                            <span class="text-xs font-bold text-green-700 bg-green-100 px-2 py-1 rounded-full">
+                            <span class="badge badge-success bg-green-100 text-green-700 border-none font-bold text-xs px-2 py-3 rounded-full">
                                 3 months
                             </span>
                         </div>
                     </div>
                 </div>
 
-                <div class="relative overflow-hidden mx-3 rounded-lg">
+                <figure class="relative overflow-hidden mx-3 rounded-lg">
                     <div
-                        class="bg-gradient-to-br from-neutral-700 via-neutral-800 to-neutral-900 aspect-[3/2] flex items-center justify-center relative rounded-lg">
+                        class="bg-gradient-to-br from-neutral-700 via-neutral-800 to-neutral-900 aspect-[3/2] flex items-center justify-center relative w-full rounded-lg">
                         <i data-lucide="home" class="w-12 h-12 text-[var(--muted-foreground)] opacity-40"></i>
                     </div>
                     <div class="absolute top-4 left-4">
                         <span
-                            class="bg-white/95 backdrop-blur-md text-neutral-900 text-xs font-bold px-4 py-2 rounded-full shadow-lg">
+                            class="badge bg-white/95 backdrop-blur-md text-neutral-900 border-none font-bold text-xs px-4 py-3 rounded-full shadow-lg h-auto">
                             #PL-10236
                         </span>
                     </div>
                     <div class="absolute top-4 right-4 flex flex-col gap-2">
                         <span
-                            class="backdrop-blur-md text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg bg-green-600">
+                            class="badge bg-green-600 border-none backdrop-blur-md text-white font-bold text-xs px-3 py-3 rounded-full shadow-lg h-auto">
                             For Sale
                         </span>
                         <span
-                            class="bg-black/70 backdrop-blur-md text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg">
+                            class="badge bg-black/70 border-none backdrop-blur-md text-white font-bold text-xs px-3 py-3 rounded-full shadow-lg h-auto">
                             18 days on market
                         </span>
                     </div>
-                </div>
+                </figure>
 
-                <div class="p-7">
+                <div class="card-body p-7">
                     <div class="mb-6 relative">
-                        <h3 class="font-heading text-4xl font-bold text-[var(--accent)] mb-2">
+                        <h3 class="card-title font-heading text-4xl font-bold text-[var(--accent)] mb-2">
                             $385,000
                         </h3>
                         <div class="h-1 w-16 bg-gradient-to-r from-[var(--accent)] to-transparent rounded-full"></div>
@@ -444,7 +437,7 @@
                                 community pool access...
                             </div>
                             <button
-                                class="flex items-center gap-1 mt-2 text-xs text-[var(--accent)] hover:text-[var(--accent-hover)] transition-colors font-medium">
+                                class="btn btn-link btn-xs no-underline flex items-center gap-1 mt-2 text-[var(--accent)] hover:text-[var(--accent-hover)] transition-colors font-medium p-0 h-auto min-h-0">
                                 <i data-lucide="file-text" class="w-3 h-3"></i> Show More
                             </button>
                         </div>
@@ -452,25 +445,21 @@
 
                     <div class="mb-4">
                         <div class="flex flex-wrap gap-2">
-                            <span
-                                class="px-2 py-1 bg-[var(--muted)]/30 text-[var(--foreground)] text-xs rounded-md">Townhome</span>
-                            <span
-                                class="px-2 py-1 bg-[var(--muted)]/30 text-[var(--foreground)] text-xs rounded-md">Carpet</span>
-                            <span
-                                class="px-2 py-1 bg-[var(--muted)]/30 text-[var(--foreground)] text-xs rounded-md">Wood</span>
-                            <span class="px-2 py-1 bg-[var(--muted)]/30 text-[var(--foreground)] text-xs rounded-md">+4
-                                more</span>
+                            <span class="badge bg-[#464646]/30 text-[var(--foreground)] border-none text-xs rounded-md h-auto py-1">Townhome</span>
+                            <span class="badge bg-[#464646]/30 text-[var(--foreground)] border-none text-xs rounded-md h-auto py-1">Carpet</span>
+                            <span class="badge bg-[#464646]/30 text-[var(--foreground)] border-none text-xs rounded-md h-auto py-1">Wood</span>
+                            <span class="badge bg-[#464646]/30 text-[var(--foreground)] border-none text-xs rounded-md h-auto py-1">+4 more</span>
                         </div>
                     </div>
 
-                    <div class="flex flex-col sm:flex-row gap-3">
+                    <div class="card-actions flex-col sm:flex-row gap-3">
                         <button
-                            class="flex-1 font-heading text-base font-semibold px-4 py-3 bg-gradient-to-r from-[var(--accent)] to-[var(--accent-hover)] text-white rounded-lg shadow-lg flex items-center justify-center gap-2 cursor-pointer transition-opacity hover:opacity-90">
+                            class="btn flex-1 font-heading text-base font-semibold px-4 py-3 bg-gradient-to-r from-[var(--accent)] to-[var(--accent-hover)] text-white border-none rounded-lg shadow-lg flex items-center justify-center gap-2 cursor-pointer transition-opacity hover:opacity-90 h-auto">
                             <span>Contact Seller Agent</span>
                             <i data-lucide="arrow-right" class="w-4 h-4"></i>
                         </button>
                         <button
-                            class="flex-1 font-heading text-base px-4 py-3 bg-[var(--card)] text-[var(--foreground)] rounded-lg border border-[var(--border)] hover:bg-[var(--muted)] hover:text-[var(--foreground)] flex items-center justify-center gap-2 transition-colors">
+                            class="btn btn-outline flex-1 font-heading text-base px-4 py-3 bg-[var(--card)] text-[var(--foreground)] rounded-lg border border-[var(--border)] hover:bg-[var(--muted)] hover:text-[var(--foreground)] flex items-center justify-center gap-2 transition-colors h-auto">
                             <i data-lucide="eye" class="w-4 h-4"></i>
                             <span>View Details</span>
                         </button>
@@ -482,7 +471,12 @@
 
         <div class="text-center mt-12">
             <button
-                class="font-heading text-base px-8 py-3 bg-transparent hover:bg-[var(--accent)]/10 text-[var(--accent)] border border-[var(--accent)] hover:border-[var(--accent-hover)] rounded-lg shadow-lg font-semibold cursor-pointer transition-colors">
+                hx-get="/api/v1/properties/?page=2"
+                hx-trigger="click"
+                hx-target="#property-grid"
+                hx-swap="beforeend"
+                class="btn btn-lg btn-outline font-heading text-base px-8 py-3 bg-transparent hover:bg-[var(--accent)]/10 text-[var(--accent)] border border-[var(--accent)] hover:border-[var(--accent-hover)] rounded-lg shadow-lg font-semibold cursor-pointer transition-colors h-auto">
+                <span class="htmx-indicator hidden loading loading-spinner loading-xs"></span>
                 Load More
             </button>
         </div>

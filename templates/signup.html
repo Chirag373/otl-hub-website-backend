@@ -17,96 +17,112 @@
 
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
 
-            <div class="bg-[var(--card)] rounded-lg border border-[var(--border)] p-4 sm:p-6 lg:p-8 shadow-lg">
-                <form id="signup-form" class="space-y-6">
+            <div class="card bg-[var(--card)] rounded-lg border border-[var(--border)] shadow-lg">
+                <div class="card-body p-4 sm:p-6 lg:p-8">
+                    <form id="signup-form" class="space-y-6">
 
-                    <div class="space-y-4">
-                        <label class="text-[var(--foreground)] font-medium">I am a:</label>
-                        <div class="grid grid-cols-2 gap-3 sm:gap-4">
-                            <button type="button" onclick="selectUserType('buyer')" id="btn-buyer"
-                                class="user-type-btn p-3 sm:p-4 rounded-lg border-2 text-left transition-all border-[var(--accent)] bg-[var(--accent)]/10 h-full">
-                                <div class="font-heading text-base sm:text-lg text-[var(--foreground)] mb-1">Buyer</div>
-                                <div class="text-xs sm:text-sm text-[var(--muted-foreground)]">Looking to purchase
-                                    properties</div>
-                            </button>
-                            <button type="button" onclick="selectUserType('realtor')" id="btn-realtor"
-                                class="user-type-btn p-3 sm:p-4 rounded-lg border-2 border-[var(--border)] hover:border-[var(--accent)]/50 text-left transition-all h-full">
-                                <div class="font-heading text-base sm:text-lg text-[var(--foreground)] mb-1">Realtor
-                                </div>
-                                <div class="text-xs sm:text-sm text-[var(--muted-foreground)]">Licensed real estate
-                                    professional</div>
-                            </button>
-                            <button type="button" onclick="selectUserType('seller')" id="btn-seller"
-                                class="user-type-btn p-3 sm:p-4 rounded-lg border-2 border-[var(--border)] hover:border-[var(--accent)]/50 text-left transition-all h-full">
-                                <div class="font-heading text-base sm:text-lg text-[var(--foreground)] mb-1">Seller
-                                </div>
-                                <div class="text-xs sm:text-sm text-[var(--muted-foreground)]">Want to sell your
-                                    property</div>
-                            </button>
-                            <button type="button" onclick="selectUserType('partner')" id="btn-partner"
-                                class="user-type-btn p-3 sm:p-4 rounded-lg border-2 border-[var(--border)] hover:border-[var(--accent)]/50 text-left transition-all h-full">
-                                <div class="font-heading text-base sm:text-lg text-[var(--foreground)] mb-1">Partner
-                                </div>
-                                <div class="text-xs sm:text-sm text-[var(--muted-foreground)]">Business partner or
-                                    service provider</div>
-                            </button>
+                        <div class="space-y-4">
+                            <label class="label">
+                                <span class="label-text text-[var(--foreground)] font-medium text-base">I am a:</span>
+                            </label>
+                            <div class="grid grid-cols-2 gap-3 sm:gap-4">
+                                <button type="button" onclick="selectUserType('buyer')" id="btn-buyer"
+                                    class="user-type-btn btn h-auto min-h-0 block p-3 sm:p-4 rounded-lg border-2 text-left transition-all border-[var(--accent)] bg-[var(--accent)]/10 hover:bg-[var(--accent)]/20 hover:border-[var(--accent)]">
+                                    <div class="font-heading text-base sm:text-lg text-[var(--foreground)] mb-1 normal-case">Buyer</div>
+                                    <div class="text-xs sm:text-sm text-[var(--muted-foreground)] font-normal normal-case whitespace-normal">Looking to purchase
+                                        properties</div>
+                                </button>
+                                <button type="button" onclick="selectUserType('realtor')" id="btn-realtor"
+                                    class="user-type-btn btn btn-outline h-auto min-h-0 block p-3 sm:p-4 rounded-lg border-2 border-[var(--border)] hover:border-[var(--accent)]/50 text-left transition-all">
+                                    <div class="font-heading text-base sm:text-lg text-[var(--foreground)] mb-1 normal-case">Realtor
+                                    </div>
+                                    <div class="text-xs sm:text-sm text-[var(--muted-foreground)] font-normal normal-case whitespace-normal">Licensed real estate
+                                        professional</div>
+                                </button>
+                                <button type="button" onclick="selectUserType('seller')" id="btn-seller"
+                                    class="user-type-btn btn btn-outline h-auto min-h-0 block p-3 sm:p-4 rounded-lg border-2 border-[var(--border)] hover:border-[var(--accent)]/50 text-left transition-all">
+                                    <div class="font-heading text-base sm:text-lg text-[var(--foreground)] mb-1 normal-case">Seller
+                                    </div>
+                                    <div class="text-xs sm:text-sm text-[var(--muted-foreground)] font-normal normal-case whitespace-normal">Want to sell your
+                                        property</div>
+                                </button>
+                                <button type="button" onclick="selectUserType('partner')" id="btn-partner"
+                                    class="user-type-btn btn btn-outline h-auto min-h-0 block p-3 sm:p-4 rounded-lg border-2 border-[var(--border)] hover:border-[var(--accent)]/50 text-left transition-all">
+                                    <div class="font-heading text-base sm:text-lg text-[var(--foreground)] mb-1 normal-case">Partner
+                                    </div>
+                                    <div class="text-xs sm:text-sm text-[var(--muted-foreground)] font-normal normal-case whitespace-normal">Business partner or
+                                        service provider</div>
+                                </button>
+                            </div>
                         </div>
-                    </div>
 
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div class="space-y-2">
-                            <label class="text-[var(--foreground)] text-sm font-medium">First Name *</label>
-                            <input type="text" placeholder="Enter your first name" required
-                                class="w-full px-3 py-2 bg-[var(--input)] border border-[var(--border)] rounded-md text-[var(--foreground)] focus:outline-none focus:border-[var(--accent)] text-base">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="form-control w-full">
+                                <label class="label">
+                                    <span class="label-text text-[var(--foreground)] font-medium">First Name *</span>
+                                </label>
+                                <input type="text" placeholder="Enter your first name" required
+                                    class="input input-bordered w-full bg-[var(--input)] border-[var(--border)] text-[var(--foreground)] focus:outline-none focus:border-[var(--accent)]">
+                            </div>
+                            <div class="form-control w-full">
+                                <label class="label">
+                                    <span class="label-text text-[var(--foreground)] font-medium">Last Name *</span>
+                                </label>
+                                <input type="text" placeholder="Enter your last name" required
+                                    class="input input-bordered w-full bg-[var(--input)] border-[var(--border)] text-[var(--foreground)] focus:outline-none focus:border-[var(--accent)]">
+                            </div>
                         </div>
-                        <div class="space-y-2">
-                            <label class="text-[var(--foreground)] text-sm font-medium">Last Name *</label>
-                            <input type="text" placeholder="Enter your last name" required
-                                class="w-full px-3 py-2 bg-[var(--input)] border border-[var(--border)] rounded-md text-[var(--foreground)] focus:outline-none focus:border-[var(--accent)] text-base">
+
+                        <div class="form-control w-full">
+                            <label class="label">
+                                <span class="label-text text-[var(--foreground)] font-medium">Email Address *</span>
+                            </label>
+                            <input type="email" placeholder="Enter your email address" required
+                                class="input input-bordered w-full bg-[var(--input)] border-[var(--border)] text-[var(--foreground)] focus:outline-none focus:border-[var(--accent)]">
                         </div>
-                    </div>
 
-                    <div class="space-y-2">
-                        <label class="text-[var(--foreground)] text-sm font-medium">Email Address *</label>
-                        <input type="email" placeholder="Enter your email address" required
-                            class="w-full px-3 py-2 bg-[var(--input)] border border-[var(--border)] rounded-md text-[var(--foreground)] focus:outline-none focus:border-[var(--accent)] text-base">
-                    </div>
-
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div class="space-y-2">
-                            <label class="text-[var(--foreground)] text-sm font-medium">Password *</label>
-                            <input type="password" placeholder="Create a password" required
-                                class="w-full px-3 py-2 bg-[var(--input)] border border-[var(--border)] rounded-md text-[var(--foreground)] focus:outline-none focus:border-[var(--accent)] text-base">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="form-control w-full">
+                                <label class="label">
+                                    <span class="label-text text-[var(--foreground)] font-medium">Password *</span>
+                                </label>
+                                <input type="password" placeholder="Create a password" required
+                                    class="input input-bordered w-full bg-[var(--input)] border-[var(--border)] text-[var(--foreground)] focus:outline-none focus:border-[var(--accent)]">
+                            </div>
+                            <div class="form-control w-full">
+                                <label class="label">
+                                    <span class="label-text text-[var(--foreground)] font-medium">Confirm Password *</span>
+                                </label>
+                                <input type="password" placeholder="Confirm your password" required
+                                    class="input input-bordered w-full bg-[var(--input)] border-[var(--border)] text-[var(--foreground)] focus:outline-none focus:border-[var(--accent)]">
+                            </div>
                         </div>
-                        <div class="space-y-2">
-                            <label class="text-[var(--foreground)] text-sm font-medium">Confirm Password *</label>
-                            <input type="password" placeholder="Confirm your password" required
-                                class="w-full px-3 py-2 bg-[var(--input)] border border-[var(--border)] rounded-md text-[var(--foreground)] focus:outline-none focus:border-[var(--accent)] text-base">
+
+                        <div class="form-control w-full">
+                            <label class="label">
+                                <span class="label-text text-[var(--foreground)] font-medium">Phone Number *</span>
+                            </label>
+                            <input type="tel" placeholder="Enter your phone number" required
+                                class="input input-bordered w-full bg-[var(--input)] border-[var(--border)] text-[var(--foreground)] focus:outline-none focus:border-[var(--accent)]">
                         </div>
-                    </div>
 
-                    <div class="space-y-2">
-                        <label class="text-[var(--foreground)] text-sm font-medium">Phone Number *</label>
-                        <input type="tel" placeholder="Enter your phone number" required
-                            class="w-full px-3 py-2 bg-[var(--input)] border border-[var(--border)] rounded-md text-[var(--foreground)] focus:outline-none focus:border-[var(--accent)] text-base">
-                    </div>
+                        <div id="dynamic-fields-container">
+                        </div>
 
-                    <div id="dynamic-fields-container">
-                    </div>
+                        <button type="submit" id="submit-btn"
+                            class="btn btn-block font-heading text-base bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-[var(--bg)] border-none rounded transition-all font-semibold cursor-pointer">
+                            Create Account
+                        </button>
 
-                    <button type="submit" id="submit-btn"
-                        class="w-full font-heading text-base px-6 py-3 bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-[var(--bg)] rounded transition-all font-semibold cursor-pointer">
-                        Create Account
-                    </button>
-
-                    <div class="text-center text-sm text-[var(--muted-foreground)]">
-                        Already have an account?
-                        <a href="login.html"
-                            class="text-[var(--accent)] hover:text-[var(--accent-hover)] transition-colors font-medium">
-                            Sign in here
-                        </a>
-                    </div>
-                </form>
+                        <div class="text-center text-sm text-[var(--muted-foreground)]">
+                            Already have an account?
+                            <a href="login.html"
+                                class="link link-hover text-[var(--accent)] hover:text-[var(--accent-hover)] transition-colors font-medium">
+                                Sign in here
+                            </a>
+                        </div>
+                    </form>
+                </div>
             </div>
 
             <div class="flex flex-col">
@@ -145,13 +161,17 @@
             <div class="space-y-4 p-4 bg-[var(--muted)]/30 rounded-lg border border-[var(--border)]">
                 <h3 class="font-heading text-lg text-[var(--foreground)]">Buyer Preferences</h3>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div class="space-y-2">
-                        <label class="text-[var(--foreground)] text-sm font-medium">Preferred Location</label>
-                        <input type="text" placeholder="City, State" class="w-full px-3 py-2 bg-[var(--input)] border border-[var(--border)] rounded-md text-[var(--foreground)] focus:outline-none focus:border-[var(--accent)] text-base">
+                    <div class="form-control w-full">
+                        <label class="label">
+                            <span class="label-text text-[var(--foreground)] font-medium">Preferred Location</span>
+                        </label>
+                        <input type="text" placeholder="City, State" class="input input-bordered w-full bg-[var(--input)] border-[var(--border)] text-[var(--foreground)] focus:outline-none focus:border-[var(--accent)]">
                     </div>
-                    <div class="space-y-2">
-                        <label class="text-[var(--foreground)] text-sm font-medium">Budget Range</label>
-                        <select class="w-full px-3 py-2 bg-[var(--input)] border border-[var(--border)] rounded-md text-[var(--foreground)] focus:outline-none focus:border-[var(--accent)] text-base">
+                    <div class="form-control w-full">
+                        <label class="label">
+                            <span class="label-text text-[var(--foreground)] font-medium">Budget Range</span>
+                        </label>
+                        <select class="select select-bordered w-full bg-[var(--input)] border-[var(--border)] text-[var(--foreground)] focus:outline-none focus:border-[var(--accent)]">
                             <option value="">Select budget range</option>
                             <option value="0-200k">$0 - $200,000</option>
                             <option value="200k-400k">$200,000 - $400,000</option>
@@ -167,18 +187,24 @@
             <div class="space-y-4 p-4 bg-[var(--muted)]/30 rounded-lg border border-[var(--border)]">
                 <h3 class="font-heading text-lg text-[var(--foreground)]">Professional Information</h3>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div class="space-y-2">
-                        <label class="text-[var(--foreground)] text-sm font-medium">License Number *</label>
-                        <input type="text" placeholder="Real estate license number" required class="w-full px-3 py-2 bg-[var(--input)] border border-[var(--border)] rounded-md text-[var(--foreground)] focus:outline-none focus:border-[var(--accent)] text-base">
+                    <div class="form-control w-full">
+                        <label class="label">
+                            <span class="label-text text-[var(--foreground)] font-medium">License Number *</span>
+                        </label>
+                        <input type="text" placeholder="Real estate license number" required class="input input-bordered w-full bg-[var(--input)] border-[var(--border)] text-[var(--foreground)] focus:outline-none focus:border-[var(--accent)]">
                     </div>
-                    <div class="space-y-2">
-                        <label class="text-[var(--foreground)] text-sm font-medium">Company/Brokerage</label>
-                        <input type="text" placeholder="Company or brokerage name" class="w-full px-3 py-2 bg-[var(--input)] border border-[var(--border)] rounded-md text-[var(--foreground)] focus:outline-none focus:border-[var(--accent)] text-base">
+                    <div class="form-control w-full">
+                        <label class="label">
+                            <span class="label-text text-[var(--foreground)] font-medium">Company/Brokerage</span>
+                        </label>
+                        <input type="text" placeholder="Company or brokerage name" class="input input-bordered w-full bg-[var(--input)] border-[var(--border)] text-[var(--foreground)] focus:outline-none focus:border-[var(--accent)]">
                     </div>
                 </div>
-                <div class="space-y-2">
-                    <label class="text-[var(--foreground)] text-sm font-medium">Years of Experience</label>
-                    <select class="w-full px-3 py-2 bg-[var(--input)] border border-[var(--border)] rounded-md text-[var(--foreground)] focus:outline-none focus:border-[var(--accent)] text-base">
+                <div class="form-control w-full">
+                    <label class="label">
+                        <span class="label-text text-[var(--foreground)] font-medium">Years of Experience</span>
+                    </label>
+                    <select class="select select-bordered w-full bg-[var(--input)] border-[var(--border)] text-[var(--foreground)] focus:outline-none focus:border-[var(--accent)]">
                         <option value="">Select experience level</option>
                         <option value="0-2">0-2 years</option>
                         <option value="3-5">3-5 years</option>
@@ -192,9 +218,11 @@
             <div class="space-y-4 p-4 bg-[var(--muted)]/30 rounded-lg border border-[var(--border)]">
                 <h3 class="font-heading text-lg text-[var(--foreground)]">Property Information</h3>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div class="space-y-2">
-                        <label class="text-[var(--foreground)] text-sm font-medium">Property Type</label>
-                        <select class="w-full px-3 py-2 bg-[var(--input)] border border-[var(--border)] rounded-md text-[var(--foreground)] focus:outline-none focus:border-[var(--accent)] text-base">
+                    <div class="form-control w-full">
+                        <label class="label">
+                            <span class="label-text text-[var(--foreground)] font-medium">Property Type</span>
+                        </label>
+                        <select class="select select-bordered w-full bg-[var(--input)] border-[var(--border)] text-[var(--foreground)] focus:outline-none focus:border-[var(--accent)]">
                             <option value="">Select property type</option>
                             <option value="single_family">Single family</option>
                             <option value="condo">Condo</option>
@@ -202,27 +230,35 @@
                             <option value="apartment_unit">Apartment unit</option>
                         </select>
                     </div>
-                    <div class="space-y-2">
-                        <label class="text-[var(--foreground)] text-sm font-medium">Estimated Value</label>
-                        <input type="text" placeholder="Property value estimate" class="w-full px-3 py-2 bg-[var(--input)] border border-[var(--border)] rounded-md text-[var(--foreground)] focus:outline-none focus:border-[var(--accent)] text-base">
+                    <div class="form-control w-full">
+                        <label class="label">
+                            <span class="label-text text-[var(--foreground)] font-medium">Estimated Value</span>
+                        </label>
+                        <input type="text" placeholder="Property value estimate" class="input input-bordered w-full bg-[var(--input)] border-[var(--border)] text-[var(--foreground)] focus:outline-none focus:border-[var(--accent)]">
                     </div>
                 </div>
-                <div class="space-y-2">
-                    <label class="text-[var(--foreground)] text-sm font-medium">Property Location</label>
-                    <input type="text" placeholder="City, State where property is located" class="w-full px-3 py-2 bg-[var(--input)] border border-[var(--border)] rounded-md text-[var(--foreground)] focus:outline-none focus:border-[var(--accent)] text-base">
+                <div class="form-control w-full">
+                    <label class="label">
+                        <span class="label-text text-[var(--foreground)] font-medium">Property Location</span>
+                    </label>
+                    <input type="text" placeholder="City, State where property is located" class="input input-bordered w-full bg-[var(--input)] border-[var(--border)] text-[var(--foreground)] focus:outline-none focus:border-[var(--accent)]">
                 </div>
             </div>`,
         partner: `
             <div class="space-y-4 p-4 bg-[var(--muted)]/30 rounded-lg border border-[var(--border)]">
                 <h3 class="font-heading text-lg text-[var(--foreground)]">Business Partnership Information</h3>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div class="space-y-2">
-                        <label class="text-[var(--foreground)] text-sm font-medium">Company/Business Name *</label>
-                        <input type="text" placeholder="Your business or company name" required class="w-full px-3 py-2 bg-[var(--input)] border border-[var(--border)] rounded-md text-[var(--foreground)] focus:outline-none focus:border-[var(--accent)] text-base">
+                    <div class="form-control w-full">
+                        <label class="label">
+                            <span class="label-text text-[var(--foreground)] font-medium">Company/Business Name *</span>
+                        </label>
+                        <input type="text" placeholder="Your business or company name" required class="input input-bordered w-full bg-[var(--input)] border-[var(--border)] text-[var(--foreground)] focus:outline-none focus:border-[var(--accent)]">
                     </div>
-                    <div class="space-y-2">
-                        <label class="text-[var(--foreground)] text-sm font-medium">Partnership Type *</label>
-                        <select required class="w-full px-3 py-2 bg-[var(--input)] border border-[var(--border)] rounded-md text-[var(--foreground)] focus:outline-none focus:border-[var(--accent)] text-base">
+                    <div class="form-control w-full">
+                        <label class="label">
+                            <span class="label-text text-[var(--foreground)] font-medium">Partnership Type *</span>
+                        </label>
+                        <select required class="select select-bordered w-full bg-[var(--input)] border-[var(--border)] text-[var(--foreground)] focus:outline-none focus:border-[var(--accent)]">
                             <option value="">Select partnership type</option>
                             <option value="real-estate-agency">Real Estate Agency</option>
                             <option value="mortgage-lender">Mortgage Lender</option>
@@ -232,9 +268,11 @@
                         </select>
                     </div>
                 </div>
-                <div class="space-y-2">
-                    <label class="text-[var(--foreground)] text-sm font-medium">Service Areas *</label>
-                    <input type="text" placeholder="Cities or regions you serve" required class="w-full px-3 py-2 bg-[var(--input)] border border-[var(--border)] rounded-md text-[var(--foreground)] focus:outline-none focus:border-[var(--accent)] text-base">
+                <div class="form-control w-full">
+                    <label class="label">
+                        <span class="label-text text-[var(--foreground)] font-medium">Service Areas *</span>
+                    </label>
+                    <input type="text" placeholder="Cities or regions you serve" required class="input input-bordered w-full bg-[var(--input)] border-[var(--border)] text-[var(--foreground)] focus:outline-none focus:border-[var(--accent)]">
                 </div>
             </div>`
     };
@@ -243,7 +281,7 @@
 
     function renderPricingPlan(type) {
         // Changed padding from p-6 to p-4 sm:p-6 for better mobile view
-        let html = `<div class="bg-[var(--card)] rounded-lg border border-[var(--border)] p-4 sm:p-6 shadow-lg overflow-visible">`;
+        let html = `<div class="card bg-[var(--card)] rounded-lg border border-[var(--border)] shadow-lg overflow-visible"><div class="card-body p-4 sm:p-6">`;
 
         // Header
         html += `
@@ -283,7 +321,7 @@
         // Features List
         html += renderFeaturesList(type);
 
-        html += `</div>`;
+        html += `</div></div>`;
         pricingPlanContainer.innerHTML = html;
 
         // Re-init icons for the new content
@@ -317,7 +355,7 @@
 
                 <button class="relative mt-4 sm:mt-0 text-center p-4 rounded-lg border-2 transition-all cursor-pointer bg-gradient-to-br from-[var(--accent)]/20 to-[var(--accent)]/10 border-[var(--accent)] shadow-lg sm:scale-105 hover:scale-105">
                     <div class="absolute -top-4 left-1/2 transform -translate-x-1/2 z-10 w-max">
-                        <div class="bg-[var(--accent)] text-white px-3 py-1 rounded-full text-xs font-bold shadow-lg">RECOMMENDED</div>
+                        <div class="badge bg-[var(--accent)] border-none text-white px-3 py-1 text-xs font-bold shadow-lg">RECOMMENDED</div>
                     </div>
                     <div class="absolute -top-2 -right-2 bg-green-500 text-white rounded-full p-1">
                         <i data-lucide="check" class="w-4 h-4"></i>
@@ -384,33 +422,70 @@
         };
 
         const features = featuresMap[type] || [];
+        const visibleFeatures = features.slice(0, 3).map(f => `<li>• ${f}</li>`).join('');
 
-        // Only show first 3, then blur the 4th
-        let listHtml = features.slice(0, 3).map(f => `<li>• ${f}</li>`).join('');
-
-        if (features.length > 3) {
-            listHtml += `
-                <li class="relative">
-                    <span class="blur-text">• ${features[3]}</span>
-                    <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-white/10"></div>
-                </li>
-                <li class="pt-2">
-                    <button class="flex items-center gap-2 text-[var(--accent)] hover:text-[var(--accent-hover)] transition-colors font-medium text-sm">
-                        <span>Show ${features.length - 3} More</span>
-                        <i data-lucide="chevron-down" class="w-4 h-4"></i>
-                    </button>
-                </li>
+        if (features.length <= 3) {
+            return `
+                <div class="mt-6 space-y-2">
+                    <h4 class="font-medium text-[var(--foreground)] text-lg">What's Included:</h4>
+                    <ul class="text-sm text-[var(--muted-foreground)] space-y-1">
+                        ${visibleFeatures}
+                    </ul>
+                </div>
             `;
         }
+
+        const remainingCount = features.length - 3;
+        const hiddenFeatures = features.slice(3).map(f => `<li>• ${f}</li>`).join('');
+        const blurredFeature = features[3];
 
         return `
             <div class="mt-6 space-y-2">
                 <h4 class="font-medium text-[var(--foreground)] text-lg">What's Included:</h4>
                 <ul class="text-sm text-[var(--muted-foreground)] space-y-1">
-                    ${listHtml}
+                    ${visibleFeatures}
+                    
+                    <div id="features-collapsed">
+                        <li class="relative">
+                            <span class="blur-text">• ${blurredFeature}</span>
+                            <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-white/10"></div>
+                        </li>
+                    </div>
+                    
+                    <div id="features-expanded" class="hidden">
+                        ${hiddenFeatures}
+                    </div>
+
+                    <li class="pt-2">
+                        <button onclick="toggleFeatures(${remainingCount})" class="btn btn-ghost btn-xs flex items-center gap-2 text-[var(--accent)] hover:text-[var(--accent-hover)] transition-colors font-medium text-sm p-0 h-auto min-h-0 hover:bg-transparent">
+                            <span id="features-btn-text">Show ${remainingCount} More</span>
+                            <i id="features-btn-icon" data-lucide="chevron-down" class="w-4 h-4 transition-transform duration-200"></i>
+                        </button>
+                    </li>
                 </ul>
             </div>
         `;
+    }
+
+    function toggleFeatures(count) {
+        const collapsed = document.getElementById('features-collapsed');
+        const expanded = document.getElementById('features-expanded');
+        const btnText = document.getElementById('features-btn-text');
+        const btnIcon = document.getElementById('features-btn-icon');
+        
+        if (expanded.classList.contains('hidden')) {
+            // Expand
+            expanded.classList.remove('hidden');
+            collapsed.classList.add('hidden');
+            btnText.textContent = "Show Less";
+            btnIcon.style.transform = "rotate(180deg)";
+        } else {
+            // Collapse
+            expanded.classList.add('hidden');
+            collapsed.classList.remove('hidden');
+            btnText.textContent = `Show ${count} More`;
+            btnIcon.style.transform = "rotate(0deg)";
+        }
     }
 
     // --- ACTIONS ---
@@ -423,9 +498,11 @@
             if (btn.id === `btn-${type}`) {
                 btn.classList.add('border-[var(--accent)]', 'bg-[var(--accent)]/10');
                 btn.classList.remove('border-[var(--border)]');
+                btn.classList.remove('btn-outline');
             } else {
                 btn.classList.remove('border-[var(--accent)]', 'bg-[var(--accent)]/10');
                 btn.classList.add('border-[var(--border)]');
+                btn.classList.add('btn-outline');
             }
         });
 
@@ -452,7 +529,7 @@
         e.preventDefault();
         const btn = document.getElementById('submit-btn');
         btn.disabled = true;
-        btn.textContent = "Creating Account...";
+        btn.innerHTML = '<span class="loading loading-spinner loading-sm"></span> Creating Account...';
         btn.classList.add('opacity-70');
 
         setTimeout(() => {

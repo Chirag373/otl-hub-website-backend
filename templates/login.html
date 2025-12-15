@@ -15,52 +15,50 @@
             </p>
         </div>
 
-        <div class="bg-[var(--card)] rounded-lg border border-[var(--border)] p-8 shadow-lg">
-            <form id="login-form" class="space-y-6">
+        <div class="card bg-[var(--card)] rounded-lg border border-[var(--border)] shadow-xl">
+            <div class="card-body p-8">
+                <form id="login-form" class="space-y-6">
 
-                <div class="space-y-4">
-                    <div class="space-y-2">
-                        <label for="email"
-                            class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-[var(--foreground)]">
-                            Email Address
-                        </label>
-                        <input id="email" type="email" placeholder="Enter your email" required
-                            class="flex h-9 w-full rounded-md border border-[var(--border)] bg-[var(--input)] px-3 py-1 text-base shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-[var(--muted-foreground)] focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-[var(--accent)]/50 focus:border-[var(--accent)] disabled:cursor-not-allowed disabled:opacity-50 md:text-sm text-[var(--foreground)]" />
-                    </div>
-
-                    <div class="space-y-2">
-                        <div class="flex items-center justify-between">
-                            <label for="password"
-                                class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-[var(--foreground)]">
-                                Password
+                    <div class="space-y-4">
+                        <div class="form-control w-full">
+                            <label for="email" class="label">
+                                <span class="label-text text-[var(--foreground)] font-medium">Email Address</span>
                             </label>
-                            <a href="/forgot-password"
-                                class="text-sm text-[var(--accent)] hover:text-[var(--accent-hover)] transition-colors">
-                                Forgot password?
-                            </a>
+                            <input id="email" type="email" placeholder="Enter your email" required
+                                class="input input-bordered w-full bg-[var(--input)] border-[var(--border)] text-[var(--foreground)] focus:outline-none focus:border-[var(--accent)]" />
                         </div>
-                        <input id="password" type="password" placeholder="Enter your password" required
-                            class="flex h-9 w-full rounded-md border border-[var(--border)] bg-[var(--input)] px-3 py-1 text-base shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-[var(--muted-foreground)] focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-[var(--accent)]/50 focus:border-[var(--accent)] disabled:cursor-not-allowed disabled:opacity-50 md:text-sm text-[var(--foreground)]" />
+
+                        <div class="form-control w-full">
+                            <label class="label">
+                                <span class="label-text text-[var(--foreground)] font-medium">Password</span>
+                                <a href="/forgot-password"
+                                    class="label-text-alt link link-hover text-[var(--accent)] hover:text-[var(--accent-hover)]">
+                                    Forgot password?
+                                </a>
+                            </label>
+                            <input id="password" type="password" placeholder="Enter your password" required
+                                class="input input-bordered w-full bg-[var(--input)] border-[var(--border)] text-[var(--foreground)] focus:outline-none focus:border-[var(--accent)]" />
+                        </div>
                     </div>
-                </div>
 
-                <div id="message-container" class="hidden p-3 rounded-md">
-                    <p id="message-text" class="text-sm"></p>
-                </div>
+                    <div id="message-container" class="hidden p-3 rounded-md">
+                        <p id="message-text" class="text-sm"></p>
+                    </div>
 
-                <button id="submit-btn" type="submit"
-                    class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 w-full font-heading px-6 py-3 bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-[var(--bg)] font-semibold">
-                    Sign In
-                </button>
+                    <button id="submit-btn" type="submit"
+                        class="btn btn-block font-heading bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-[var(--bg)] font-semibold border-none">
+                        Sign In
+                    </button>
 
-                <div class="text-center text-sm text-[var(--muted-foreground)]">
-                    Don't have an account?
-                    <a href="signup.html"
-                        class="text-[var(--accent)] hover:text-[var(--accent-hover)] transition-colors font-medium">
-                        Sign up here
-                    </a>
-                </div>
-            </form>
+                    <div class="text-center text-sm text-[var(--muted-foreground)]">
+                        Don't have an account?
+                        <a href="signup.html"
+                            class="link link-hover text-[var(--accent)] hover:text-[var(--accent-hover)] font-medium">
+                            Sign up here
+                        </a>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
 </div>
@@ -97,7 +95,7 @@
 
             // Set loading state
             submitBtn.disabled = true;
-            submitBtn.textContent = "Signing in...";
+            submitBtn.innerHTML = '<span class="loading loading-spinner loading-sm"></span> Signing in...';
             submitBtn.classList.add('opacity-70');
             messageContainer.classList.add('hidden');
 

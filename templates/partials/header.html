@@ -1,59 +1,63 @@
 <header class="fixed inset-x-0 top-0 z-50 bg-[var(--bg)] border-b border-neutral-800">
     <div class="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="h-16 flex items-center justify-between">
-            <a href="index.html" class="font-heading text-xl sm:text-2xl text-[#f3f4f6]">
-                OTL Platform
-            </a>
+        <div class="navbar h-16 p-0">
+            <div class="navbar-start">
+                <a href="index.html" class="font-heading text-xl sm:text-2xl text-[#f3f4f6] no-underline hover:text-[#f3f4f6]">
+                    OTL Platform
+                </a>
+            </div>
 
-            <nav class="hidden md:flex items-center gap-6" aria-label="Primary">
-                <a class="font-heading text-base text-[#c0c0c0] hover:text-[#f3f4f6] transition-colors"
+            <div class="navbar-end hidden md:flex items-center gap-4">
+                <a class="btn btn-ghost font-heading text-base text-[#c0c0c0] hover:text-[#f3f4f6] hover:bg-transparent transition-colors"
                     href="index.html">Home</a>
-                <a class="font-heading text-base text-[#c0c0c0] hover:text-[#f3f4f6] transition-colors"
+                <a class="btn btn-ghost font-heading text-base text-[#c0c0c0] hover:text-[#f3f4f6] hover:bg-transparent transition-colors"
                     href="about.html">About Us</a>
-                <a class="font-heading text-base text-[#c0c0c0] hover:text-[#f3f4f6] transition-colors"
+                <a class="btn btn-ghost font-heading text-base text-[#c0c0c0] hover:text-[#f3f4f6] hover:bg-transparent transition-colors"
                     href="partners.html">Partners</a>
 
                 <a href="signup.html"
-                    class="font-heading text-base px-4 py-2 border border-[#4a4a4a] rounded-lg text-[#c0c0c0] hover:bg-[#464646] hover:text-[#f3f4f6] transition-colors">
+                    class="btn btn-outline border-[#4a4a4a] text-[#c0c0c0] hover:bg-[#464646] hover:text-[#f3f4f6] font-heading font-normal h-auto py-2 min-h-0">
                     Sign Up
                 </a>
                 <a href="login.html">
                     <button
-                        class="font-heading text-base px-4 py-2 rounded-lg text-[#2a2a2a] bg-[#d4af37] hover:bg-[#e0c066] transition-colors font-semibold">
+                        class="btn bg-[#d4af37] hover:bg-[#e0c066] text-[#2a2a2a] border-none font-heading font-semibold h-auto py-2 min-h-0">
                         Login
                     </button>
                 </a>
-            </nav>
+            </div>
 
-            <button id="mobile-menu-btn"
-                class="md:hidden p-3 text-[#c0c0c0] hover:text-[#f3f4f6] hover:bg-[#464646] rounded-lg transition-colors">
-                <i data-lucide="menu" class="w-6 h-6"></i>
-            </button>
+            <div class="navbar-end md:hidden">
+                <button id="mobile-menu-btn"
+                    class="btn btn-ghost btn-square text-[#c0c0c0] hover:text-[#f3f4f6] hover:bg-[#464646]">
+                    <i data-lucide="menu" class="w-6 h-6"></i>
+                </button>
+            </div>
         </div>
     </div>
 
-    <div id="mobile-menu" class="hidden fixed inset-0 z-50 bg-black/50">
+    <div id="mobile-menu" class="hidden fixed inset-0 z-50 bg-black/50 transition-opacity">
         <div
-            class="absolute right-0 top-0 h-full w-80 max-w-[80%] bg-[var(--bg)] border-l border-[#4a4a4a] p-6 shadow-xl">
+            class="absolute right-0 top-0 h-full w-80 max-w-[80%] bg-[var(--bg)] border-l border-[#4a4a4a] p-6 shadow-xl transform transition-transform">
             <div class="flex justify-end mb-6">
-                <button id="close-menu-btn" class="p-2 text-[#c0c0c0] hover:text-[#f3f4f6]">
+                <button id="close-menu-btn" class="btn btn-ghost btn-square btn-sm text-[#c0c0c0] hover:text-[#f3f4f6]">
                     <i data-lucide="x" class="w-6 h-6"></i>
                 </button>
             </div>
-            <div class="flex flex-col gap-1">
+            <div class="flex flex-col gap-2">
                 <a href="index.html"
-                    class="font-heading text-base py-2 px-3 rounded-lg text-[#c0c0c0] hover:text-[#f3f4f6] hover:bg-[#464646]">Home</a>
+                    class="btn btn-ghost justify-start font-heading text-base text-[#c0c0c0] hover:text-[#f3f4f6] hover:bg-[#464646]">Home</a>
                 <a href="about.html"
-                    class="font-heading text-base py-2 px-3 rounded-lg text-[#c0c0c0] hover:text-[#f3f4f6] hover:bg-[#464646]">About
+                    class="btn btn-ghost justify-start font-heading text-base text-[#c0c0c0] hover:text-[#f3f4f6] hover:bg-[#464646]">About
                     Us</a>
                 <a href="partners.html"
-                    class="font-heading text-base py-2 px-3 rounded-lg text-[#c0c0c0] hover:text-[#f3f4f6] hover:bg-[#464646]">Partners</a>
-                <div class="border-t border-[#4a4a4a] my-4"></div>
+                    class="btn btn-ghost justify-start font-heading text-base text-[#c0c0c0] hover:text-[#f3f4f6] hover:bg-[#464646]">Partners</a>
+                <div class="divider my-2 border-[#4a4a4a]"></div>
                 <a href="signup.html"
-                    class="font-heading text-base text-[#c0c0c0] hover:text-[#f3f4f6] py-2 px-3 rounded-lg hover:bg-[#464646]">Sign
+                    class="btn btn-ghost justify-start font-heading text-base text-[#c0c0c0] hover:text-[#f3f4f6] hover:bg-[#464646]">Sign
                     Up</a>
                 <a href="login.html"
-                    class="font-heading text-base text-[#d4af37] hover:text-[#e0c066] py-2 px-3 rounded-lg hover:bg-[#464646] font-semibold block">
+                    class="btn justify-start font-heading text-base bg-transparent text-[#d4af37] hover:text-[#e0c066] hover:bg-[#464646] font-semibold border-none shadow-none">
                     Login
                 </a>
             </div>
