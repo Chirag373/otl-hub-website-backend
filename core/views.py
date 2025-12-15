@@ -15,6 +15,15 @@ class SignupView(TemplateView):
 class BuyerDashboardView(TemplateView):
     template_name = "buyer-dashboard.html"
 
+class BuyerPropertySearchView(TemplateView):
+    template_name = "buyer-property-search.html"
+
+class BuyerFavoritesView(TemplateView):
+    template_name = "buyer-favorites.html"
+
+class BuyerSettingsView(TemplateView):
+    template_name = "buyer-settings.html"
+
 class SellerDashboardView(TemplateView):
     template_name = "seller-dashboard.html"
 

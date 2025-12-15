@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Property Search | OTL Platform</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Arima:wght@100..700&display=swap" rel="stylesheet">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Arima', 'system-ui', 'sans-serif'],
+                        heading: ['Arima', 'system-ui', 'sans-serif'],
+                        body: ['Arima', 'system-ui', 'sans-serif'],
+                    },
+                    colors: {
+                        border: "var(--border)",
+                        input: "var(--input)",
+                        ring: "var(--ring)",
+                        background: "var(--background)",
+                        foreground: "var(--foreground)",
+                        primary: {
+                            DEFAULT: "var(--primary)",
+                            foreground: "var(--primary-foreground)",
+                        },
+                        muted: {
+                            DEFAULT: "var(--muted)",
+                            foreground: "var(--muted-foreground)",
+                        },
+                        accent: {
+                            DEFAULT: "var(--accent)",
+                            foreground: "var(--accent-foreground)",
+                            hover: "var(--accent-hover)",
+                        },
+                        card: {
+                            DEFAULT: "var(--card)",
+                            foreground: "var(--card-foreground)",
+                        },
+                    },
+                }
+            }
+        }
+    </script>
+
+    <style>
+        :root {
+            --radius: 0.625rem;
+            --bg: #2a2a2a;
+            --card: #3a3a3a;
+            --muted: #c0c0c0;
+            --accent: #d4af37;
+            --accent-hover: #e0c066;
+            --border: #4a4a4a;
+
+            --background: #2a2a2a;
+            --foreground: #f3f4f6;
+            --card-foreground: #f3f4f6;
+            --popover: #3a3a3a;
+            --popover-foreground: #f3f4f6;
+            --primary: #d4af37;
+            --primary-foreground: #2a2a2a;
+            --secondary: #464646;
+            --secondary-foreground: #f3f4f6;
+            --muted: #464646;
+            --muted-foreground: #c0c0c0;
+            --accent-foreground: #2a2a2a;
+            --destructive: #dc2626;
+            --input: #464646;
+            --ring: #d4af37;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--foreground);
+            font-family: 'Arima', sans-serif;
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+        
+        .sidebar-transition {
+            transition: transform 0.3s ease-in-out;
+        }
+
+        /* Hide scrollbar for cleaner look in some areas */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-[var(--bg)]">
+
+    <div class="lg:hidden fixed top-0 left-0 right-0 z-50 bg-[var(--card)] border-b border-[var(--border)] px-4 py-3 flex items-center justify-between">
+        <span class="font-bold text-lg text-[var(--foreground)]">OTL Dashboard</span>
+        <button id="mobile-menu-btn" class="p-2 rounded-md border border-[var(--border)] text-[var(--foreground)] hover:bg-[var(--accent)] hover:text-black transition-colors">
+            <i data-lucide="menu" class="w-5 h-5"></i>
+        </button>
+    </div>
+
+    <aside id="sidebar" class="fixed inset-y-0 left-0 z-40 w-64 bg-[var(--card)] border-r border-[var(--border)] transform -translate-x-full lg:translate-x-0 sidebar-transition flex flex-col">
+        <div class="flex items-center justify-center h-16 px-6 border-b border-[var(--border)]">
+            <h1 class="font-heading text-xl font-bold text-[var(--foreground)]">
+                OTL Dashboard
+            </h1>
+        </div>
+
+        <div class="px-6 py-4 border-b border-[var(--border)]">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 bg-[var(--accent)] rounded-full flex items-center justify-center">
+                    <span class="text-[var(--bg)] font-semibold text-sm">JD</span>
+                </div>
+                <div class="flex-1 min-w-0">
+                    <p class="text-sm font-medium text-[var(--foreground)] truncate">John Doe</p>
+                    <p class="text-xs text-[var(--muted-foreground)] truncate capitalize">Buyer</p>
+                </div>
+            </div>
+        </div>
+
+        <nav class="flex-1 px-4 py-6 space-y-2">
+            <a href="buyer-dashboard.html" class="flex items-center w-full px-4 py-2 text-sm font-medium rounded-md text-[var(--foreground)] hover:bg-[var(--accent)] hover:text-black transition-colors">
+                <i data-lucide="home" class="mr-3 h-4 w-4"></i> Dashboard
+            </a>
+            <a href="buyer-property-search.html" class="flex items-center w-full px-4 py-2 text-sm font-medium rounded-md bg-[var(--accent)] text-[var(--bg)]">
+                <i data-lucide="search" class="mr-3 h-4 w-4"></i> Property Search
+            </a>
+            <a href="buyer-favorites.html" class="flex items-center w-full px-4 py-2 text-sm font-medium rounded-md text-[var(--foreground)] hover:bg-[var(--accent)] hover:text-black transition-colors">
+                <i data-lucide="heart" class="mr-3 h-4 w-4"></i> Favorites
+            </a>
+            <a href="#" class="flex items-center w-full px-4 py-2 text-sm font-medium rounded-md text-[var(--foreground)] hover:bg-[var(--accent)] hover:text-black transition-colors">
+                <i data-lucide="message-square" class="mr-3 h-4 w-4"></i> Messages
+            </a>
+            <a href="buyer-settings.html" class="flex items-center w-full px-4 py-2 text-sm font-medium rounded-md text-[var(--foreground)] hover:bg-[var(--accent)] hover:text-black transition-colors">
+                <i data-lucide="settings" class="mr-3 h-4 w-4"></i> Settings
+            </a>
+        </nav>
+
+        <div class="p-4 border-t border-[var(--border)]">
+            <button onclick="window.location.href='login.html'" class="flex items-center w-full px-4 py-2 text-sm font-medium rounded-md text-[var(--foreground)] hover:bg-yellow-500 hover:text-black transition-colors">
+                <i data-lucide="log-out" class="mr-3 h-4 w-4"></i> Sign Out
+            </button>
+        </div>
+    </aside>
+
+    <div id="sidebar-overlay" class="fixed inset-0 bg-black/50 z-30 hidden lg:hidden"></div>
+
+    <div class="lg:pl-64 pt-16 lg:pt-0">
+        <main class="min-h-screen bg-[var(--bg)]">
+            <div class="w-full max-w-7xl mx-auto px-6 py-8 space-y-6">
+                
+                <div class="space-y-2">
+                    <h1 class="text-3xl font-bold text-[var(--foreground)]">Property Search</h1>
+                    <p class="text-[var(--muted-foreground)]">Find your perfect property with advanced filters</p>
+                </div>
+
+                <div class="bg-[var(--card)] rounded-lg border border-[var(--border)] p-6 space-y-6">
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                        <div class="space-y-2">
+                            <label class="text-sm font-medium text-[var(--foreground)]">Keywords</label>
+                            <input type="text" id="filter-keywords" placeholder="e.g., condo, downtown, pool" class="w-full px-3 py-2 bg-[var(--input)] border border-[var(--border)] rounded-md text-[var(--foreground)] focus:outline-none focus:border-[var(--accent)]">
+                        </div>
+                        <div class="space-y-2">
+                            <label class="text-sm font-medium text-[var(--foreground)]">Location</label>
+                            <input type="text" id="filter-location" placeholder="City, State or ZIP" class="w-full px-3 py-2 bg-[var(--input)] border border-[var(--border)] rounded-md text-[var(--foreground)] focus:outline-none focus:border-[var(--accent)]">
+                        </div>
+                        <div class="space-y-2">
+                            <label class="text-sm font-medium text-[var(--foreground)]">Property Type</label>
+                            <select id="filter-type" class="w-full px-3 py-2 bg-[var(--input)] border border-[var(--border)] rounded-md text-[var(--foreground)] focus:outline-none focus:border-[var(--accent)]">
+                                <option value="">Any Type</option>
+                                <option value="house">House</option>
+                                <option value="condo">Condo</option>
+                                <option value="townhouse">Townhouse</option>
+                                <option value="apartment">Apartment</option>
+                                <option value="land">Land</option>
+                            </select>
+                        </div>
+                        <div class="flex items-end space-x-2">
+                            <button id="btn-search" class="flex-1 flex items-center justify-center px-4 py-2 bg-[var(--accent)] text-[var(--bg)] rounded-md hover:bg-[var(--accent-hover)] transition-colors font-medium">
+                                <i data-lucide="search" class="mr-2 h-4 w-4"></i> Search
+                            </button>
+                            <button id="btn-toggle-filters" class="p-2 border border-[var(--border)] rounded-md text-[var(--foreground)] hover:bg-[var(--muted)] transition-colors" title="Advanced Filters">
+                                <i data-lucide="sliders-horizontal" class="h-5 w-5"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="advanced-filters" class="hidden pt-4 border-t border-[var(--border)]">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-lg font-semibold text-[var(--foreground)]">Advanced Filters</h3>
+                            <button id="btn-clear-filters" class="flex items-center px-3 py-1 text-sm border border-[var(--border)] rounded-md text-[var(--foreground)] hover:bg-[var(--muted)] transition-colors">
+                                <i data-lucide="x" class="mr-2 h-4 w-4"></i> Clear All
+                            </button>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div class="space-y-2">
+                                <label class="text-sm font-medium text-[var(--foreground)]">Price Range</label>
+                                <select id="filter-price" class="w-full px-3 py-2 bg-[var(--input)] border border-[var(--border)] rounded-md text-[var(--foreground)] focus:outline-none focus:border-[var(--accent)]">
+                                    <option value="">Any Price</option>
+                                    <option value="0-200000">Under $200,000</option>
+                                    <option value="200000-400000">$200,000 - $400,000</option>
+                                    <option value="400000-600000">$400,000 - $600,000</option>
+                                    <option value="600000-800000">$600,000 - $800,000</option>
+                                    <option value="800000-1000000">$800,000 - $1,000,000</option>
+                                    <option value="1000000+">$1,000,000+</option>
+                                </select>
+                            </div>
+
+                            <div class="space-y-2">
+                                <label class="text-sm font-medium text-[var(--foreground)]">Bedrooms</label>
+                                <select id="filter-beds" class="w-full px-3 py-2 bg-[var(--input)] border border-[var(--border)] rounded-md text-[var(--foreground)] focus:outline-none focus:border-[var(--accent)]">
+                                    <option value="">Any</option>
+                                    <option value="1">1+</option>
+                                    <option value="2">2+</option>
+                                    <option value="3">3+</option>
+                                    <option value="4">4+</option>
+                                    <option value="5">5+</option>
+                                </select>
+                            </div>
+
+                            <div class="space-y-2">
+                                <label class="text-sm font-medium text-[var(--foreground)]">Bathrooms</label>
+                                <select id="filter-baths" class="w-full px-3 py-2 bg-[var(--input)] border border-[var(--border)] rounded-md text-[var(--foreground)] focus:outline-none focus:border-[var(--accent)]">
+                                    <option value="">Any</option>
+                                    <option value="1">1+</option>
+                                    <option value="2">2+</option>
+                                    <option value="3">3+</option>
+                                    <option value="4">4+</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-between">
+                    <h2 class="text-xl font-semibold text-[var(--foreground)]">
+                        Search Results (<span id="results-count">0</span> properties)
+                    </h2>
+                    <div class="flex items-center space-x-2">
+                        <span class="text-sm text-[var(--muted-foreground)] hidden sm:inline">Sort by:</span>
+                        <select id="sort-order" class="bg-[var(--input)] border border-[var(--border)] text-[var(--foreground)] rounded px-2 py-1 text-sm focus:outline-none">
+                            <option value="relevant">Most Relevant</option>
+                            <option value="price-asc">Price: Low to High</option>
+                            <option value="price-desc">Price: High to Low</option>
+                            <option value="newest">Newest First</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div id="property-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    </div>
+
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // --- MOCK DATA ---
+        const mockProperties = [
+            {
+                id: 1,
+                title: "Modern Downtown Condo",
+                location: "Downtown, City Center",
+                price: 450000,
+                bedrooms: 2,
+                bathrooms: 2,
+                sqft: 1200,
+                image: "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&q=80&w=300&h=200",
+                type: "condo",
+                status: "active",
+                features: ["Balcony", "Gym Access", "Parking"],
+                dateAdded: "2025-01-10"
+            },
+            {
+                id: 2,
+                title: "Spacious Family Home",
+                location: "Suburb Valley",
+                price: 650000,
+                bedrooms: 4,
+                bathrooms: 3,
+                sqft: 2400,
+                image: "https://images.unsplash.com/photo-1568605114967-8130f3a36994?auto=format&fit=crop&q=80&w=300&h=200",
+                type: "house",
+                status: "active",
+                features: ["Garden", "Garage", "Fireplace"],
+                dateAdded: "2025-01-12"
+            },
+            {
+                id: 3,
+                title: "Cozy Townhouse",
+                location: "Riverside District",
+                price: 380000,
+                bedrooms: 3,
+                bathrooms: 2,
+                sqft: 1600,
+                image: "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&q=80&w=300&h=200",
+                type: "townhouse",
+                status: "active",
+                features: ["Patio", "Storage", "Community Pool"],
+                dateAdded: "2025-01-05"
+            },
+            {
+                id: 4,
+                title: "Luxury Apartment",
+                location: "Arts District",
+                price: 720000,
+                bedrooms: 2,
+                bathrooms: 2,
+                sqft: 1400,
+                image: "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&q=80&w=300&h=200",
+                type: "apartment",
+                status: "active",
+                features: ["City Views", "Concierge", "Rooftop Access"],
+                dateAdded: "2025-01-15"
+            },
+            {
+                id: 5,
+                title: "Countryside Villa",
+                location: "Green Hills",
+                price: 850000,
+                bedrooms: 5,
+                bathrooms: 4,
+                sqft: 3500,
+                image: "https://images.unsplash.com/photo-1600596542815-2a4d9fddace7?auto=format&fit=crop&q=80&w=300&h=200",
+                type: "house",
+                status: "active",
+                features: ["Large Lot", "Pool", "Solar Panels"],
+                dateAdded: "2025-01-01"
+            },
+            {
+                id: 6,
+                title: "Studio Loft",
+                location: "Old Town",
+                price: 250000,
+                bedrooms: 1,
+                bathrooms: 1,
+                sqft: 800,
+                image: "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&q=80&w=300&h=200",
+                type: "apartment",
+                status: "active",
+                features: ["High Ceilings", "Exposed Brick", "Near Transit"],
+                dateAdded: "2025-01-14"
+            }
+        ];
+
+        // --- STATE ---
+        let favorites = [1, 3]; // Mock initial favorites
+        let currentFilters = {
+            keywords: "",
+            location: "",
+            type: "",
+            priceMin: 0,
+            priceMax: Infinity,
+            beds: 0,
+            baths: 0,
+            sort: "relevant"
+        };
+
+        // --- DOM ELEMENTS ---
+        const dom = {
+            sidebar: document.getElementById('sidebar'),
+            overlay: document.getElementById('sidebar-overlay'),
+            mobileMenuBtn: document.getElementById('mobile-menu-btn'),
+            
+            grid: document.getElementById('property-grid'),
+            resultsCount: document.getElementById('results-count'),
+            
+            // Filters
+            inputKeywords: document.getElementById('filter-keywords'),
+            inputLocation: document.getElementById('filter-location'),
+            inputType: document.getElementById('filter-type'),
+            inputPrice: document.getElementById('filter-price'),
+            inputBeds: document.getElementById('filter-beds'),
+            inputBaths: document.getElementById('filter-baths'),
+            inputSort: document.getElementById('sort-order'),
+            
+            // Buttons
+            btnSearch: document.getElementById('btn-search'),
+            btnToggleFilters: document.getElementById('btn-toggle-filters'),
+            btnClearFilters: document.getElementById('btn-clear-filters'),
+            advancedFilters: document.getElementById('advanced-filters')
+        };
+
+        // --- INITIALIZATION ---
+        function init() {
+            lucide.createIcons();
+            renderProperties();
+            setupEventListeners();
+        }
+
+        // --- LOGIC ---
+
+        function formatPrice(price) {
+            return new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: 'USD',
+                maximumFractionDigits: 0
+            }).format(price);
+        }
+
+        function getFilteredProperties() {
+            return mockProperties.filter(p => {
+                // Keyword match
+                const keywordMatch = !currentFilters.keywords || 
+                    p.title.toLowerCase().includes(currentFilters.keywords.toLowerCase()) ||
+                    p.features.some(f => f.toLowerCase().includes(currentFilters.keywords.toLowerCase()));
+                
+                // Location match
+                const locationMatch = !currentFilters.location || 
+                    p.location.toLowerCase().includes(currentFilters.location.toLowerCase());
+                
+                // Type match
+                const typeMatch = !currentFilters.type || p.type === currentFilters.type;
+                
+                // Price match
+                const priceMatch = p.price >= currentFilters.priceMin && p.price <= currentFilters.priceMax;
+                
+                // Beds/Baths match
+                const bedsMatch = p.bedrooms >= currentFilters.beds;
+                const bathsMatch = p.bathrooms >= currentFilters.baths;
+
+                return keywordMatch && locationMatch && typeMatch && priceMatch && bedsMatch && bathsMatch;
+            }).sort((a, b) => {
+                switch(currentFilters.sort) {
+                    case "price-asc": return a.price - b.price;
+                    case "price-desc": return b.price - a.price;
+                    case "newest": return new Date(b.dateAdded) - new Date(a.dateAdded);
+                    default: return 0; // relevance (id order)
+                }
+            });
+        }
+
+        function renderProperties() {
+            const properties = getFilteredProperties();
+            dom.resultsCount.textContent = properties.length;
+            dom.grid.innerHTML = "";
+
+            if (properties.length === 0) {
+                dom.grid.innerHTML = `
+                    <div class="col-span-1 md:col-span-2 lg:col-span-3 text-center py-12">
+                        <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-[var(--muted)]/20 mb-4">
+                            <i data-lucide="search-x" class="w-8 h-8 text-[var(--muted-foreground)]"></i>
+                        </div>
+                        <h3 class="text-lg font-medium text-[var(--foreground)]">No properties found</h3>
+                        <p class="text-[var(--muted-foreground)]">Try adjusting your filters to find what you're looking for.</p>
+                    </div>
+                `;
+                lucide.createIcons();
+                return;
+            }
+
+            properties.forEach(p => {
+                const isFav = favorites.includes(p.id);
+                const card = document.createElement('div');
+                card.className = "bg-[var(--card)] rounded-lg border border-[var(--border)] overflow-hidden hover:shadow-lg transition-shadow group";
+                card.innerHTML = `
+                    <div class="relative">
+                        <div class="aspect-video bg-gray-700 relative overflow-hidden">
+                            <img src="${p.image}" alt="${p.title}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105">
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-60"></div>
+                            
+                            <button onclick="toggleFavorite(${p.id})" class="absolute top-2 right-2 p-2 rounded-full hover:bg-white/20 transition-colors z-10">
+                                <i data-lucide="heart" class="w-5 h-5 ${isFav ? 'fill-red-500 text-red-500' : 'text-white'} transition-colors"></i>
+                            </button>
+                        </div>
+                        <div class="absolute bottom-2 left-2">
+                            <span class="px-2 py-1 bg-[var(--accent)] text-[var(--bg)] text-xs font-bold rounded capitalize shadow-md">
+                                ${p.type}
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="p-4 space-y-3">
+                        <div>
+                            <div class="flex justify-between items-start">
+                                <h3 class="font-semibold text-[var(--foreground)] line-clamp-1 text-lg" title="${p.title}">
+                                    ${p.title}
+                                </h3>
+                            </div>
+                            <div class="flex items-center text-sm text-[var(--muted-foreground)] mt-1">
+                                <i data-lucide="map-pin" class="h-3 w-3 mr-1"></i>
+                                ${p.location}
+                            </div>
+                        </div>
+
+                        <div class="flex items-center justify-between border-t border-[var(--border)] pt-3 mt-2">
+                            <span class="text-xl font-bold text-[var(--accent)]">
+                                ${formatPrice(p.price)}
+                            </span>
+                        </div>
+                        
+                        <div class="flex items-center justify-between text-sm text-[var(--muted-foreground)]">
+                            <div class="flex items-center gap-1"><i data-lucide="bed" class="w-4 h-4"></i> <span>${p.bedrooms} bed</span></div>
+                            <div class="flex items-center gap-1"><i data-lucide="bath" class="w-4 h-4"></i> <span>${p.bathrooms} bath</span></div>
+                            <div class="flex items-center gap-1"><i data-lucide="square" class="w-4 h-4"></i> <span>${p.sqft.toLocaleString()} sqft</span></div>
+                        </div>
+
+                        <div class="flex flex-wrap gap-1 pt-1">
+                            ${p.features.slice(0, 3).map(f => `
+                                <span class="px-2 py-1 bg-[var(--muted)]/20 text-[var(--muted-foreground)] text-xs rounded border border-[var(--border)]">
+                                    ${f}
+                                </span>
+                            `).join('')}
+                        </div>
+
+                        <div class="flex space-x-2 pt-2">
+                            <button class="flex-1 px-3 py-2 text-sm font-medium border border-[var(--border)] rounded-md text-[var(--foreground)] hover:bg-[var(--muted)] transition-colors">
+                                View Details
+                            </button>
+                            <button class="flex-1 px-3 py-2 text-sm font-medium bg-[var(--accent)] text-[var(--bg)] rounded-md hover:bg-[var(--accent-hover)] transition-colors font-semibold">
+                                Contact Agent
+                            </button>
+                        </div>
+                    </div>
+                `;
+                dom.grid.appendChild(card);
+            });
+            lucide.createIcons();
+        }
+
+        // --- ACTIONS ---
+
+        window.toggleFavorite = (id) => {
+            if (favorites.includes(id)) {
+                favorites = favorites.filter(favId => favId !== id);
+            } else {
+                favorites.push(id);
+            }
+            renderProperties(); // Re-render to update icon
+        };
+
+        function updateFilters() {
+            // Price parsing
+            let min = 0, max = Infinity;
+            if (dom.inputPrice.value) {
+                if (dom.inputPrice.value.includes('+')) {
+                    min = parseInt(dom.inputPrice.value.replace('+', ''));
+                } else {
+                    const parts = dom.inputPrice.value.split('-');
+                    min = parseInt(parts[0]);
+                    max = parseInt(parts[1]);
+                }
+            }
+
+            currentFilters = {
+                keywords: dom.inputKeywords.value,
+                location: dom.inputLocation.value,
+                type: dom.inputType.value,
+                priceMin: min,
+                priceMax: max,
+                beds: parseInt(dom.inputBeds.value) || 0,
+                baths: parseInt(dom.inputBaths.value) || 0,
+                sort: dom.inputSort.value
+            };
+            
+            renderProperties();
+        }
+
+        function clearFilters() {
+            dom.inputKeywords.value = "";
+            dom.inputLocation.value = "";
+            dom.inputType.value = "";
+            dom.inputPrice.value = "";
+            dom.inputBeds.value = "";
+            dom.inputBaths.value = "";
+            
+            updateFilters();
+        }
+
+        // --- EVENT LISTENERS ---
+        function setupEventListeners() {
+            // Sidebar
+            const toggleSidebar = () => {
+                const isClosed = dom.sidebar.classList.contains('-translate-x-full');
+                if (isClosed) {
+                    dom.sidebar.classList.remove('-translate-x-full');
+                    dom.overlay.classList.remove('hidden');
+                } else {
+                    dom.sidebar.classList.add('-translate-x-full');
+                    dom.overlay.classList.add('hidden');
+                }
+            };
+            dom.mobileMenuBtn.addEventListener('click', toggleSidebar);
+            dom.overlay.addEventListener('click', toggleSidebar);
+
+            // Filter UI Toggle
+            dom.btnToggleFilters.addEventListener('click', () => {
+                dom.advancedFilters.classList.toggle('hidden');
+            });
+
+            // Search Button
+            dom.btnSearch.addEventListener('click', updateFilters);
+
+            // Clear Filters
+            dom.btnClearFilters.addEventListener('click', clearFilters);
+
+            // Sort Change
+            dom.inputSort.addEventListener('change', updateFilters);
+
+            // Enter key on inputs
+            [dom.inputKeywords, dom.inputLocation].forEach(input => {
+                input.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') updateFilters();
+                });
+            });
+        }
+
+        // Run
+        init();
+    </script>
+</body>
+</html>

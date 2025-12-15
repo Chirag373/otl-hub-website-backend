@@ -21,7 +21,7 @@ from core.views import (
     IndexView, AboutView, LoginView, SignupView,
     BuyerDashboardView, SellerDashboardView,
     RealtorDashboardView, PartnerDashboardView,
-    PartnersView
+    PartnersView, BuyerPropertySearchView, BuyerFavoritesView, BuyerSettingsView
 )
 
 urlpatterns = [
@@ -38,6 +38,9 @@ urlpatterns = [
     
     # Dashboards
     path("buyer-dashboard.html", BuyerDashboardView.as_view(), name="buyer_dashboard"),
+    path("buyer-property-search.html", BuyerPropertySearchView.as_view(), name="buyer_property_search"),
+    path("buyer-favorites.html", BuyerFavoritesView.as_view(), name="buyer_favorites"),
+    path("buyer-settings.html", BuyerSettingsView.as_view(), name="buyer_settings"),
     path("seller-dashboard.html", SellerDashboardView.as_view(), name="seller_dashboard"),
     path("realtor-dashboard.html", RealtorDashboardView.as_view(), name="realtor_dashboard"),
     path("partner-dashboard.html", PartnerDashboardView.as_view(), name="partner_dashboard"),
