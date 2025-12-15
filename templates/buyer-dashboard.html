@@ -106,7 +106,7 @@
         class="lg:hidden fixed top-0 left-0 right-0 z-50 bg-[var(--card)] border-b border-[var(--border)] px-4 py-3 flex items-center justify-between">
         <span class="font-bold text-lg text-[var(--foreground)]">OTL Dashboard</span>
         <button id="mobile-menu-btn"
-            class="btn btn-square btn-ghost btn-sm text-[var(--foreground)]">
+            class="p-2 rounded-md border border-[var(--border)] text-[var(--foreground)] hover:bg-[var(--accent)] hover:text-black transition-colors">
             <i data-lucide="menu" class="w-5 h-5"></i>
         </button>
     </div>
@@ -121,10 +121,8 @@
 
         <div class="px-6 py-4 border-b border-[var(--border)]">
             <div class="flex items-center space-x-3">
-                <div class="avatar placeholder">
-                    <div class="bg-[var(--accent)] text-[var(--bg)] rounded-full w-10">
-                        <span id="sidebar-avatar-initials" class="text-sm font-semibold">JD</span>
-                    </div>
+                <div class="w-10 h-10 bg-[var(--accent)] rounded-full flex items-center justify-center">
+                    <span id="sidebar-avatar-initials" class="text-[var(--bg)] font-semibold text-sm">JD</span>
                 </div>
                 <div class="flex-1 min-w-0">
                     <p id="sidebar-user-name" class="text-sm font-medium text-[var(--foreground)] truncate">John Doe</p>
@@ -135,30 +133,30 @@
 
         <nav class="flex-1 px-4 py-6 space-y-2">
             <a href="buyer-dashboard.html"
-                class="btn btn-ghost w-full justify-start bg-[var(--accent)] text-[var(--bg)] hover:bg-[var(--accent-hover)]">
+                class="flex items-center w-full px-4 py-2 text-sm font-medium rounded-md bg-[var(--accent)] text-[var(--bg)]">
                 <i data-lucide="home" class="mr-3 h-4 w-4"></i> Dashboard
             </a>
             <a href="buyer-property-search.html"
-                class="btn btn-ghost w-full justify-start text-[var(--foreground)] hover:bg-[var(--accent)] hover:text-black">
+                class="flex items-center w-full px-4 py-2 text-sm font-medium rounded-md text-[var(--foreground)] hover:bg-[var(--accent)] hover:text-black transition-colors">
                 <i data-lucide="search" class="mr-3 h-4 w-4"></i> Property Search
             </a>
             <a href="buyer-favorites.html"
-                class="btn btn-ghost w-full justify-start text-[var(--foreground)] hover:bg-[var(--accent)] hover:text-black">
+                class="flex items-center w-full px-4 py-2 text-sm font-medium rounded-md text-[var(--foreground)] hover:bg-[var(--accent)] hover:text-black transition-colors">
                 <i data-lucide="heart" class="mr-3 h-4 w-4"></i> Favorites
             </a>
             <a href="#"
-                class="btn btn-ghost w-full justify-start text-[var(--foreground)] hover:bg-[var(--accent)] hover:text-black">
+                class="flex items-center w-full px-4 py-2 text-sm font-medium rounded-md text-[var(--foreground)] hover:bg-[var(--accent)] hover:text-black transition-colors">
                 <i data-lucide="message-square" class="mr-3 h-4 w-4"></i> Messages
             </a>
             <a href="buyer-settings.html"
-                class="btn btn-ghost w-full justify-start text-[var(--foreground)] hover:bg-[var(--accent)] hover:text-black">
+                class="flex items-center w-full px-4 py-2 text-sm font-medium rounded-md text-[var(--foreground)] hover:bg-[var(--accent)] hover:text-black transition-colors">
                 <i data-lucide="settings" class="mr-3 h-4 w-4"></i> Settings
             </a>
         </nav>
 
         <div class="p-4 border-t border-[var(--border)]">
             <button onclick="window.location.href='login.html'"
-                class="btn btn-ghost w-full justify-start text-[var(--foreground)] hover:bg-yellow-500 hover:text-black">
+                class="flex items-center w-full px-4 py-2 text-sm font-medium rounded-md text-[var(--foreground)] hover:bg-yellow-500 hover:text-black transition-colors">
                 <i data-lucide="log-out" class="mr-3 h-4 w-4"></i> Sign Out
             </button>
         </div>
