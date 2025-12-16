@@ -90,7 +90,7 @@
     const messageText = document.getElementById('message-text');
 
     if (loginForm) {
-        loginForm.addEventListener('submit', (e) => {
+        loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
 
             // Set loading state
@@ -98,18 +98,62 @@
             submitBtn.innerHTML = '<span class="loading loading-spinner loading-sm"></span> Signing in...';
             submitBtn.classList.add('opacity-70');
             messageContainer.classList.add('hidden');
+            
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
 
-            // Simulate API call
-            setTimeout(() => {
+            try {
+                const response = await fetch('/api/v1/auth/login/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    // Save tokens and user info
+                    localStorage.setItem('access_token', data.access_token);
+                    localStorage.setItem('refresh_token', data.refresh_token);
+                    localStorage.setItem('user', JSON.stringify(data.user));
+
+                    // Reset button
+                    submitBtn.innerHTML = 'Success!';
+                    submitBtn.classList.remove('opacity-70');
+                    
+                    // Redirect based on role
+                    const role = data.user.role;
+                    let redirectUrl = "{% url 'buyer_dashboard' %}"; // Default
+
+                    if (role === 'SELLER') {
+                        redirectUrl = "{% url 'seller_dashboard' %}";
+                    } else if (role === 'REALTOR') {
+                        redirectUrl = "{% url 'realtor_dashboard' %}";
+                    } else if (role === 'PARTNER') {
+                        redirectUrl = "{% url 'partner_dashboard' %}";
+                    }
+
+                    window.location.href = redirectUrl;
+                } else {
+                    // Handle error
+                    throw new Error(data.detail || Object.values(data)[0] || 'Login failed');
+                }
+
+            } catch (error) {
                 // Reset button
                 submitBtn.disabled = false;
                 submitBtn.textContent = "Sign In";
                 submitBtn.classList.remove('opacity-70');
 
-                // Redirect to dashboard
-                window.location.href = "{% url 'buyer_dashboard' %}";
-
-            }, 1500);
+                // Show error message
+                messageContainer.classList.remove('hidden');
+                messageContainer.classList.remove('bg-green-50', 'border-green-200'); // Remove success styles if present
+                messageContainer.classList.add('bg-red-50', 'border', 'border-red-200');
+                messageText.className = 'text-sm text-red-800';
+                messageText.textContent = error.message;
+            }
         });
     }
 
