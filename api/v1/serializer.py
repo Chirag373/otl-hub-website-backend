@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from django.db import transaction
-from core.models import User
+from core.models import User, PendingSignup
 from api.models import BuyerProfile, RealtorProfile, SellerProfile, PartnerProfile
 from django.contrib.auth import authenticate
 from django.contrib.auth.password_validation import validate_password
@@ -29,27 +29,25 @@ class VerifyOTPSerializer(serializers.Serializer):
         email = attrs.get('email')
         otp = attrs.get('otp')
 
-        # 1. Check if user exists
+        # 1. Check if pending signup exists
         try:
-            user = User.objects.get(email=email)
-        except User.DoesNotExist:
-            raise serializers.ValidationError({"email": "User with this email does not exist."})
+            pending_signup = PendingSignup.objects.get(email=email)
+        except PendingSignup.DoesNotExist:
+            # Check if User exists and is active (already verified)
+            if User.objects.filter(email=email, is_active=True).exists():
+                 raise serializers.ValidationError({"message": "Account is already verified."})
+            raise serializers.ValidationError({"email": "No pending verification found for this email."})
 
-        # 2. Check if already active
-        if user.is_active:
-             raise serializers.ValidationError({"message": "Account is already verified."})
+        # 2. Check if OTP is expired
+        if pending_signup.otp_created_at and (timezone.now() > pending_signup.otp_created_at + timedelta(minutes=10)):
+            raise serializers.ValidationError({"otp": "OTP has expired. Please signup again."})
 
-        # 3. Check if OTP is expired
-        if user.otp_created_at and (timezone.now() > user.otp_created_at + timedelta(minutes=10)):
-            raise serializers.ValidationError({"otp": "OTP has expired. Please request a new one."})
-
-        # 4. Verify OTP (Safe Comparison)
-        # Handle case where DB otp might be None
-        if not user.otp or not secrets.compare_digest(str(user.otp), str(otp)):
+        # 3. Verify OTP (Safe Comparison)
+        if not secrets.compare_digest(str(pending_signup.otp), str(otp)):
             raise serializers.ValidationError({"otp": "Invalid OTP."})
 
-        # Attach the user object to the validated data for the View to use
-        attrs['user'] = user
+        # Attach the pending signup object to the validated data for the View to use
+        attrs['pending_signup'] = pending_signup
         return attrs
 
 

@@ -95,3 +95,20 @@ class Subscription(models.Model):
 
     def __str__(self):
         return f"{self.user.email} - {self.get_subscription_type_display()}"
+
+
+class PendingSignup(models.Model):
+    """Temporary storage for signup data before OTP verification"""
+    email = models.EmailField(unique=True)
+    otp = models.CharField(max_length=8)
+    otp_created_at = models.DateTimeField(auto_now_add=True)
+    signup_data = models.JSONField()
+
+    class Meta:
+        db_table = "pending_signups"
+        indexes = [
+            models.Index(fields=["email"]),
+        ]
+
+    def __str__(self):
+        return f"Pending: {self.email}"

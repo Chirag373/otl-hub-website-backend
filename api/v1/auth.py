@@ -6,14 +6,26 @@ from api.v1.serializer import SignupSerializer, LoginSerializer, UserResponseSer
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth.models import update_last_login
-from core.models import User
-from core.mail import send_otp_email
+from core.models import User, PendingSignup
+from core.mail import send_verification_email, generate_otp
 from django.db import transaction
+from django.utils import timezone
+from decimal import Decimal
+
+
+def convert_decimals(data):
+    if isinstance(data, dict):
+        return {k: convert_decimals(v) for k, v in data.items()}
+    elif isinstance(data, list):
+        return [convert_decimals(v) for v in data]
+    elif isinstance(data, Decimal):
+        return str(data)
+    return data
 
 
 class SignupView(APIView):
     """
-    View for user signup - POST (create user)
+    View for user signup - POST (initiate signup with OTP)
     """
 
     permission_classes = (AllowAny,)
@@ -22,29 +34,40 @@ class SignupView(APIView):
 
     def post(self, request):
         """
-        Create new user signup
+        Initiate signup, validate data, and send OTP
         """
         serializer = SignupSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        user = serializer.save()
+        
+        email = serializer.validated_data['email']
+
+        # Store data temporarily
+        otp = generate_otp()
+        signup_data = convert_decimals(serializer.validated_data)
+        
+        PendingSignup.objects.update_or_create(
+            email=email,
+            defaults={
+                'otp': otp,
+                'otp_created_at': timezone.now(),
+                'signup_data': signup_data
+            }
+        )
         
         # Send OTP
-        send_otp_email(user.email)
-        
-        user_data = UserResponseSerializer(user).data
+        send_verification_email(email, otp)
         
         return Response(
             {
-                "message": "User created successfully. Please verify your email.",
-                "user": user_data,
+                "message": "Please verify your email with the OTP sent.",
             },
-            status=status.HTTP_201_CREATED,
+            status=status.HTTP_200_OK,
         )
 
 
 class VerifyOTPView(generics.GenericAPIView):
     """
-    View for verifying OTP with expiration and robust validation
+    View for verifying OTP and completing signup
     """
     permission_classes = (AllowAny,)
     serializer_class = VerifyOTPSerializer
@@ -52,30 +75,35 @@ class VerifyOTPView(generics.GenericAPIView):
     throttle_scope = 'signup'
 
     def post(self, request):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        
-        # Get the validated user from the serializer
-        user = serializer.validated_data['user']
-
-        # Atomic transaction ensures data integrity
         with transaction.atomic():
-            user.is_active = True
-            user.otp = None 
-            user.otp_created_at = None # Clean up timestamp
-            user.save()
+            serializer = self.get_serializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
+            
+            pending_signup = serializer.validated_data['pending_signup']
+            signup_data = pending_signup.signup_data
+
+            # Create the actual user
+            signup_serializer = SignupSerializer(data=signup_data)
+            if signup_serializer.is_valid(raise_exception=True):
+                user = signup_serializer.save()
+                
+                user.is_active = True
+                user.save()
+                
+                # Cleanup
+                pending_signup.delete()
 
         # Generate tokens
         refresh = RefreshToken.for_user(user)
         
         return Response(
             {
-                "message": "Email verified successfully",
+                "message": "Email verified and account created successfully",
                 "access_token": str(refresh.access_token),
                 "refresh_token": str(refresh),
                 "user": UserResponseSerializer(user).data
             },
-            status=status.HTTP_200_OK
+            status=status.HTTP_201_CREATED
         )
 
 
