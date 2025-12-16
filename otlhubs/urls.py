@@ -19,11 +19,13 @@ from django.contrib import admin
 from django.urls import path, include
 from core.views import (
     IndexView, AboutView, LoginView, SignupView,
-    BuyerDashboardView, SellerDashboardView,
-    RealtorDashboardView, PartnerDashboardView,
+    BuyerDashboardView, SellerDashboardView, SellerSettingsView,
+    RealtorDashboardView, RealtorSettingsView, PartnerDashboardView, PartnerSettingsView,
     PartnersView, BuyerPropertySearchView, BuyerFavoritesView, BuyerSettingsView,
     TermsOfServiceView, PrivacyPolicyView
 )
+
+from django.contrib.auth.views import LogoutView
 
 urlpatterns = [
     path("admin/", admin.site.urls),
@@ -35,16 +37,20 @@ urlpatterns = [
     path("about", AboutView.as_view(), name="about"),
     path("partners", PartnersView.as_view(), name="partners"),
     path("login", LoginView.as_view(), name="login"),
+    path("logout", LogoutView.as_view(next_page='index'), name="logout"),
     path("signup", SignupView.as_view(), name="signup"),
     path("terms-of-service", TermsOfServiceView.as_view(), name="terms_of_service"),
     path("privacy-policy", PrivacyPolicyView.as_view(), name="privacy_policy"),
     
     # Dashboards
-    path("buyer-dashboard", BuyerDashboardView.as_view(), name="buyer_dashboard"),
-    path("buyer-property-search", BuyerPropertySearchView.as_view(), name="buyer_property_search"),
-    path("buyer-favorites", BuyerFavoritesView.as_view(), name="buyer_favorites"),
-    path("buyer-settings", BuyerSettingsView.as_view(), name="buyer_settings"),
-    path("seller-dashboard", SellerDashboardView.as_view(), name="seller_dashboard"),
-    path("realtor-dashboard", RealtorDashboardView.as_view(), name="realtor_dashboard"),
-    path("partner-dashboard", PartnerDashboardView.as_view(), name="partner_dashboard"),
+    path("buyer/dashboard", BuyerDashboardView.as_view(), name="buyer_dashboard"),
+    path("buyer/property-search", BuyerPropertySearchView.as_view(), name="buyer_property_search"),
+    path("buyer/favorites", BuyerFavoritesView.as_view(), name="buyer_favorites"),
+    path("buyer/settings", BuyerSettingsView.as_view(), name="buyer_settings"),
+    path("seller/dashboard", SellerDashboardView.as_view(), name="seller_dashboard"),
+    path("seller/settings", SellerSettingsView.as_view(), name="seller_settings"),
+    path("realtor/dashboard", RealtorDashboardView.as_view(), name="realtor_dashboard"),
+    path("realtor/settings", RealtorSettingsView.as_view(), name="realtor_settings"),
+    path("partner/dashboard", PartnerDashboardView.as_view(), name="partner_dashboard"),
+    path("partner/settings", PartnerSettingsView.as_view(), name="partner_settings"),
 ]

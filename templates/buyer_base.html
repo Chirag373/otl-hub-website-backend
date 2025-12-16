@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Buyer Dashboard | OTL Platform{% endblock %}</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Arima:wght@100..700&display=swap" rel="stylesheet">
+
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.23/dist/full.min.css" rel="stylesheet" type="text/css" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/htmx.org@2.0.4"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Arima', 'system-ui', 'sans-serif'],
+                        heading: ['Arima', 'system-ui', 'sans-serif'],
+                        body: ['Arima', 'system-ui', 'sans-serif'],
+                    },
+                    colors: {
+                        border: "var(--border)",
+                        input: "var(--input)",
+                        ring: "var(--ring)",
+                        background: "var(--background)",
+                        foreground: "var(--foreground)",
+                        primary: {
+                            DEFAULT: "var(--primary)",
+                            foreground: "var(--primary-foreground)",
+                        },
+                        muted: {
+                            DEFAULT: "var(--muted)",
+                            foreground: "var(--muted-foreground)",
+                            hover: "var(--muted-hover)",
+                        },
+                        accent: {
+                            DEFAULT: "var(--accent)",
+                            foreground: "var(--accent-foreground)",
+                            hover: "var(--accent-hover)",
+                        },
+                        card: {
+                            DEFAULT: "var(--card)",
+                            foreground: "var(--card-foreground)",
+                        },
+                        destructive: {
+                            DEFAULT: "var(--destructive)",
+                            foreground: "var(--destructive-foreground)",
+                        },
+                    },
+                }
+            }
+        }
+    </script>
+
+    <style>
+        :root {
+            --radius: 0.625rem;
+            --bg: #2a2a2a;
+            --card: #3a3a3a;
+            --muted: #464646;
+            --muted-foreground: #c0c0c0;
+            --accent: #d4af37;
+            --accent-hover: #e0c066;
+            --border: #4a4a4a;
+
+            --background: #2a2a2a;
+            --foreground: #f3f4f6;
+            --card-foreground: #f3f4f6;
+            --popover: #3a3a3a;
+            --popover-foreground: #f3f4f6;
+            --primary: #d4af37;
+            --primary-foreground: #2a2a2a;
+            --secondary: #464646;
+            --secondary-foreground: #f3f4f6;
+            --accent-foreground: #2a2a2a;
+            --destructive: #dc2626;
+            --input: #464646;
+            --ring: #d4af37;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--foreground);
+            font-family: 'Arima', sans-serif;
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Smooth transitions for sidebar */
+        .sidebar-transition {
+            transition: transform 0.3s ease-in-out;
+        }
+
+        /* Hide scrollbar for cleaner look in some areas */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+    {% block extra_head %}{% endblock %}
+</head>
+
+<body class="min-h-screen bg-[var(--bg)]">
+
+    <div
+        class="lg:hidden fixed top-0 left-0 right-0 z-50 bg-[var(--card)] border-b border-[var(--border)] px-4 py-3 flex items-center justify-between">
+        <span class="font-bold text-lg text-[var(--foreground)]">OTL Dashboard</span>
+        <button id="mobile-menu-btn"
+            class="p-2 rounded-md border border-[var(--border)] text-[var(--foreground)] hover:bg-[var(--accent)] hover:text-black transition-colors">
+            <i data-lucide="menu" class="w-5 h-5"></i>
+        </button>
+    </div>
+
+    <aside id="sidebar"
+        class="fixed inset-y-0 left-0 z-40 w-64 bg-[var(--card)] border-r border-[var(--border)] transform -translate-x-full lg:translate-x-0 sidebar-transition flex flex-col">
+        {% block sidebar %}
+        {% include 'partials/buyer_sidebar.html' %}
+        {% endblock %}
+    </aside>
+
+    <div id="sidebar-overlay" class="fixed inset-0 bg-black/50 z-30 hidden lg:hidden"></div>
+
+    <div class="lg:pl-64 pt-16 lg:pt-0">
+        <main class="min-h-screen bg-[var(--bg)]">
+            <div class="w-full max-w-7xl mx-auto px-6 py-8 space-y-6">
+                {% block content %}
+                {% endblock %}
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Common Sidebar Logic
+        document.addEventListener('DOMContentLoaded', () => {
+            const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebar-overlay');
+
+            if (mobileMenuBtn && sidebar && overlay) {
+                const toggleSidebar = () => {
+                    const isClosed = sidebar.classList.contains('-translate-x-full');
+                    if (isClosed) {
+                        sidebar.classList.remove('-translate-x-full');
+                        overlay.classList.remove('hidden');
+                    } else {
+                        sidebar.classList.add('-translate-x-full');
+                        overlay.classList.add('hidden');
+                    }
+                };
+
+                mobileMenuBtn.addEventListener('click', toggleSidebar);
+                overlay.addEventListener('click', toggleSidebar);
+            }
+
+            // Initialize Lucide icons if not already done by page script
+            if (window.lucide) {
+                lucide.createIcons();
+            }
+        });
+    </script>
+
+    {% block scripts %}{% endblock %}
+</body>
+
+</html>

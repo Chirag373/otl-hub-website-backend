@@ -26,12 +26,27 @@ class BuyerSettingsView(TemplateView):
 
 class SellerDashboardView(TemplateView):
     template_name = "seller-dashboard.html"
+    extra_context = {'active_page': 'dashboard'}
+
+class SellerSettingsView(TemplateView):
+    template_name = "seller-settings.html"
+    extra_context = {'active_page': 'settings'}
 
 class RealtorDashboardView(TemplateView):
     template_name = "realtor-dashboard.html"
+    extra_context = {'active_page': 'dashboard'}
+
+class RealtorSettingsView(TemplateView):
+    template_name = "realtor-settings.html"
+    extra_context = {'active_page': 'settings'}
 
 class PartnerDashboardView(TemplateView):
     template_name = "partner-dashboard.html"
+    extra_context = {'active_page': 'dashboard'}
+
+class PartnerSettingsView(TemplateView):
+    template_name = "partner-settings.html"
+    extra_context = {'active_page': 'settings'}
 
 class PartnersView(TemplateView):
     template_name = "partners.html"

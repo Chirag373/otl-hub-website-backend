@@ -1,553 +1,382 @@
-<!DOCTYPE html>
-<html lang="en" data-theme="dark">
+{% extends 'partner_base.html' %}
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Partner Dashboard | OTL Platform</title>
+{% block title %}Partner Dashboard | OTL Platform{% endblock %}
 
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Arima:wght@100..700&display=swap" rel="stylesheet">
+{% block content %}
+<div class="space-y-2">
+    <h1 class="text-3xl font-bold text-[var(--foreground)]">Partner Dashboard</h1>
+    <p class="text-[var(--muted-foreground)]">Manage your business partnership and track performance</p>
+</div>
 
-    <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.23/dist/full.min.css" rel="stylesheet" type="text/css" />
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/htmx.org@2.0.4"></script>
-    <script src="https://unpkg.com/lucide@latest"></script>
-
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['Arima', 'system-ui', 'sans-serif'],
-                        heading: ['Arima', 'system-ui', 'sans-serif'],
-                        body: ['Arima', 'system-ui', 'sans-serif'],
-                    },
-                    colors: {
-                        border: "var(--border)",
-                        input: "var(--input)",
-                        ring: "var(--ring)",
-                        background: "var(--background)",
-                        foreground: "var(--foreground)",
-                        primary: {
-                            DEFAULT: "var(--primary)",
-                            foreground: "var(--primary-foreground)",
-                        },
-                        muted: {
-                            DEFAULT: "var(--muted)",
-                            foreground: "var(--muted-foreground)",
-                        },
-                        accent: {
-                            DEFAULT: "var(--accent)",
-                            foreground: "var(--accent-foreground)",
-                            hover: "var(--accent-hover)",
-                        },
-                        card: {
-                            DEFAULT: "var(--card)",
-                            foreground: "var(--card-foreground)",
-                        },
-                    },
-                }
-            }
-        }
-    </script>
-
-    <style>
-        :root {
-            --radius: 0.625rem;
-            --bg: #2a2a2a;
-            --card: #3a3a3a;
-            --muted: #c0c0c0;
-            --accent: #d4af37;
-            --accent-hover: #e0c066;
-            --border: #4a4a4a;
-
-            --background: #2a2a2a;
-            --foreground: #f3f4f6;
-            --card-foreground: #f3f4f6;
-            --popover: #3a3a3a;
-            --popover-foreground: #f3f4f6;
-            --primary: #d4af37;
-            --primary-foreground: #2a2a2a;
-            --secondary: #464646;
-            --secondary-foreground: #f3f4f6;
-            --muted: #464646;
-            --muted-foreground: #c0c0c0;
-            --accent-foreground: #2a2a2a;
-            --destructive: #dc2626;
-            --input: #464646;
-            --ring: #d4af37;
-        }
-
-        body {
-            background-color: var(--bg);
-            color: var(--foreground);
-            font-family: 'Arima', sans-serif;
-            line-height: 1.6;
-            -webkit-font-smoothing: antialiased;
-        }
-
-        .sidebar-transition {
-            transition: transform 0.3s ease-in-out;
-        }
-    </style>
-</head>
-
-<body class="min-h-screen bg-[var(--bg)]">
-
-    <div
-        class="lg:hidden fixed top-0 left-0 right-0 z-50 bg-[var(--card)] border-b border-[var(--border)] px-4 py-3 flex items-center justify-between">
-        <span class="font-bold text-lg text-[var(--foreground)]">OTL Dashboard</span>
-        <button id="mobile-menu-btn"
-            class="btn btn-square btn-ghost btn-sm text-[var(--foreground)]">
-            <i data-lucide="menu" class="w-5 h-5"></i>
-        </button>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+    <div class="card bg-[var(--card)] border border-[var(--border)] shadow-sm">
+        <div class="card-body p-4 flex-row items-center space-x-4">
+            <div class="p-3 bg-green-100/10 rounded-lg text-green-400">
+                <i data-lucide="trending-up" class="h-6 w-6"></i>
+            </div>
+            <div>
+                <p class="text-sm text-[var(--muted-foreground)]">Revenue This Month</p>
+                <p class="text-xl font-bold text-[var(--foreground)]">$12,450</p>
+            </div>
+        </div>
     </div>
 
-    <aside id="sidebar"
-        class="fixed inset-y-0 left-0 z-40 w-64 bg-[var(--card)] border-r border-[var(--border)] transform -translate-x-full lg:translate-x-0 sidebar-transition flex flex-col">
-        <div class="flex items-center justify-center h-16 px-6 border-b border-[var(--border)]">
-            <h1 class="font-heading text-xl font-bold text-[var(--foreground)]">
-                OTL Dashboard
-            </h1>
+    <div class="card bg-[var(--card)] border border-[var(--border)] shadow-sm">
+        <div class="card-body p-4 flex-row items-center space-x-4">
+            <div class="p-3 bg-yellow-100/10 rounded-lg text-yellow-400">
+                <i data-lucide="star" class="h-6 w-6"></i>
+            </div>
+            <div>
+                <p class="text-sm text-[var(--muted-foreground)]">Average Rating</p>
+                <p class="text-xl font-bold text-[var(--foreground)]">4.8★</p>
+            </div>
         </div>
+    </div>
+</div>
 
-        <div class="px-6 py-4 border-b border-[var(--border)]">
-            <div class="flex items-center space-x-3">
+<div class="card bg-[var(--card)] border border-[var(--border)] shadow-xl">
+    <div class="card-body p-6">
+        <div class="flex items-center justify-between mb-6">
+            <div class="flex items-center space-x-4">
                 <div class="avatar placeholder">
-                    <div class="bg-[var(--accent)] text-[var(--bg)] rounded-full w-10">
-                        <span id="sidebar-avatar-initials" class="text-sm font-semibold">SJ</span>
+                    <div class="bg-[var(--accent)] text-[var(--bg)] rounded-full w-16">
+                        <span id="profile-avatar-initials" class="text-xl font-bold">SJ</span>
+                    </div>
+                    <button
+                        class="absolute -bottom-1 -right-1 btn btn-circle btn-xs border border-[var(--border)] bg-[var(--card)] hover:bg-[var(--muted)]">
+                        <i data-lucide="camera" class="h-3 w-3 text-[var(--foreground)]"></i>
+                    </button>
+                </div>
+                <div>
+                    <h3 id="profile-display-name" class="font-semibold text-[var(--foreground)] text-lg">
+                        Sarah Johnson</h3>
+                    <p id="profile-role" class="text-sm text-[var(--muted-foreground)]">Home Inspector</p>
+                    <div class="flex items-center space-x-1 text-xs text-[var(--muted-foreground)] mt-1">
+                        <i data-lucide="calendar" class="h-3 w-3"></i>
+                        <span id="profile-member-since">Partner since March 2022</span>
                     </div>
                 </div>
-                <div class="flex-1 min-w-0">
-                    <p id="sidebar-user-name" class="text-sm font-medium text-[var(--foreground)] truncate">Sarah
-                        Johnson</p>
-                    <p class="text-xs text-[var(--muted-foreground)] truncate capitalize">Partner</p>
+            </div>
+
+            <div class="flex items-center space-x-2">
+                <button id="btn-edit-profile"
+                    class="btn btn-outline border-[var(--border)] text-[var(--foreground)] hover:bg-[var(--muted)] hover:text-[var(--foreground)] btn-sm">
+                    <i data-lucide="edit" class="mr-2 h-4 w-4"></i> Edit Profile
+                </button>
+                <div id="edit-actions" class="hidden flex space-x-2">
+                    <button id="btn-cancel-profile" class="btn btn-ghost btn-sm text-[var(--foreground)]">
+                        <i data-lucide="x" class="mr-2 h-4 w-4"></i> Cancel
+                    </button>
+                    <button id="btn-save-profile"
+                        class="btn btn-primary btn-sm bg-[var(--accent)] text-[var(--bg)] border-none hover:bg-[var(--accent-hover)]">
+                        <i data-lucide="save" class="mr-2 h-4 w-4"></i> Save
+                    </button>
                 </div>
             </div>
         </div>
 
-        <nav class="flex-1 px-4 py-6 space-y-2">
-            <a href="#"
-                class="btn btn-ghost w-full justify-start bg-[var(--accent)] text-[var(--bg)] hover:bg-[var(--accent-hover)]">
-                <i data-lucide="home" class="mr-3 h-4 w-4"></i> Dashboard
-            </a>
-            <a href="#"
-                class="btn btn-ghost w-full justify-start text-[var(--foreground)] hover:bg-[var(--accent)] hover:text-black">
-                <i data-lucide="settings" class="mr-3 h-4 w-4"></i> Settings
-            </a>
-        </nav>
+        <h3 class="text-lg font-semibold text-[var(--foreground)] mb-4">Business Information</h3>
 
-        <div class="p-4 border-t border-[var(--border)]">
-            <a href="{% url 'login' %}"
-                class="btn btn-ghost w-full justify-start text-[var(--foreground)] hover:bg-yellow-500 hover:text-black">
-                <i data-lucide="log-out" class="mr-3 h-4 w-4"></i> Sign Out
-            </a>
-        </div>
-    </aside>
-
-    <div id="sidebar-overlay" class="fixed inset-0 bg-black/50 z-30 hidden lg:hidden"></div>
-
-    <div class="lg:pl-64 pt-16 lg:pt-0">
-        <main class="min-h-screen bg-[var(--bg)]">
-            <div class="w-full max-w-7xl mx-auto px-6 py-8 space-y-6">
-
-                <div class="space-y-2">
-                    <h1 class="text-3xl font-bold text-[var(--foreground)]">Partner Dashboard</h1>
-                    <p class="text-[var(--muted-foreground)]">Manage your business partnership and track performance</p>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                    <div class="card bg-[var(--card)] border border-[var(--border)] shadow-sm">
-                        <div class="card-body p-4 flex-row items-center space-x-4">
-                            <div class="p-3 bg-green-100/10 rounded-lg text-green-400">
-                                <i data-lucide="trending-up" class="h-6 w-6"></i>
-                            </div>
-                            <div>
-                                <p class="text-sm text-[var(--muted-foreground)]">Revenue This Month</p>
-                                <p class="text-xl font-bold text-[var(--foreground)]">$12,450</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="card bg-[var(--card)] border border-[var(--border)] shadow-sm">
-                        <div class="card-body p-4 flex-row items-center space-x-4">
-                            <div class="p-3 bg-yellow-100/10 rounded-lg text-yellow-400">
-                                <i data-lucide="star" class="h-6 w-6"></i>
-                            </div>
-                            <div>
-                                <p class="text-sm text-[var(--muted-foreground)]">Average Rating</p>
-                                <p class="text-xl font-bold text-[var(--foreground)]">4.8★</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="card bg-[var(--card)] border border-[var(--border)] shadow-xl">
-                    <div class="card-body p-6">
-                        <div class="flex items-center justify-between mb-6">
-                            <div class="flex items-center space-x-4">
-                                <div class="avatar placeholder">
-                                    <div class="bg-[var(--accent)] text-[var(--bg)] rounded-full w-16">
-                                        <span id="profile-avatar-initials" class="text-xl font-bold">SJ</span>
-                                    </div>
-                                    <button
-                                        class="absolute -bottom-1 -right-1 btn btn-circle btn-xs border border-[var(--border)] bg-[var(--card)] hover:bg-[var(--muted)]">
-                                        <i data-lucide="camera" class="h-3 w-3 text-[var(--foreground)]"></i>
-                                    </button>
-                                </div>
-                                <div>
-                                    <h3 id="profile-display-name" class="font-semibold text-[var(--foreground)] text-lg">
-                                        Sarah Johnson</h3>
-                                    <p id="profile-role" class="text-sm text-[var(--muted-foreground)]">Home Inspector</p>
-                                    <div class="flex items-center space-x-1 text-xs text-[var(--muted-foreground)] mt-1">
-                                        <i data-lucide="calendar" class="h-3 w-3"></i>
-                                        <span id="profile-member-since">Partner since March 2022</span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="flex items-center space-x-2">
-                                <button id="btn-edit-profile"
-                                    class="btn btn-outline border-[var(--border)] text-[var(--foreground)] hover:bg-[var(--muted)] hover:text-[var(--foreground)] btn-sm">
-                                    <i data-lucide="edit" class="mr-2 h-4 w-4"></i> Edit Profile
-                                </button>
-                                <div id="edit-actions" class="hidden flex space-x-2">
-                                    <button id="btn-cancel-profile"
-                                        class="btn btn-ghost btn-sm text-[var(--foreground)]">
-                                        <i data-lucide="x" class="mr-2 h-4 w-4"></i> Cancel
-                                    </button>
-                                    <button id="btn-save-profile"
-                                        class="btn btn-primary btn-sm bg-[var(--accent)] text-[var(--bg)] border-none hover:bg-[var(--accent-hover)]">
-                                        <i data-lucide="save" class="mr-2 h-4 w-4"></i> Save
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-
-                        <h3 class="text-lg font-semibold text-[var(--foreground)] mb-4">Business Information</h3>
-
-                        <form id="profile-form" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div class="form-control w-full">
-                                <label class="label">
-                                    <span class="label-text text-[var(--foreground)] font-medium">First Name</span>
-                                </label>
-                                <input type="text" id="input-first-name"
-                                    class="input input-bordered w-full bg-[var(--input)] border-[var(--border)] text-[var(--foreground)] disabled:opacity-50 disabled:bg-[var(--input)] disabled:text-[var(--muted-foreground)] focus:outline-none focus:border-[var(--accent)]"
-                                    disabled>
-                            </div>
-                            <div class="form-control w-full">
-                                <label class="label">
-                                    <span class="label-text text-[var(--foreground)] font-medium">Last Name</span>
-                                </label>
-                                <input type="text" id="input-last-name"
-                                    class="input input-bordered w-full bg-[var(--input)] border-[var(--border)] text-[var(--foreground)] disabled:opacity-50 disabled:bg-[var(--input)] disabled:text-[var(--muted-foreground)] focus:outline-none focus:border-[var(--accent)]"
-                                    disabled>
-                            </div>
-                            <div class="form-control w-full">
-                                <label class="label">
-                                    <span class="label-text text-[var(--foreground)] font-medium">Email Address</span>
-                                </label>
-                                <input type="email" id="input-email"
-                                    class="input input-bordered w-full bg-[var(--input)] border-[var(--border)] text-[var(--foreground)] disabled:opacity-50 disabled:bg-[var(--input)] disabled:text-[var(--muted-foreground)] focus:outline-none focus:border-[var(--accent)]"
-                                    disabled>
-                            </div>
-                            <div class="form-control w-full">
-                                <label class="label">
-                                    <span class="label-text text-[var(--foreground)] font-medium">Phone Number</span>
-                                </label>
-                                <input type="tel" id="input-phone"
-                                    class="input input-bordered w-full bg-[var(--input)] border-[var(--border)] text-[var(--foreground)] disabled:opacity-50 disabled:bg-[var(--input)] disabled:text-[var(--muted-foreground)] focus:outline-none focus:border-[var(--accent)]"
-                                    disabled>
-                            </div>
-
-                            <div class="form-control w-full">
-                                <label class="label">
-                                    <span class="label-text text-[var(--foreground)] font-medium">Company Name</span>
-                                </label>
-                                <input type="text" id="input-company"
-                                    class="input input-bordered w-full bg-[var(--input)] border-[var(--border)] text-[var(--foreground)] disabled:opacity-50 disabled:bg-[var(--input)] disabled:text-[var(--muted-foreground)] focus:outline-none focus:border-[var(--accent)]"
-                                    disabled>
-                            </div>
-                            <div class="form-control w-full">
-                                <label class="label">
-                                    <span class="label-text text-[var(--foreground)] font-medium">Partnership Type</span>
-                                </label>
-                                <input type="text" id="input-type"
-                                    class="input input-bordered w-full bg-[var(--input)] border-[var(--border)] text-[var(--foreground)] disabled:opacity-50 disabled:bg-[var(--input)] disabled:text-[var(--muted-foreground)] focus:outline-none focus:border-[var(--accent)]"
-                                    disabled>
-                            </div>
-                            <div class="form-control w-full">
-                                <label class="label">
-                                    <span class="label-text text-[var(--foreground)] font-medium">Service Areas</span>
-                                </label>
-                                <input type="text" id="input-areas"
-                                    class="input input-bordered w-full bg-[var(--input)] border-[var(--border)] text-[var(--foreground)] disabled:opacity-50 disabled:bg-[var(--input)] disabled:text-[var(--muted-foreground)] focus:outline-none focus:border-[var(--accent)]"
-                                    disabled>
-                            </div>
-                            <div class="form-control w-full">
-                                <label class="label">
-                                    <span class="label-text text-[var(--foreground)] font-medium">Business License</span>
-                                </label>
-                                <input type="text" id="input-license"
-                                    class="input input-bordered w-full bg-[var(--input)] border-[var(--border)] text-[var(--foreground)] disabled:opacity-50 disabled:bg-[var(--input)] disabled:text-[var(--muted-foreground)] focus:outline-none focus:border-[var(--accent)]"
-                                    disabled>
-                            </div>
-                            <div class="form-control w-full">
-                                <label class="label">
-                                    <span class="label-text text-[var(--foreground)] font-medium">Website</span>
-                                </label>
-                                <input type="url" id="input-website"
-                                    class="input input-bordered w-full bg-[var(--input)] border-[var(--border)] text-[var(--foreground)] disabled:opacity-50 disabled:bg-[var(--input)] disabled:text-[var(--muted-foreground)] focus:outline-none focus:border-[var(--accent)]"
-                                    disabled>
-                            </div>
-                            <div class="form-control w-full">
-                                <label class="label">
-                                    <span class="label-text text-[var(--foreground)] font-medium">Years of Experience</span>
-                                </label>
-                                <input type="text" id="input-experience"
-                                    class="input input-bordered w-full bg-[var(--input)] border-[var(--border)] text-[var(--foreground)] disabled:opacity-50 disabled:bg-[var(--input)] disabled:text-[var(--muted-foreground)] focus:outline-none focus:border-[var(--accent)]"
-                                    disabled>
-                            </div>
-
-                            <div class="form-control w-full md:col-span-2">
-                                <label class="label">
-                                    <span class="label-text text-[var(--foreground)] font-medium">Business Description</span>
-                                </label>
-                                <textarea id="input-bio" rows="3"
-                                    class="textarea textarea-bordered w-full bg-[var(--input)] border-[var(--border)] text-[var(--foreground)] disabled:opacity-50 disabled:bg-[var(--input)] disabled:text-[var(--muted-foreground)] focus:outline-none focus:border-[var(--accent)] resize-none"
-                                    disabled></textarea>
-                            </div>
-                        </form>
-
-                        <div id="save-notification" class="hidden mt-4 p-4 rounded-lg border"></div>
-                    </div>
-                </div>
-
-                <div class="card bg-[var(--card)] border border-[var(--border)] shadow-xl">
-                    <div class="card-body p-6">
-                        <h3 class="text-lg font-semibold text-[var(--foreground)] mb-4">Partnership Status</h3>
-
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div class="space-y-4">
-                                <div class="form-control w-full">
-                                    <label class="label">
-                                        <span class="label-text text-[var(--foreground)] font-medium">Partner Since</span>
-                                    </label>
-                                    <div
-                                        class="flex items-center space-x-2 px-3 py-3 bg-[var(--muted)]/30 rounded-lg border border-[var(--border)]">
-                                        <i data-lucide="calendar" class="h-4 w-4 text-[var(--muted-foreground)]"></i>
-                                        <span id="status-since" class="text-[var(--foreground)] text-sm">--</span>
-                                    </div>
-                                </div>
-                                <div class="form-control w-full">
-                                    <label class="label">
-                                        <span class="label-text text-[var(--foreground)] font-medium">Renewal Date</span>
-                                    </label>
-                                    <input type="text" id="status-renewal" disabled
-                                        class="input input-bordered w-full bg-[var(--muted)]/30 border-[var(--border)] text-[var(--foreground)] opacity-70">
-                                </div>
-                            </div>
-                            <div class="space-y-4">
-                                <div class="form-control w-full">
-                                    <label class="label">
-                                        <span class="label-text text-[var(--foreground)] font-medium">Partnership Fee</span>
-                                    </label>
-                                    <input type="text" id="status-fee" disabled
-                                        class="input input-bordered w-full bg-[var(--muted)]/30 border-[var(--border)] text-[var(--foreground)] font-semibold opacity-70">
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="mt-6 alert bg-[var(--accent)]/10 border-[var(--accent)]/20 text-[var(--accent)] text-sm">
-                            <i data-lucide="info" class="h-4 w-4"></i>
-                            <span><strong>Your partnership</strong> provides access to our client referral network, marketing tools, and business development resources.</span>
-                        </div>
-                    </div>
-                </div>
-
+        <form id="profile-form" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="form-control w-full">
+                <label class="label">
+                    <span class="label-text text-[var(--foreground)] font-medium">First Name</span>
+                </label>
+                <input type="text" id="input-first-name"
+                    class="input input-bordered w-full bg-[var(--input)] border-[var(--border)] text-[var(--foreground)] disabled:opacity-50 disabled:bg-[var(--input)] disabled:text-[var(--muted-foreground)] focus:outline-none focus:border-[var(--accent)]"
+                    disabled>
             </div>
-        </main>
+            <div class="form-control w-full">
+                <label class="label">
+                    <span class="label-text text-[var(--foreground)] font-medium">Last Name</span>
+                </label>
+                <input type="text" id="input-last-name"
+                    class="input input-bordered w-full bg-[var(--input)] border-[var(--border)] text-[var(--foreground)] disabled:opacity-50 disabled:bg-[var(--input)] disabled:text-[var(--muted-foreground)] focus:outline-none focus:border-[var(--accent)]"
+                    disabled>
+            </div>
+            <div class="form-control w-full">
+                <label class="label">
+                    <span class="label-text text-[var(--foreground)] font-medium">Email Address</span>
+                </label>
+                <input type="email" id="input-email"
+                    class="input input-bordered w-full bg-[var(--input)] border-[var(--border)] text-[var(--foreground)] disabled:opacity-50 disabled:bg-[var(--input)] disabled:text-[var(--muted-foreground)] focus:outline-none focus:border-[var(--accent)]"
+                    disabled>
+            </div>
+            <div class="form-control w-full">
+                <label class="label">
+                    <span class="label-text text-[var(--foreground)] font-medium">Phone Number</span>
+                </label>
+                <input type="tel" id="input-phone"
+                    class="input input-bordered w-full bg-[var(--input)] border-[var(--border)] text-[var(--foreground)] disabled:opacity-50 disabled:bg-[var(--input)] disabled:text-[var(--muted-foreground)] focus:outline-none focus:border-[var(--accent)]"
+                    disabled>
+            </div>
+
+            <div class="form-control w-full">
+                <label class="label">
+                    <span class="label-text text-[var(--foreground)] font-medium">Company Name</span>
+                </label>
+                <input type="text" id="input-company"
+                    class="input input-bordered w-full bg-[var(--input)] border-[var(--border)] text-[var(--foreground)] disabled:opacity-50 disabled:bg-[var(--input)] disabled:text-[var(--muted-foreground)] focus:outline-none focus:border-[var(--accent)]"
+                    disabled>
+            </div>
+            <div class="form-control w-full">
+                <label class="label">
+                    <span class="label-text text-[var(--foreground)] font-medium">Partnership Type</span>
+                </label>
+                <input type="text" id="input-type"
+                    class="input input-bordered w-full bg-[var(--input)] border-[var(--border)] text-[var(--foreground)] disabled:opacity-50 disabled:bg-[var(--input)] disabled:text-[var(--muted-foreground)] focus:outline-none focus:border-[var(--accent)]"
+                    disabled>
+            </div>
+            <div class="form-control w-full">
+                <label class="label">
+                    <span class="label-text text-[var(--foreground)] font-medium">Service Areas</span>
+                </label>
+                <input type="text" id="input-areas"
+                    class="input input-bordered w-full bg-[var(--input)] border-[var(--border)] text-[var(--foreground)] disabled:opacity-50 disabled:bg-[var(--input)] disabled:text-[var(--muted-foreground)] focus:outline-none focus:border-[var(--accent)]"
+                    disabled>
+            </div>
+            <div class="form-control w-full">
+                <label class="label">
+                    <span class="label-text text-[var(--foreground)] font-medium">Business License</span>
+                </label>
+                <input type="text" id="input-license"
+                    class="input input-bordered w-full bg-[var(--input)] border-[var(--border)] text-[var(--foreground)] disabled:opacity-50 disabled:bg-[var(--input)] disabled:text-[var(--muted-foreground)] focus:outline-none focus:border-[var(--accent)]"
+                    disabled>
+            </div>
+            <div class="form-control w-full">
+                <label class="label">
+                    <span class="label-text text-[var(--foreground)] font-medium">Website</span>
+                </label>
+                <input type="url" id="input-website"
+                    class="input input-bordered w-full bg-[var(--input)] border-[var(--border)] text-[var(--foreground)] disabled:opacity-50 disabled:bg-[var(--input)] disabled:text-[var(--muted-foreground)] focus:outline-none focus:border-[var(--accent)]"
+                    disabled>
+            </div>
+            <div class="form-control w-full">
+                <label class="label">
+                    <span class="label-text text-[var(--foreground)] font-medium">Years of Experience</span>
+                </label>
+                <input type="text" id="input-experience"
+                    class="input input-bordered w-full bg-[var(--input)] border-[var(--border)] text-[var(--foreground)] disabled:opacity-50 disabled:bg-[var(--input)] disabled:text-[var(--muted-foreground)] focus:outline-none focus:border-[var(--accent)]"
+                    disabled>
+            </div>
+
+            <div class="form-control w-full md:col-span-2">
+                <label class="label">
+                    <span class="label-text text-[var(--foreground)] font-medium">Business Description</span>
+                </label>
+                <textarea id="input-bio" rows="3"
+                    class="textarea textarea-bordered w-full bg-[var(--input)] border-[var(--border)] text-[var(--foreground)] disabled:opacity-50 disabled:bg-[var(--input)] disabled:text-[var(--muted-foreground)] focus:outline-none focus:border-[var(--accent)] resize-none"
+                    disabled></textarea>
+            </div>
+        </form>
+
+        <div id="save-notification" class="hidden mt-4 p-4 rounded-lg border"></div>
     </div>
+</div>
 
-    <script>
-        // --- DATA ---
-        let profile = {
-            firstName: "Sarah",
-            lastName: "Johnson",
-            email: "sarah.johnson@business.com",
-            phone: "(555) 123-4567",
-            companyName: "Johnson Home Services",
-            partnershipType: "Home Inspector",
-            serviceAreas: "Houston, TX",
-            website: "https://johnsonhomeservices.com",
-            businessLicense: "TX-HI-12345",
-            experience: "12 years",
-            joinDate: "March 2022",
-            bio: "Professional home inspection services with over 12 years of experience serving the Houston area. Certified and licensed to provide comprehensive property assessments.",
-            membership: {
-                level: "Business Partner",
-                feePaid: "$398.00",
-                expirationDate: "March 2025"
-            }
-        };
+<div class="card bg-[var(--card)] border border-[var(--border)] shadow-xl">
+    <div class="card-body p-6">
+        <h3 class="text-lg font-semibold text-[var(--foreground)] mb-4">Partnership Status</h3>
 
-        // --- DOM ELEMENTS ---
-        const dom = {
-            mobileMenuBtn: document.getElementById('mobile-menu-btn'),
-            sidebar: document.getElementById('sidebar'),
-            overlay: document.getElementById('sidebar-overlay'),
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="space-y-4">
+                <div class="form-control w-full">
+                    <label class="label">
+                        <span class="label-text text-[var(--foreground)] font-medium">Partner Since</span>
+                    </label>
+                    <div
+                        class="flex items-center space-x-2 px-3 py-3 bg-[var(--muted)]/30 rounded-lg border border-[var(--border)]">
+                        <i data-lucide="calendar" class="h-4 w-4 text-[var(--muted-foreground)]"></i>
+                        <span id="status-since" class="text-[var(--foreground)] text-sm">--</span>
+                    </div>
+                </div>
+                <div class="form-control w-full">
+                    <label class="label">
+                        <span class="label-text text-[var(--foreground)] font-medium">Renewal Date</span>
+                    </label>
+                    <input type="text" id="status-renewal" disabled
+                        class="input input-bordered w-full bg-[var(--muted)]/30 border-[var(--border)] text-[var(--foreground)] opacity-70">
+                </div>
+            </div>
+            <div class="space-y-4">
+                <div class="form-control w-full">
+                    <label class="label">
+                        <span class="label-text text-[var(--foreground)] font-medium">Partnership Fee</span>
+                    </label>
+                    <input type="text" id="status-fee" disabled
+                        class="input input-bordered w-full bg-[var(--muted)]/30 border-[var(--border)] text-[var(--foreground)] font-semibold opacity-70">
+                </div>
+            </div>
+        </div>
 
-            // Profile Display
-            avatarInitials: document.getElementById('profile-avatar-initials'),
-            sidebarInitials: document.getElementById('sidebar-avatar-initials'),
-            displayName: document.getElementById('profile-display-name'),
-            sidebarName: document.getElementById('sidebar-user-name'),
-            memberSince: document.getElementById('profile-member-since'),
-            displayRole: document.getElementById('profile-role'),
+        <div class="mt-6 alert bg-[var(--accent)]/10 border-[var(--accent)]/20 text-[var(--accent)] text-sm">
+            <i data-lucide="info" class="h-4 w-4"></i>
+            <span><strong>Your partnership</strong> provides access to our client referral network, marketing tools, and
+                business development resources.</span>
+        </div>
+    </div>
+</div>
+{% endblock %}
 
-            // Form Inputs
-            inputFirstName: document.getElementById('input-first-name'),
-            inputLastName: document.getElementById('input-last-name'),
-            inputEmail: document.getElementById('input-email'),
-            inputPhone: document.getElementById('input-phone'),
-            inputCompany: document.getElementById('input-company'),
-            inputType: document.getElementById('input-type'),
-            inputAreas: document.getElementById('input-areas'),
-            inputLicense: document.getElementById('input-license'),
-            inputWebsite: document.getElementById('input-website'),
-            inputExperience: document.getElementById('input-experience'),
-            inputBio: document.getElementById('input-bio'),
+{% block scripts %}
+<script>
+    // --- DATA ---
+    let profile = {
+        firstName: "Sarah",
+        lastName: "Johnson",
+        email: "sarah.johnson@business.com",
+        phone: "(555) 123-4567",
+        companyName: "Johnson Home Services",
+        partnershipType: "Home Inspector",
+        serviceAreas: "Houston, TX",
+        website: "https://johnsonhomeservices.com",
+        businessLicense: "TX-HI-12345",
+        experience: "12 years",
+        joinDate: "March 2022",
+        bio: "Professional home inspection services with over 12 years of experience serving the Houston area. Certified and licensed to provide comprehensive property assessments.",
+        membership: {
+            level: "Business Partner",
+            feePaid: "$398.00",
+            expirationDate: "March 2025"
+        }
+    };
 
-            // Status
-            statusSince: document.getElementById('status-since'),
-            statusRenewal: document.getElementById('status-renewal'),
-            statusFee: document.getElementById('status-fee'),
+    // --- DOM ELEMENTS ---
+    const dom = {
+        // Sidebar Initials handled by partial mostly, but for syncing
+        sidebarInitials: document.getElementById('sidebar-avatar-initials'),
+        sidebarName: document.getElementById('sidebar-user-name'),
 
-            // Actions
-            btnEdit: document.getElementById('btn-edit-profile'),
-            btnCancel: document.getElementById('btn-cancel-profile'),
-            btnSave: document.getElementById('btn-save-profile'),
-            editActions: document.getElementById('edit-actions'),
-            saveNotification: document.getElementById('save-notification')
-        };
+        // Profile Display
+        avatarInitials: document.getElementById('profile-avatar-initials'),
+        displayName: document.getElementById('profile-display-name'),
+        memberSince: document.getElementById('profile-member-since'),
+        displayRole: document.getElementById('profile-role'),
 
-        // --- INITIALIZATION ---
-        function init() {
-            lucide.createIcons();
+        // Form Inputs
+        inputFirstName: document.getElementById('input-first-name'),
+        inputLastName: document.getElementById('input-last-name'),
+        inputEmail: document.getElementById('input-email'),
+        inputPhone: document.getElementById('input-phone'),
+        inputCompany: document.getElementById('input-company'),
+        inputType: document.getElementById('input-type'),
+        inputAreas: document.getElementById('input-areas'),
+        inputLicense: document.getElementById('input-license'),
+        inputWebsite: document.getElementById('input-website'),
+        inputExperience: document.getElementById('input-experience'),
+        inputBio: document.getElementById('input-bio'),
+
+        // Status
+        statusSince: document.getElementById('status-since'),
+        statusRenewal: document.getElementById('status-renewal'),
+        statusFee: document.getElementById('status-fee'),
+
+        // Actions
+        btnEdit: document.getElementById('btn-edit-profile'),
+        btnCancel: document.getElementById('btn-cancel-profile'),
+        btnSave: document.getElementById('btn-save-profile'),
+        editActions: document.getElementById('edit-actions'),
+        saveNotification: document.getElementById('save-notification')
+    };
+
+    // --- INITIALIZATION ---
+    function init() {
+        if (window.lucide) lucide.createIcons();
+        populateData();
+        setupEventListeners();
+    }
+
+    // --- LOGIC ---
+
+    function populateData() {
+        // Text Elements
+        const fullName = `${profile.firstName} ${profile.lastName}`;
+        const initials = (profile.firstName[0] + profile.lastName[0]).toUpperCase();
+
+        if (dom.avatarInitials) dom.avatarInitials.textContent = initials;
+        if (dom.sidebarInitials) dom.sidebarInitials.textContent = initials;
+        if (dom.displayName) dom.displayName.textContent = fullName;
+        if (dom.sidebarName) dom.sidebarName.textContent = fullName;
+        if (dom.memberSince) dom.memberSince.textContent = `Partner since ${profile.joinDate}`;
+        if (dom.displayRole) dom.displayRole.textContent = profile.partnershipType;
+
+        // Inputs
+        if (dom.inputFirstName) dom.inputFirstName.value = profile.firstName;
+        if (dom.inputLastName) dom.inputLastName.value = profile.lastName;
+        if (dom.inputEmail) dom.inputEmail.value = profile.email;
+        if (dom.inputPhone) dom.inputPhone.value = profile.phone;
+        if (dom.inputCompany) dom.inputCompany.value = profile.companyName;
+        if (dom.inputType) dom.inputType.value = profile.partnershipType;
+        if (dom.inputAreas) dom.inputAreas.value = profile.serviceAreas;
+        if (dom.inputLicense) dom.inputLicense.value = profile.businessLicense;
+        if (dom.inputWebsite) dom.inputWebsite.value = profile.website;
+        if (dom.inputExperience) dom.inputExperience.value = profile.experience;
+        if (dom.inputBio) dom.inputBio.value = profile.bio;
+
+        // Status
+        if (dom.statusSince) dom.statusSince.textContent = profile.joinDate;
+        if (dom.statusRenewal) dom.statusRenewal.value = profile.membership.expirationDate;
+        if (dom.statusFee) dom.statusFee.value = profile.membership.feePaid;
+    }
+
+    // --- EVENT LISTENERS ---
+    function setupEventListeners() {
+        // Edit Profile
+        if (dom.btnEdit) dom.btnEdit.addEventListener('click', () => setEditMode(true));
+        if (dom.btnCancel) dom.btnCancel.addEventListener('click', () => {
+            setEditMode(false);
+            populateData(); // Reset
+        });
+        if (dom.btnSave) dom.btnSave.addEventListener('click', (e) => {
+            e.preventDefault();
+            saveProfile();
+        });
+    }
+
+    function setEditMode(isEditing) {
+        dom.btnEdit.parentElement.classList.toggle('hidden', isEditing);
+        dom.editActions.classList.toggle('hidden', !isEditing);
+
+        const inputs = document.querySelectorAll('#profile-form input, #profile-form textarea');
+        inputs.forEach(input => input.disabled = !isEditing);
+    }
+
+    function saveProfile() {
+        dom.btnSave.innerHTML = `<span class="loading loading-spinner loading-xs"></span> Saving...`;
+
+        setTimeout(() => {
+            // Update Local Data
+            profile.firstName = dom.inputFirstName.value;
+            profile.lastName = dom.inputLastName.value;
+            profile.email = dom.inputEmail.value;
+            profile.phone = dom.inputPhone.value;
+            profile.companyName = dom.inputCompany.value;
+            profile.partnershipType = dom.inputType.value;
+            profile.serviceAreas = dom.inputAreas.value;
+            profile.businessLicense = dom.inputLicense.value;
+            profile.website = dom.inputWebsite.value;
+            profile.experience = dom.inputExperience.value;
+            profile.bio = dom.inputBio.value;
+
+            // UI Updates
             populateData();
-            setupEventListeners();
-        }
+            setEditMode(false);
 
-        // --- LOGIC ---
+            dom.btnSave.innerHTML = `<i data-lucide="save" class="mr-2 h-4 w-4"></i> Save`;
+            if (window.lucide) lucide.createIcons();
 
-        function populateData() {
-            // Text Elements
-            const fullName = `${profile.firstName} ${profile.lastName}`;
-            const initials = (profile.firstName[0] + profile.lastName[0]).toUpperCase();
+            // Success Message
+            dom.saveNotification.className = "mt-4 alert alert-success text-sm";
+            dom.saveNotification.innerHTML = `<i data-lucide="check-circle" class="w-5 h-5"></i> <span>Profile updated successfully!</span>`;
+            dom.saveNotification.classList.remove('hidden');
+            if (window.lucide) lucide.createIcons();
 
-            dom.avatarInitials.textContent = initials;
-            dom.sidebarInitials.textContent = initials;
-            dom.displayName.textContent = fullName;
-            dom.sidebarName.textContent = fullName;
-            dom.memberSince.textContent = `Partner since ${profile.joinDate}`;
-            dom.displayRole.textContent = profile.partnershipType;
-
-            // Inputs
-            dom.inputFirstName.value = profile.firstName;
-            dom.inputLastName.value = profile.lastName;
-            dom.inputEmail.value = profile.email;
-            dom.inputPhone.value = profile.phone;
-            dom.inputCompany.value = profile.companyName;
-            dom.inputType.value = profile.partnershipType;
-            dom.inputAreas.value = profile.serviceAreas;
-            dom.inputLicense.value = profile.businessLicense;
-            dom.inputWebsite.value = profile.website;
-            dom.inputExperience.value = profile.experience;
-            dom.inputBio.value = profile.bio;
-
-            // Status
-            dom.statusSince.textContent = profile.joinDate;
-            dom.statusRenewal.value = profile.membership.expirationDate;
-            dom.statusFee.value = profile.membership.feePaid;
-        }
-
-        // --- EVENT LISTENERS ---
-        function setupEventListeners() {
-            // Sidebar
-            const toggleSidebar = () => {
-                const isClosed = dom.sidebar.classList.contains('-translate-x-full');
-                if (isClosed) {
-                    dom.sidebar.classList.remove('-translate-x-full');
-                    dom.overlay.classList.remove('hidden');
-                } else {
-                    dom.sidebar.classList.add('-translate-x-full');
-                    dom.overlay.classList.add('hidden');
-                }
-            };
-            dom.mobileMenuBtn.addEventListener('click', toggleSidebar);
-            dom.overlay.addEventListener('click', toggleSidebar);
-
-            // Edit Profile
-            dom.btnEdit.addEventListener('click', () => setEditMode(true));
-            dom.btnCancel.addEventListener('click', () => {
-                setEditMode(false);
-                populateData(); // Reset
-            });
-            dom.btnSave.addEventListener('click', (e) => {
-                e.preventDefault();
-                saveProfile();
-            });
-        }
-
-        function setEditMode(isEditing) {
-            dom.btnEdit.parentElement.classList.toggle('hidden', isEditing);
-            dom.editActions.classList.toggle('hidden', !isEditing);
-
-            const inputs = document.querySelectorAll('#profile-form input, #profile-form textarea');
-            inputs.forEach(input => input.disabled = !isEditing);
-        }
-
-        function saveProfile() {
-            dom.btnSave.innerHTML = `<span class="loading loading-spinner loading-xs"></span> Saving...`;
-            
             setTimeout(() => {
-                // Update Local Data
-                profile.firstName = dom.inputFirstName.value;
-                profile.lastName = dom.inputLastName.value;
-                profile.email = dom.inputEmail.value;
-                profile.phone = dom.inputPhone.value;
-                profile.companyName = dom.inputCompany.value;
-                profile.partnershipType = dom.inputType.value;
-                profile.serviceAreas = dom.inputAreas.value;
-                profile.businessLicense = dom.inputLicense.value;
-                profile.website = dom.inputWebsite.value;
-                profile.experience = dom.inputExperience.value;
-                profile.bio = dom.inputBio.value;
+                dom.saveNotification.classList.add('hidden');
+            }, 3000);
+        }, 1000);
+    }
 
-                // UI Updates
-                populateData();
-                setEditMode(false);
-
-                dom.btnSave.innerHTML = `<i data-lucide="save" class="mr-2 h-4 w-4"></i> Save`;
-                lucide.createIcons();
-
-                // Success Message
-                dom.saveNotification.className = "mt-4 alert alert-success text-sm";
-                dom.saveNotification.innerHTML = `<i data-lucide="check-circle" class="w-5 h-5"></i> <span>Profile updated successfully!</span>`;
-                dom.saveNotification.classList.remove('hidden');
-                lucide.createIcons();
-
-                setTimeout(() => {
-                    dom.saveNotification.classList.add('hidden');
-                }, 3000);
-            }, 1000);
-        }
-
-        init();
-    </script>
-</body>
-
-</html>
+    init();
+</script>
+{% endblock %}

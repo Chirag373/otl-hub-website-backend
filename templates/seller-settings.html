@@ -1,4 +1,4 @@
-{% extends 'buyer_base.html' %}
+{% extends 'seller_base.html' %}
 
 {% block title %}Settings | OTL Platform{% endblock %}
 
@@ -17,7 +17,7 @@
 {% endblock %}
 
 {% block sidebar %}
-{% include 'partials/buyer_sidebar.html' with active_page='settings' %}
+{% include 'partials/seller_sidebar.html' with active_page='settings' %}
 {% endblock %}
 
 {% block content %}
@@ -36,14 +36,27 @@
     <div class="p-6 space-y-6">
         <div class="flex items-center justify-between">
             <div class="space-y-0.5">
-                <label class="text-base font-medium text-[var(--foreground)]">Email Alerts</label>
-                <p class="text-sm text-[var(--muted-foreground)]">Receive updates about new properties matching your
-                    searches</p>
+                <label class="text-base font-medium text-[var(--foreground)]">Showing Requests</label>
+                <p class="text-sm text-[var(--muted-foreground)]">Receive alerts when buyers request to see your
+                    property</p>
             </div>
             <div class="relative inline-block w-12 mr-2 align-middle select-none transition duration-200 ease-in">
-                <input type="checkbox" name="toggle" id="email-alerts"
+                <input type="checkbox" name="toggle" id="showing-alerts" checked
                     class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer border-[var(--input)] checked:right-0 checked:border-[var(--accent)]" />
-                <label for="email-alerts"
+                <label for="showing-alerts"
+                    class="toggle-label block overflow-hidden h-6 rounded-full bg-[var(--input)] cursor-pointer"></label>
+            </div>
+        </div>
+
+        <div class="flex items-center justify-between border-t border-[var(--border)] pt-6">
+            <div class="space-y-0.5">
+                <label class="text-base font-medium text-[var(--foreground)]">Offer Alerts</label>
+                <p class="text-sm text-[var(--muted-foreground)]">Receive instant notification for new offers</p>
+            </div>
+            <div class="relative inline-block w-12 mr-2 align-middle select-none transition duration-200 ease-in">
+                <input type="checkbox" name="toggle" id="offer-alerts" checked
+                    class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer border-[var(--input)] checked:right-0 checked:border-[var(--accent)]" />
+                <label for="offer-alerts"
                     class="toggle-label block overflow-hidden h-6 rounded-full bg-[var(--input)] cursor-pointer"></label>
             </div>
         </div>
@@ -57,19 +70,6 @@
                 <input type="checkbox" name="toggle" id="marketing-emails"
                     class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer border-[var(--input)] checked:right-0 checked:border-[var(--accent)]" />
                 <label for="marketing-emails"
-                    class="toggle-label block overflow-hidden h-6 rounded-full bg-[var(--input)] cursor-pointer"></label>
-            </div>
-        </div>
-
-        <div class="flex items-center justify-between border-t border-[var(--border)] pt-6">
-            <div class="space-y-0.5">
-                <label class="text-base font-medium text-[var(--foreground)]">Push Notifications</label>
-                <p class="text-sm text-[var(--muted-foreground)]">Receive notifications on your device</p>
-            </div>
-            <div class="relative inline-block w-12 mr-2 align-middle select-none transition duration-200 ease-in">
-                <input type="checkbox" name="toggle" id="push-notifs" checked
-                    class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer border-[var(--input)] checked:right-0 checked:border-[var(--accent)]" />
-                <label for="push-notifs"
                     class="toggle-label block overflow-hidden h-6 rounded-full bg-[var(--input)] cursor-pointer"></label>
             </div>
         </div>
@@ -149,7 +149,7 @@
 
     // --- EVENT LISTENERS ---
     function setupEventListeners() {
-        // Sidebar toggle managed by buyer_base.html
+        // Sidebar toggle managed by seller_base.html
     }
 
     // Run

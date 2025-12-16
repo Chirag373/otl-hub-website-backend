@@ -1,552 +1,388 @@
-<!DOCTYPE html>
-<html lang="en" data-theme="dark">
+{% extends 'buyer_base.html' %}
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Buyer Dashboard | OTL Platform</title>
+{% block title %}Buyer Dashboard | OTL Platform{% endblock %}
 
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Arima:wght@100..700&display=swap" rel="stylesheet">
+{% block sidebar %}
+{% include 'partials/buyer_sidebar.html' with active_page='dashboard' %}
+{% endblock %}
 
-    <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.23/dist/full.min.css" rel="stylesheet" type="text/css" />
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/htmx.org@2.0.4"></script>
-    <script src="https://unpkg.com/lucide@latest"></script>
+{% block content %}
+<div class="space-y-2">
+    <h1 class="text-3xl font-bold text-[var(--foreground)]">Welcome back!</h1>
+    <p class="text-[var(--muted-foreground)]">Find your perfect property today</p>
+</div>
 
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['Arima', 'system-ui', 'sans-serif'],
-                        heading: ['Arima', 'system-ui', 'sans-serif'],
-                        body: ['Arima', 'system-ui', 'sans-serif'],
-                    },
-                    colors: {
-                        border: "var(--border)",
-                        input: "var(--input)",
-                        ring: "var(--ring)",
-                        background: "var(--background)",
-                        foreground: "var(--foreground)",
-                        primary: {
-                            DEFAULT: "var(--primary)",
-                            foreground: "var(--primary-foreground)",
-                        },
-                        muted: {
-                            DEFAULT: "var(--muted)",
-                            foreground: "var(--muted-foreground)",
-                        },
-                        accent: {
-                            DEFAULT: "var(--accent)",
-                            foreground: "var(--accent-foreground)",
-                            hover: "var(--accent-hover)",
-                        },
-                        card: {
-                            DEFAULT: "var(--card)",
-                            foreground: "var(--card-foreground)",
-                        },
-                        destructive: {
-                            DEFAULT: "var(--destructive)",
-                            foreground: "var(--destructive-foreground)",
-                        },
-                    },
-                }
-            }
-        }
-    </script>
-
-    <style>
-        :root {
-            --radius: 0.625rem;
-            --bg: #2a2a2a;
-            --card: #3a3a3a;
-            --muted: #c0c0c0;
-            --accent: #d4af37;
-            --accent-hover: #e0c066;
-            --border: #4a4a4a;
-
-            --background: #2a2a2a;
-            --foreground: #f3f4f6;
-            --card-foreground: #f3f4f6;
-            --popover: #3a3a3a;
-            --popover-foreground: #f3f4f6;
-            --primary: #d4af37;
-            --primary-foreground: #2a2a2a;
-            --secondary: #464646;
-            --secondary-foreground: #f3f4f6;
-            --muted: #464646;
-            --muted-foreground: #c0c0c0;
-            --accent-foreground: #2a2a2a;
-            --destructive: #dc2626;
-            --input: #464646;
-            --ring: #d4af37;
-        }
-
-        body {
-            background-color: var(--bg);
-            color: var(--foreground);
-            font-family: 'Arima', sans-serif;
-            line-height: 1.6;
-            -webkit-font-smoothing: antialiased;
-        }
-
-        /* Smooth transitions for sidebar */
-        .sidebar-transition {
-            transition: transform 0.3s ease-in-out;
-        }
-    </style>
-</head>
-
-<body class="min-h-screen bg-[var(--bg)]">
-
-    <div
-        class="lg:hidden fixed top-0 left-0 right-0 z-50 bg-[var(--card)] border-b border-[var(--border)] px-4 py-3 flex items-center justify-between">
-        <span class="font-bold text-lg text-[var(--foreground)]">OTL Dashboard</span>
-        <button id="mobile-menu-btn"
-            class="p-2 rounded-md border border-[var(--border)] text-[var(--foreground)] hover:bg-[var(--accent)] hover:text-black transition-colors">
-            <i data-lucide="menu" class="w-5 h-5"></i>
-        </button>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <div class="card bg-[var(--card)] border border-[var(--border)] shadow-sm">
+        <div class="card-body p-6 flex-row items-center space-x-4">
+            <div class="p-3 bg-blue-100/10 rounded-lg text-blue-400">
+                <i data-lucide="eye" class="h-6 w-6"></i>
+            </div>
+            <div>
+                <p class="text-sm text-[var(--muted-foreground)]">Properties Viewed</p>
+                <p id="stat-views-count" class="text-2xl font-bold text-[var(--foreground)]">0</p>
+                <p id="stat-views-remaining" class="text-xs text-[var(--muted-foreground)]">Calculating...</p>
+            </div>
+        </div>
     </div>
 
-    <aside id="sidebar"
-        class="fixed inset-y-0 left-0 z-40 w-64 bg-[var(--card)] border-r border-[var(--border)] transform -translate-x-full lg:translate-x-0 sidebar-transition flex flex-col">
-        <div class="flex items-center justify-center h-16 px-6 border-b border-[var(--border)]">
-            <h1 class="font-heading text-xl font-bold text-[var(--foreground)]">
-                OTL Dashboard
-            </h1>
+    <div class="card bg-[var(--card)] border border-[var(--border)] shadow-sm">
+        <div class="card-body p-6 flex-row items-center space-x-4">
+            <div class="p-3 bg-green-100/10 rounded-lg text-green-400">
+                <i data-lucide="bookmark" class="h-6 w-6"></i>
+            </div>
+            <div>
+                <p class="text-sm text-[var(--muted-foreground)]">Saved Searches</p>
+                <p class="text-2xl font-bold text-[var(--foreground)]">3</p>
+            </div>
         </div>
+    </div>
 
-        <div class="px-6 py-4 border-b border-[var(--border)]">
-            <div class="flex items-center space-x-3">
-                <div class="w-10 h-10 bg-[var(--accent)] rounded-full flex items-center justify-center">
-                    <span id="sidebar-avatar-initials" class="text-[var(--bg)] font-semibold text-sm">JD</span>
+    <div class="card bg-[var(--card)] border border-[var(--border)] shadow-sm">
+        <div class="card-body p-6 flex-row items-center space-x-4">
+            <div class="p-3 bg-purple-100/10 rounded-lg text-purple-400">
+                <i data-lucide="calendar" class="h-6 w-6"></i>
+            </div>
+            <div>
+                <p class="text-sm text-[var(--muted-foreground)]">Time Remaining</p>
+                <p id="stat-days-left" class="text-2xl font-bold text-[var(--foreground)]">0d</p>
+                <p class="text-xs text-[var(--muted-foreground)]">Access plan validity</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="access-counter-container" class="card bg-[var(--card)] border border-[var(--border)] p-6 shadow-sm">
+</div>
+
+<div class="card bg-[var(--card)] border border-[var(--border)] shadow-xl">
+    <div class="card-body p-6">
+        <div class="flex items-center justify-between mb-6">
+            <div class="flex items-center space-x-4">
+                <div class="avatar placeholder">
+                    <div class="bg-[var(--accent)] text-[var(--bg)] rounded-full w-16">
+                        <span id="profile-avatar-initials" class="text-xl font-bold">JD</span>
+                    </div>
+                    <button
+                        class="absolute -bottom-1 -right-1 btn btn-circle btn-xs border border-[var(--border)] bg-[var(--card)] hover:bg-[var(--muted)]">
+                        <i data-lucide="camera" class="h-3 w-3 text-[var(--foreground)]"></i>
+                    </button>
                 </div>
-                <div class="flex-1 min-w-0">
-                    <p id="sidebar-user-name" class="text-sm font-medium text-[var(--foreground)] truncate">John Doe</p>
-                    <p class="text-xs text-[var(--muted-foreground)] truncate capitalize">Buyer</p>
+                <div>
+                    <h3 id="profile-display-name" class="font-semibold text-[var(--foreground)] text-lg">
+                        John Doe</h3>
+                    <p class="text-sm text-[var(--muted-foreground)]">Home Buyer</p>
+                    <div class="flex items-center space-x-1 text-xs text-[var(--muted-foreground)] mt-1">
+                        <i data-lucide="calendar" class="h-3 w-3"></i>
+                        <span id="profile-member-since">Member since Jan 2025</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex items-center space-x-2">
+                <button id="btn-edit-profile"
+                    class="btn btn-outline border-[var(--border)] text-[var(--foreground)] hover:bg-[var(--muted)] hover:text-[var(--foreground)] btn-sm">
+                    <i data-lucide="edit" class="mr-2 h-4 w-4"></i> Edit Profile
+                </button>
+                <div id="edit-actions" class="hidden flex space-x-2">
+                    <button id="btn-cancel-profile" class="btn btn-ghost btn-sm text-[var(--foreground)]">
+                        <i data-lucide="x" class="mr-2 h-4 w-4"></i> Cancel
+                    </button>
+                    <button id="btn-save-profile"
+                        class="btn btn-primary btn-sm bg-[var(--accent)] text-[var(--bg)] border-none hover:bg-[var(--accent-hover)]">
+                        <i data-lucide="save" class="mr-2 h-4 w-4"></i> Save
+                    </button>
                 </div>
             </div>
         </div>
 
-        <nav class="flex-1 px-4 py-6 space-y-2">
-            <a href="{% url 'buyer_dashboard' %}"
-                class="flex items-center w-full px-4 py-2 text-sm font-medium rounded-md bg-[var(--accent)] text-[var(--bg)]">
-                <i data-lucide="home" class="mr-3 h-4 w-4"></i> Dashboard
-            </a>
-            <a href="{% url 'buyer_property_search' %}"
-                class="flex items-center w-full px-4 py-2 text-sm font-medium rounded-md text-[var(--foreground)] hover:bg-[var(--accent)] hover:text-black transition-colors">
-                <i data-lucide="search" class="mr-3 h-4 w-4"></i> Property Search
-            </a>
-            <a href="{% url 'buyer_favorites' %}"
-                class="flex items-center w-full px-4 py-2 text-sm font-medium rounded-md text-[var(--foreground)] hover:bg-[var(--accent)] hover:text-black transition-colors">
-                <i data-lucide="heart" class="mr-3 h-4 w-4"></i> Favorites
-            </a>
-            <a href="#"
-                class="flex items-center w-full px-4 py-2 text-sm font-medium rounded-md text-[var(--foreground)] hover:bg-[var(--accent)] hover:text-black transition-colors">
-                <i data-lucide="message-square" class="mr-3 h-4 w-4"></i> Messages
-            </a>
-            <a href="{% url 'buyer_settings' %}"
-                class="flex items-center w-full px-4 py-2 text-sm font-medium rounded-md text-[var(--foreground)] hover:bg-[var(--accent)] hover:text-black transition-colors">
-                <i data-lucide="settings" class="mr-3 h-4 w-4"></i> Settings
-            </a>
-        </nav>
+        <h3 class="text-lg font-semibold text-[var(--foreground)] mb-4">Personal Information</h3>
 
-        <div class="p-4 border-t border-[var(--border)]">
-            <a href="{% url 'login' %}"
-                class="flex items-center w-full px-4 py-2 text-sm font-medium rounded-md text-[var(--foreground)] hover:bg-yellow-500 hover:text-black transition-colors">
-                <i data-lucide="log-out" class="mr-3 h-4 w-4"></i> Sign Out
-            </a>
-        </div>
-    </aside>
-
-    <div id="sidebar-overlay" class="fixed inset-0 bg-black/50 z-30 hidden lg:hidden"></div>
-
-    <div class="lg:pl-64 pt-16 lg:pt-0">
-        <main class="min-h-screen bg-[var(--bg)]">
-            <div class="w-full max-w-7xl mx-auto px-6 py-8 space-y-6">
-
-                <div class="space-y-2">
-                    <h1 class="text-3xl font-bold text-[var(--foreground)]">Welcome back!</h1>
-                    <p class="text-[var(--muted-foreground)]">Find your perfect property today</p>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div class="card bg-[var(--card)] border border-[var(--border)] shadow-sm">
-                        <div class="card-body p-6 flex-row items-center space-x-4">
-                            <div class="p-3 bg-blue-100/10 rounded-lg text-blue-400">
-                                <i data-lucide="eye" class="h-6 w-6"></i>
-                            </div>
-                            <div>
-                                <p class="text-sm text-[var(--muted-foreground)]">Properties Viewed</p>
-                                <p id="stat-views-count" class="text-2xl font-bold text-[var(--foreground)]">0</p>
-                                <p id="stat-views-remaining" class="text-xs text-[var(--muted-foreground)]">Calculating...</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="card bg-[var(--card)] border border-[var(--border)] shadow-sm">
-                        <div class="card-body p-6 flex-row items-center space-x-4">
-                            <div class="p-3 bg-green-100/10 rounded-lg text-green-400">
-                                <i data-lucide="bookmark" class="h-6 w-6"></i>
-                            </div>
-                            <div>
-                                <p class="text-sm text-[var(--muted-foreground)]">Saved Searches</p>
-                                <p class="text-2xl font-bold text-[var(--foreground)]">3</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="card bg-[var(--card)] border border-[var(--border)] shadow-sm">
-                        <div class="card-body p-6 flex-row items-center space-x-4">
-                            <div class="p-3 bg-purple-100/10 rounded-lg text-purple-400">
-                                <i data-lucide="calendar" class="h-6 w-6"></i>
-                            </div>
-                            <div>
-                                <p class="text-sm text-[var(--muted-foreground)]">Time Remaining</p>
-                                <p id="stat-days-left" class="text-2xl font-bold text-[var(--foreground)]">0d</p>
-                                <p class="text-xs text-[var(--muted-foreground)]">Access plan validity</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div id="access-counter-container"
-                    class="card bg-[var(--card)] border border-[var(--border)] p-6 shadow-sm">
-                </div>
-
-                <div class="card bg-[var(--card)] border border-[var(--border)] shadow-xl">
-                    <div class="card-body p-6">
-                        <div class="flex items-center justify-between mb-6">
-                            <div class="flex items-center space-x-4">
-                                <div class="avatar placeholder">
-                                    <div class="bg-[var(--accent)] text-[var(--bg)] rounded-full w-16">
-                                        <span id="profile-avatar-initials" class="text-xl font-bold">JD</span>
-                                    </div>
-                                    <button
-                                        class="absolute -bottom-1 -right-1 btn btn-circle btn-xs border border-[var(--border)] bg-[var(--card)] hover:bg-[var(--muted)]">
-                                        <i data-lucide="camera" class="h-3 w-3 text-[var(--foreground)]"></i>
-                                    </button>
-                                </div>
-                                <div>
-                                    <h3 id="profile-display-name" class="font-semibold text-[var(--foreground)] text-lg">
-                                        John Doe</h3>
-                                    <p class="text-sm text-[var(--muted-foreground)]">Home Buyer</p>
-                                    <div class="flex items-center space-x-1 text-xs text-[var(--muted-foreground)] mt-1">
-                                        <i data-lucide="calendar" class="h-3 w-3"></i>
-                                        <span id="profile-member-since">Member since Jan 2025</span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="flex items-center space-x-2">
-                                <button id="btn-edit-profile"
-                                    class="btn btn-outline border-[var(--border)] text-[var(--foreground)] hover:bg-[var(--muted)] hover:text-[var(--foreground)] btn-sm">
-                                    <i data-lucide="edit" class="mr-2 h-4 w-4"></i> Edit Profile
-                                </button>
-                                <div id="edit-actions" class="hidden flex space-x-2">
-                                    <button id="btn-cancel-profile"
-                                        class="btn btn-ghost btn-sm text-[var(--foreground)]">
-                                        <i data-lucide="x" class="mr-2 h-4 w-4"></i> Cancel
-                                    </button>
-                                    <button id="btn-save-profile"
-                                        class="btn btn-primary btn-sm bg-[var(--accent)] text-[var(--bg)] border-none hover:bg-[var(--accent-hover)]">
-                                        <i data-lucide="save" class="mr-2 h-4 w-4"></i> Save
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-
-                        <h3 class="text-lg font-semibold text-[var(--foreground)] mb-4">Personal Information</h3>
-
-                        <form id="profile-form" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div class="form-control w-full">
-                                <label class="label">
-                                    <span class="label-text text-[var(--foreground)] font-medium">First Name</span>
-                                </label>
-                                <input type="text" id="input-first-name"
-                                    class="input input-bordered w-full bg-[var(--input)] border-[var(--border)] text-[var(--foreground)] disabled:opacity-50 disabled:bg-[var(--input)] disabled:text-[var(--muted-foreground)] focus:outline-none focus:border-[var(--accent)]"
-                                    disabled>
-                            </div>
-                            <div class="form-control w-full">
-                                <label class="label">
-                                    <span class="label-text text-[var(--foreground)] font-medium">Last Name</span>
-                                </label>
-                                <input type="text" id="input-last-name"
-                                    class="input input-bordered w-full bg-[var(--input)] border-[var(--border)] text-[var(--foreground)] disabled:opacity-50 disabled:bg-[var(--input)] disabled:text-[var(--muted-foreground)] focus:outline-none focus:border-[var(--accent)]"
-                                    disabled>
-                            </div>
-                            <div class="form-control w-full">
-                                <label class="label">
-                                    <span class="label-text text-[var(--foreground)] font-medium">Email Address</span>
-                                </label>
-                                <input type="email" id="input-email"
-                                    class="input input-bordered w-full bg-[var(--input)] border-[var(--border)] text-[var(--foreground)] disabled:opacity-50 disabled:bg-[var(--input)] disabled:text-[var(--muted-foreground)] focus:outline-none focus:border-[var(--accent)]"
-                                    disabled>
-                            </div>
-                            <div class="form-control w-full">
-                                <label class="label">
-                                    <span class="label-text text-[var(--foreground)] font-medium">Phone Number</span>
-                                </label>
-                                <input type="tel" id="input-phone"
-                                    class="input input-bordered w-full bg-[var(--input)] border-[var(--border)] text-[var(--foreground)] disabled:opacity-50 disabled:bg-[var(--input)] disabled:text-[var(--muted-foreground)] focus:outline-none focus:border-[var(--accent)]"
-                                    disabled>
-                            </div>
-                            <div class="form-control w-full md:col-span-2">
-                                <label class="label">
-                                    <span class="label-text text-[var(--foreground)] font-medium">Location</span>
-                                </label>
-                                <input type="text" id="input-location"
-                                    class="input input-bordered w-full bg-[var(--input)] border-[var(--border)] text-[var(--foreground)] disabled:opacity-50 disabled:bg-[var(--input)] disabled:text-[var(--muted-foreground)] focus:outline-none focus:border-[var(--accent)]"
-                                    disabled>
-                            </div>
-                        </form>
-
-                        <div id="save-notification" class="hidden mt-4 p-4 rounded-lg border"></div>
-                    </div>
-                </div>
-
-                <div class="card bg-[var(--card)] border border-[var(--border)] shadow-xl">
-                    <div class="card-body p-6">
-                        <h3 class="text-lg font-semibold text-[var(--foreground)] mb-4">Buyer's Agent</h3>
-
-                        <div id="agent-view-mode" class="space-y-3">
-                        </div>
-
-                        <div id="agent-edit-mode" class="hidden space-y-4">
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div class="form-control w-full md:col-span-2">
-                                    <label class="label">
-                                        <span class="label-text text-[var(--foreground)] font-medium">Agent Name</span>
-                                    </label>
-                                    <input type="text" id="agent-input-name" placeholder="Enter agent's full name"
-                                        class="input input-bordered w-full bg-[var(--input)] border-[var(--border)] text-[var(--foreground)] focus:outline-none focus:border-[var(--accent)]">
-                                </div>
-                                <div class="form-control w-full">
-                                    <label class="label">
-                                        <span class="label-text text-[var(--foreground)] font-medium">Agent Phone</span>
-                                    </label>
-                                    <input type="tel" id="agent-input-phone" placeholder="Enter agent's phone"
-                                        class="input input-bordered w-full bg-[var(--input)] border-[var(--border)] text-[var(--foreground)] focus:outline-none focus:border-[var(--accent)]">
-                                </div>
-                                <div class="form-control w-full">
-                                    <label class="label">
-                                        <span class="label-text text-[var(--foreground)] font-medium">Agent Email</span>
-                                    </label>
-                                    <input type="email" id="agent-input-email" placeholder="Enter agent's email"
-                                        class="input input-bordered w-full bg-[var(--input)] border-[var(--border)] text-[var(--foreground)] focus:outline-none focus:border-[var(--accent)]">
-                                </div>
-                                <div class="form-control w-full md:col-span-2">
-                                    <label class="label">
-                                        <span class="label-text text-[var(--foreground)] font-medium">Brokerage Company</span>
-                                    </label>
-                                    <input type="text" id="agent-input-brokerage" placeholder="Enter brokerage company"
-                                        class="input input-bordered w-full bg-[var(--input)] border-[var(--border)] text-[var(--foreground)] focus:outline-none focus:border-[var(--accent)]">
-                                </div>
-                            </div>
-                            <div class="alert bg-[var(--muted)]/20 border-none text-sm text-[var(--muted-foreground)]">
-                                <div>
-                                    <span class="font-medium">Note:</span> Leave fields empty if you don't have buyer representation.
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="card bg-[var(--card)] border border-[var(--border)] shadow-xl">
-                    <div class="card-body p-6">
-                        <h3 class="text-lg font-semibold text-[var(--foreground)] mb-4">Membership Subscription</h3>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div class="space-y-4">
-                                <div class="form-control w-full">
-                                    <label class="label">
-                                        <span class="label-text text-[var(--foreground)] font-medium">Member Since</span>
-                                    </label>
-                                    <div
-                                        class="flex items-center space-x-2 px-3 py-3 bg-[var(--muted)]/30 rounded-lg border border-[var(--border)]">
-                                        <i data-lucide="calendar" class="h-4 w-4 text-[var(--muted-foreground)]"></i>
-                                        <span id="sub-member-since" class="text-[var(--foreground)] text-sm">--</span>
-                                    </div>
-                                </div>
-                                <div class="form-control w-full">
-                                    <label class="label">
-                                        <span class="label-text text-[var(--foreground)] font-medium">Expiration Date</span>
-                                    </label>
-                                    <input type="text" id="sub-expiration" disabled
-                                        class="input input-bordered w-full bg-[var(--muted)]/30 border-[var(--border)] text-[var(--foreground)] opacity-70">
-                                </div>
-                            </div>
-                            <div class="space-y-4">
-                                <div class="form-control w-full">
-                                    <label class="label">
-                                        <span class="label-text text-[var(--foreground)] font-medium">Fee Paid</span>
-                                    </label>
-                                    <input type="text" id="sub-fee" disabled
-                                        class="input input-bordered w-full bg-[var(--muted)]/30 border-[var(--border)] text-[var(--foreground)] font-semibold opacity-70">
-                                </div>
-                                <div class="form-control w-full">
-                                    <label class="label">
-                                        <span class="label-text text-[var(--foreground)] font-medium">Property Access</span>
-                                    </label>
-                                    <div
-                                        class="flex items-center space-x-2 px-3 py-3 bg-[var(--muted)]/30 rounded-lg border border-[var(--border)]">
-                                        <i data-lucide="eye" class="h-4 w-4 text-[var(--muted-foreground)]"></i>
-                                        <span id="sub-access-level"
-                                            class="text-[var(--foreground)] font-semibold text-sm">--</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="mt-6 alert bg-blue-50/10 border-blue-500/30 text-blue-300 text-sm">
-                            <i data-lucide="info" class="h-4 w-4"></i>
-                            <span><strong>Your membership</strong> gives you access to premium features and priority support.</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="card bg-[var(--card)] border border-[var(--border)] shadow-xl">
-                    <div class="card-body p-6">
-                        <h2 class="card-title text-xl font-semibold text-[var(--foreground)] mb-4">Recent Activity</h2>
-                        <ul class="steps steps-vertical">
-                            <li class="step step-success text-sm text-[var(--foreground)]" data-content="">You viewed "Modern Downtown Condo" 2 hours ago</li>
-                            <li class="step step-primary text-sm text-[var(--foreground)]" data-content="">Viewed "Spacious Family Home" 1 day ago</li>
-                            <li class="step step-neutral text-sm text-[var(--foreground)]" data-content="">Updated search preferences for downtown area 3 days ago</li>
-                        </ul>
-                    </div>
-                </div>
-
+        <form id="profile-form" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="form-control w-full">
+                <label class="label">
+                    <span class="label-text text-[var(--foreground)] font-medium">First Name</span>
+                </label>
+                <input type="text" id="input-first-name"
+                    class="input input-bordered w-full bg-[var(--input)] border-[var(--border)] text-[var(--foreground)] disabled:opacity-50 disabled:bg-[var(--input)] disabled:text-[var(--muted-foreground)] focus:outline-none focus:border-[var(--accent)]"
+                    disabled>
             </div>
-        </main>
-    </div>
+            <div class="form-control w-full">
+                <label class="label">
+                    <span class="label-text text-[var(--foreground)] font-medium">Last Name</span>
+                </label>
+                <input type="text" id="input-last-name"
+                    class="input input-bordered w-full bg-[var(--input)] border-[var(--border)] text-[var(--foreground)] disabled:opacity-50 disabled:bg-[var(--input)] disabled:text-[var(--muted-foreground)] focus:outline-none focus:border-[var(--accent)]"
+                    disabled>
+            </div>
+            <div class="form-control w-full">
+                <label class="label">
+                    <span class="label-text text-[var(--foreground)] font-medium">Email Address</span>
+                </label>
+                <input type="email" id="input-email"
+                    class="input input-bordered w-full bg-[var(--input)] border-[var(--border)] text-[var(--foreground)] disabled:opacity-50 disabled:bg-[var(--input)] disabled:text-[var(--muted-foreground)] focus:outline-none focus:border-[var(--accent)]"
+                    disabled>
+            </div>
+            <div class="form-control w-full">
+                <label class="label">
+                    <span class="label-text text-[var(--foreground)] font-medium">Phone Number</span>
+                </label>
+                <input type="tel" id="input-phone"
+                    class="input input-bordered w-full bg-[var(--input)] border-[var(--border)] text-[var(--foreground)] disabled:opacity-50 disabled:bg-[var(--input)] disabled:text-[var(--muted-foreground)] focus:outline-none focus:border-[var(--accent)]"
+                    disabled>
+            </div>
+            <div class="form-control w-full md:col-span-2">
+                <label class="label">
+                    <span class="label-text text-[var(--foreground)] font-medium">Location</span>
+                </label>
+                <input type="text" id="input-location"
+                    class="input input-bordered w-full bg-[var(--input)] border-[var(--border)] text-[var(--foreground)] disabled:opacity-50 disabled:bg-[var(--input)] disabled:text-[var(--muted-foreground)] focus:outline-none focus:border-[var(--accent)]"
+                    disabled>
+            </div>
+        </form>
 
-    <script>
-        // --- DATA ---
-        let profile = {
-            first_name: "John",
-            last_name: "Doe",
-            email: "john.doe@example.com",
-            phone_number: "(555) 123-4567",
-            location: "Houston, TX",
+        <div id="save-notification" class="hidden mt-4 p-4 rounded-lg border"></div>
+    </div>
+</div>
+
+<div class="card bg-[var(--card)] border border-[var(--border)] shadow-xl">
+    <div class="card-body p-6">
+        <h3 class="text-lg font-semibold text-[var(--foreground)] mb-4">Buyer's Agent</h3>
+
+        <div id="agent-view-mode" class="space-y-3">
+        </div>
+
+        <div id="agent-edit-mode" class="hidden space-y-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="form-control w-full md:col-span-2">
+                    <label class="label">
+                        <span class="label-text text-[var(--foreground)] font-medium">Agent Name</span>
+                    </label>
+                    <input type="text" id="agent-input-name" placeholder="Enter agent's full name"
+                        class="input input-bordered w-full bg-[var(--input)] border-[var(--border)] text-[var(--foreground)] focus:outline-none focus:border-[var(--accent)]">
+                </div>
+                <div class="form-control w-full">
+                    <label class="label">
+                        <span class="label-text text-[var(--foreground)] font-medium">Agent Phone</span>
+                    </label>
+                    <input type="tel" id="agent-input-phone" placeholder="Enter agent's phone"
+                        class="input input-bordered w-full bg-[var(--input)] border-[var(--border)] text-[var(--foreground)] focus:outline-none focus:border-[var(--accent)]">
+                </div>
+                <div class="form-control w-full">
+                    <label class="label">
+                        <span class="label-text text-[var(--foreground)] font-medium">Agent Email</span>
+                    </label>
+                    <input type="email" id="agent-input-email" placeholder="Enter agent's email"
+                        class="input input-bordered w-full bg-[var(--input)] border-[var(--border)] text-[var(--foreground)] focus:outline-none focus:border-[var(--accent)]">
+                </div>
+                <div class="form-control w-full md:col-span-2">
+                    <label class="label">
+                        <span class="label-text text-[var(--foreground)] font-medium">Brokerage Company</span>
+                    </label>
+                    <input type="text" id="agent-input-brokerage" placeholder="Enter brokerage company"
+                        class="input input-bordered w-full bg-[var(--input)] border-[var(--border)] text-[var(--foreground)] focus:outline-none focus:border-[var(--accent)]">
+                </div>
+            </div>
+            <div class="alert bg-[var(--muted)]/20 border-none text-sm text-[var(--muted-foreground)]">
+                <div>
+                    <span class="font-medium">Note:</span> Leave fields empty if you don't have buyer representation.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card bg-[var(--card)] border border-[var(--border)] shadow-xl">
+    <div class="card-body p-6">
+        <h3 class="text-lg font-semibold text-[var(--foreground)] mb-4">Membership Subscription</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="space-y-4">
+                <div class="form-control w-full">
+                    <label class="label">
+                        <span class="label-text text-[var(--foreground)] font-medium">Member Since</span>
+                    </label>
+                    <div
+                        class="flex items-center space-x-2 px-3 py-3 bg-[var(--muted)]/30 rounded-lg border border-[var(--border)]">
+                        <i data-lucide="calendar" class="h-4 w-4 text-[var(--muted-foreground)]"></i>
+                        <span id="sub-member-since" class="text-[var(--foreground)] text-sm">--</span>
+                    </div>
+                </div>
+                <div class="form-control w-full">
+                    <label class="label">
+                        <span class="label-text text-[var(--foreground)] font-medium">Expiration Date</span>
+                    </label>
+                    <input type="text" id="sub-expiration" disabled
+                        class="input input-bordered w-full bg-[var(--muted)]/30 border-[var(--border)] text-[var(--foreground)] opacity-70">
+                </div>
+            </div>
+            <div class="space-y-4">
+                <div class="form-control w-full">
+                    <label class="label">
+                        <span class="label-text text-[var(--foreground)] font-medium">Fee Paid</span>
+                    </label>
+                    <input type="text" id="sub-fee" disabled
+                        class="input input-bordered w-full bg-[var(--muted)]/30 border-[var(--border)] text-[var(--foreground)] font-semibold opacity-70">
+                </div>
+                <div class="form-control w-full">
+                    <label class="label">
+                        <span class="label-text text-[var(--foreground)] font-medium">Property Access</span>
+                    </label>
+                    <div
+                        class="flex items-center space-x-2 px-3 py-3 bg-[var(--muted)]/30 rounded-lg border border-[var(--border)]">
+                        <i data-lucide="eye" class="h-4 w-4 text-[var(--muted-foreground)]"></i>
+                        <span id="sub-access-level" class="text-[var(--foreground)] font-semibold text-sm">--</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="mt-6 alert bg-blue-50/10 border-blue-500/30 text-blue-300 text-sm">
+            <i data-lucide="info" class="h-4 w-4"></i>
+            <span><strong>Your membership</strong> gives you access to premium features and priority support.</span>
+        </div>
+    </div>
+</div>
+
+<div class="card bg-[var(--card)] border border-[var(--border)] shadow-xl">
+    <div class="card-body p-6">
+        <h2 class="card-title text-xl font-semibold text-[var(--foreground)] mb-4">Recent Activity</h2>
+        <ul class="steps steps-vertical">
+            <li class="step step-success text-sm text-[var(--foreground)]" data-content="">You viewed "Modern Downtown
+                Condo" 2 hours ago</li>
+            <li class="step step-primary text-sm text-[var(--foreground)]" data-content="">Viewed "Spacious Family Home"
+                1 day ago</li>
+            <li class="step step-neutral text-sm text-[var(--foreground)]" data-content="">Updated search preferences
+                for downtown area 3 days ago</li>
+        </ul>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // --- DATA ---
+    let profile = {
+        first_name: "John",
+        last_name: "Doe",
+        email: "john.doe@example.com",
+        phone_number: "(555) 123-4567",
+        location: "Houston, TX",
+        member_since: "2025-01-15",
+        agent: {
+            name: "Sarah Johnson",
+            phone: "(713) 555-0123",
+            email: "sarah.j@otl-realty.com",
+            brokerage_company: "OTL Realty Group"
+        },
+        subscription: {
             member_since: "2025-01-15",
-            agent: {
-                name: "Sarah Johnson",
-                phone: "(713) 555-0123",
-                email: "sarah.j@otl-realty.com",
-                brokerage_company: "OTL Realty Group"
-            },
-            subscription: {
-                member_since: "2025-01-15",
-                expiration_date: "2025-07-15", // 6 months later
-                fee_paid: "45.00",
-                property_access: "Pro Plan (Unlimited)"
-            }
-        };
+            expiration_date: "2025-07-15", // 6 months later
+            fee_paid: "45.00",
+            property_access: "Pro Plan (Unlimited)"
+        }
+    };
 
-        // Usage Stats (Mock)
-        let stats = {
-            propertiesViewed: 12,
-            planLimit: "unlimited" // or a number
-        };
+    // Usage Stats (Mock)
+    let stats = {
+        propertiesViewed: 12,
+        planLimit: "unlimited" // or a number
+    };
 
-        // --- DOM ELEMENTS ---
-        const dom = {
-            // Sidebar
-            mobileMenuBtn: document.getElementById('mobile-menu-btn'),
-            sidebar: document.getElementById('sidebar'),
-            overlay: document.getElementById('sidebar-overlay'),
+    // --- DOM ELEMENTS ---
+    const dom = {
+        // Header Stats
+        statViewsCount: document.getElementById('stat-views-count'),
+        statViewsRemaining: document.getElementById('stat-views-remaining'),
+        statDaysLeft: document.getElementById('stat-days-left'),
+        accessCounterContainer: document.getElementById('access-counter-container'),
 
-            // Header Stats
-            statViewsCount: document.getElementById('stat-views-count'),
-            statViewsRemaining: document.getElementById('stat-views-remaining'),
-            statDaysLeft: document.getElementById('stat-days-left'),
-            accessCounterContainer: document.getElementById('access-counter-container'),
+        // Profile View
+        avatarInitials: document.getElementById('profile-avatar-initials'),
+        sidebarInitials: document.getElementById('sidebar-avatar-initials'),
+        displayName: document.getElementById('profile-display-name'),
+        sidebarName: document.getElementById('sidebar-user-name'),
+        memberSince: document.getElementById('profile-member-since'),
 
-            // Profile View
-            avatarInitials: document.getElementById('profile-avatar-initials'),
-            sidebarInitials: document.getElementById('sidebar-avatar-initials'),
-            displayName: document.getElementById('profile-display-name'),
-            sidebarName: document.getElementById('sidebar-user-name'),
-            memberSince: document.getElementById('profile-member-since'),
+        // Inputs
+        inputFirstName: document.getElementById('input-first-name'),
+        inputLastName: document.getElementById('input-last-name'),
+        inputEmail: document.getElementById('input-email'),
+        inputPhone: document.getElementById('input-phone'),
+        inputLocation: document.getElementById('input-location'),
 
-            // Inputs
-            inputFirstName: document.getElementById('input-first-name'),
-            inputLastName: document.getElementById('input-last-name'),
-            inputEmail: document.getElementById('input-email'),
-            inputPhone: document.getElementById('input-phone'),
-            inputLocation: document.getElementById('input-location'),
+        // Buttons
+        btnEdit: document.getElementById('btn-edit-profile'),
+        btnCancel: document.getElementById('btn-cancel-profile'),
+        btnSave: document.getElementById('btn-save-profile'),
+        editActions: document.getElementById('edit-actions'),
+        saveNotification: document.getElementById('save-notification'),
 
-            // Buttons
-            btnEdit: document.getElementById('btn-edit-profile'),
-            btnCancel: document.getElementById('btn-cancel-profile'),
-            btnSave: document.getElementById('btn-save-profile'),
-            editActions: document.getElementById('edit-actions'),
-            saveNotification: document.getElementById('save-notification'),
+        // Agent Section
+        agentView: document.getElementById('agent-view-mode'),
+        agentEdit: document.getElementById('agent-edit-mode'),
+        agentInputName: document.getElementById('agent-input-name'),
+        agentInputPhone: document.getElementById('agent-input-phone'),
+        agentInputEmail: document.getElementById('agent-input-email'),
+        agentInputBrokerage: document.getElementById('agent-input-brokerage'),
 
-            // Agent Section
-            agentView: document.getElementById('agent-view-mode'),
-            agentEdit: document.getElementById('agent-edit-mode'),
-            agentInputName: document.getElementById('agent-input-name'),
-            agentInputPhone: document.getElementById('agent-input-phone'),
-            agentInputEmail: document.getElementById('agent-input-email'),
-            agentInputBrokerage: document.getElementById('agent-input-brokerage'),
+        // Subscription
+        subMemberSince: document.getElementById('sub-member-since'),
+        subExpiration: document.getElementById('sub-expiration'),
+        subFee: document.getElementById('sub-fee'),
+        subAccess: document.getElementById('sub-access-level')
+    };
 
-            // Subscription
-            subMemberSince: document.getElementById('sub-member-since'),
-            subExpiration: document.getElementById('sub-expiration'),
-            subFee: document.getElementById('sub-fee'),
-            subAccess: document.getElementById('sub-access-level')
-        };
+    // --- INITIALIZATION ---
+    function init() {
+        // lucide icons created by base
+        populateData();
+        calculateStats();
+        setupEventListeners();
+    }
 
-        // --- INITIALIZATION ---
-        function init() {
-            lucide.createIcons();
-            populateData();
-            calculateStats();
-            setupEventListeners();
+    // --- LOGIC ---
+
+    function populateData() {
+        // Text Elements
+        const fullName = `${profile.first_name} ${profile.last_name}`;
+        const initials = (profile.first_name[0] + profile.last_name[0]).toUpperCase();
+
+        // We use checks because sometimes elements might be missing if template changes
+        if (dom.avatarInitials) dom.avatarInitials.textContent = initials;
+        // Note: sidebarInitials found in partial
+        if (dom.sidebarInitials) dom.sidebarInitials.textContent = initials;
+        if (dom.displayName) dom.displayName.textContent = fullName;
+        if (dom.sidebarName) dom.sidebarName.textContent = fullName;
+        if (dom.memberSince) dom.memberSince.textContent = `Member since ${profile.member_since}`;
+
+        // Inputs
+        if (dom.inputFirstName) dom.inputFirstName.value = profile.first_name;
+        if (dom.inputLastName) dom.inputLastName.value = profile.last_name;
+        if (dom.inputEmail) dom.inputEmail.value = profile.email;
+        if (dom.inputPhone) dom.inputPhone.value = profile.phone_number;
+        if (dom.inputLocation) dom.inputLocation.value = profile.location;
+
+        // Subscription
+        if (dom.subMemberSince) dom.subMemberSince.textContent = profile.subscription.member_since;
+        if (dom.subExpiration) dom.subExpiration.value = profile.subscription.expiration_date;
+        if (dom.subFee) dom.subFee.value = `$${profile.subscription.fee_paid}`;
+        if (dom.subAccess) dom.subAccess.textContent = profile.subscription.property_access;
+
+        // Agent Inputs (for edit mode)
+        if (profile.agent) {
+            if (dom.agentInputName) dom.agentInputName.value = profile.agent.name;
+            if (dom.agentInputPhone) dom.agentInputPhone.value = profile.agent.phone;
+            if (dom.agentInputEmail) dom.agentInputEmail.value = profile.agent.email;
+            if (dom.agentInputBrokerage) dom.agentInputBrokerage.value = profile.agent.brokerage_company;
         }
 
-        // --- LOGIC ---
+        renderAgentView();
+    }
 
-        function populateData() {
-            // Text Elements
-            const fullName = `${profile.first_name} ${profile.last_name}`;
-            const initials = (profile.first_name[0] + profile.last_name[0]).toUpperCase();
+    function renderAgentView() {
+        if (!dom.agentView) return;
 
-            dom.avatarInitials.textContent = initials;
-            dom.sidebarInitials.textContent = initials;
-            dom.displayName.textContent = fullName;
-            dom.sidebarName.textContent = fullName;
-            dom.memberSince.textContent = `Member since ${profile.member_since}`;
-
-            // Inputs
-            dom.inputFirstName.value = profile.first_name;
-            dom.inputLastName.value = profile.last_name;
-            dom.inputEmail.value = profile.email;
-            dom.inputPhone.value = profile.phone_number;
-            dom.inputLocation.value = profile.location;
-
-            // Subscription
-            dom.subMemberSince.textContent = profile.subscription.member_since;
-            dom.subExpiration.value = profile.subscription.expiration_date;
-            dom.subFee.value = `$${profile.subscription.fee_paid}`;
-            dom.subAccess.textContent = profile.subscription.property_access;
-
-            // Agent Inputs (for edit mode)
-            if (profile.agent) {
-                dom.agentInputName.value = profile.agent.name;
-                dom.agentInputPhone.value = profile.agent.phone;
-                dom.agentInputEmail.value = profile.agent.email;
-                dom.agentInputBrokerage.value = profile.agent.brokerage_company;
-            }
-
-            renderAgentView();
-        }
-
-        function renderAgentView() {
-            if (profile.agent && profile.agent.name) {
-                dom.agentView.innerHTML = `
+        if (profile.agent && profile.agent.name) {
+            dom.agentView.innerHTML = `
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div class="space-y-1">
                             <span class="text-sm font-medium text-[var(--muted-foreground)]">Name</span>
@@ -566,51 +402,53 @@
                         </div>
                     </div>
                 `;
-            } else {
-                dom.agentView.innerHTML = `
+        } else {
+            dom.agentView.innerHTML = `
                     <div class="text-center py-8">
                         <p class="text-[var(--muted-foreground)] text-lg">None</p>
                     </div>
                 `;
-            }
+        }
+    }
+
+    function calculateStats() {
+        // Days Remaining Calculation
+        const now = new Date();
+        const expiry = new Date(profile.subscription.expiration_date);
+        const diffTime = expiry - now;
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        const daysLeft = Math.max(0, diffDays);
+
+        // Access Calculation
+        const remainingViews = stats.planLimit === "unlimited" ? "Unlimited" : Math.max(0, stats.planLimit - stats.propertiesViewed);
+
+        // Update DOM Stats
+        if (dom.statViewsCount) dom.statViewsCount.textContent = stats.propertiesViewed;
+        if (dom.statViewsRemaining) dom.statViewsRemaining.textContent = remainingViews === "Unlimited" ? "Unlimited access" : `${remainingViews} views remaining`;
+        if (dom.statDaysLeft) dom.statDaysLeft.textContent = `${daysLeft}d`;
+
+        // Access Status Card Logic
+        renderAccessStatus(daysLeft, remainingViews);
+    }
+
+    function renderAccessStatus(daysLeft, remainingViews) {
+        if (!dom.accessCounterContainer) return;
+
+        let statusClass = "alert-success";
+        let statusIcon = "check-circle";
+        let message = "";
+
+        if (daysLeft <= 0) {
+            statusClass = "alert-error";
+            statusIcon = "alert-triangle";
+            message = "⚠️ Your access has expired. Please renew to continue viewing properties.";
+        } else if (daysLeft <= 7) {
+            statusClass = "alert-warning";
+            statusIcon = "alert-triangle";
+            message = `⚠️ Your plan expires in ${daysLeft} days. Renew to maintain access.`;
         }
 
-        function calculateStats() {
-            // Days Remaining Calculation
-            const now = new Date();
-            const expiry = new Date(profile.subscription.expiration_date);
-            const diffTime = expiry - now;
-            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-            const daysLeft = Math.max(0, diffDays);
-
-            // Access Calculation
-            const remainingViews = stats.planLimit === "unlimited" ? "Unlimited" : Math.max(0, stats.planLimit - stats.propertiesViewed);
-
-            // Update DOM Stats
-            dom.statViewsCount.textContent = stats.propertiesViewed;
-            dom.statViewsRemaining.textContent = remainingViews === "Unlimited" ? "Unlimited access" : `${remainingViews} views remaining`;
-            dom.statDaysLeft.textContent = `${daysLeft}d`;
-
-            // Access Status Card Logic
-            renderAccessStatus(daysLeft, remainingViews);
-        }
-
-        function renderAccessStatus(daysLeft, remainingViews) {
-            let statusClass = "alert-success";
-            let statusIcon = "check-circle";
-            let message = "";
-
-            if (daysLeft <= 0) {
-                statusClass = "alert-error";
-                statusIcon = "alert-triangle";
-                message = "⚠️ Your access has expired. Please renew to continue viewing properties.";
-            } else if (daysLeft <= 7) {
-                statusClass = "alert-warning";
-                statusIcon = "alert-triangle";
-                message = `⚠️ Your plan expires in ${daysLeft} days. Renew to maintain access.`;
-            }
-
-            const html = `
+        const html = `
                 <div class="flex items-center gap-2 mb-2 ${daysLeft <= 7 ? 'text-warning' : 'text-success'}">
                     <i data-lucide="${statusIcon}" class="h-4 w-4"></i>
                     <h4 class="font-medium text-sm">Pro Plan Status</h4>
@@ -631,105 +469,100 @@
                 ${message ? `<div class="mt-3 text-xs ${daysLeft <= 0 ? 'text-error' : 'text-warning'}">${message}</div>` : ''}
             `;
 
-            dom.accessCounterContainer.innerHTML = html;
-            // Note: We are keeping the card class structure from the container div
-            lucide.createIcons();
-        }
+        dom.accessCounterContainer.innerHTML = html;
+        // Note: We are keeping the card class structure from the container div
+        if (window.lucide) lucide.createIcons();
+    }
 
-        // --- EVENT LISTENERS ---
-        function setupEventListeners() {
-            // Sidebar Toggle
-            const toggleSidebar = () => {
-                const isClosed = dom.sidebar.classList.contains('-translate-x-full');
-                if (isClosed) {
-                    dom.sidebar.classList.remove('-translate-x-full');
-                    dom.overlay.classList.remove('hidden');
-                } else {
-                    dom.sidebar.classList.add('-translate-x-full');
-                    dom.overlay.classList.add('hidden');
-                }
-            };
+    // --- EVENT LISTENERS ---
+    function setupEventListeners() {
+        // Sidebar Toggle REMOVED - Handled by buyer_base.html
 
-            dom.mobileMenuBtn.addEventListener('click', toggleSidebar);
-            dom.overlay.addEventListener('click', toggleSidebar);
-
-            // Edit Profile Mode
+        // Edit Profile Mode
+        if (dom.btnEdit) {
             dom.btnEdit.addEventListener('click', () => {
                 setEditMode(true);
             });
+        }
 
+        if (dom.btnCancel) {
             dom.btnCancel.addEventListener('click', () => {
                 setEditMode(false);
                 populateData(); // Reset inputs
             });
+        }
 
+        if (dom.btnSave) {
             dom.btnSave.addEventListener('click', (e) => {
                 e.preventDefault();
                 saveProfile();
             });
         }
+    }
 
-        function setEditMode(isEditing) {
-            // Toggle Buttons
-            dom.btnEdit.parentElement.classList.toggle('hidden', isEditing);
-            dom.editActions.classList.toggle('hidden', !isEditing);
+    function setEditMode(isEditing) {
+        // Toggle Buttons
+        if (dom.btnEdit && dom.btnEdit.parentElement) dom.btnEdit.parentElement.classList.toggle('hidden', isEditing);
+        if (dom.editActions) dom.editActions.classList.toggle('hidden', !isEditing);
 
-            // Toggle Inputs
-            const inputs = [dom.inputFirstName, dom.inputLastName, dom.inputEmail, dom.inputPhone, dom.inputLocation];
-            inputs.forEach(input => input.disabled = !isEditing);
+        // Toggle Inputs
+        const inputs = [dom.inputFirstName, dom.inputLastName, dom.inputEmail, dom.inputPhone, dom.inputLocation];
+        inputs.forEach(input => {
+            if (input) input.disabled = !isEditing;
+        });
 
-            // Toggle Agent Section
-            dom.agentView.classList.toggle('hidden', isEditing);
-            dom.agentEdit.classList.toggle('hidden', !isEditing);
-        }
+        // Toggle Agent Section
+        if (dom.agentView) dom.agentView.classList.toggle('hidden', isEditing);
+        if (dom.agentEdit) dom.agentEdit.classList.toggle('hidden', !isEditing);
+    }
 
-        function saveProfile() {
-            // Show saving state
-            dom.btnSave.innerHTML = `<span class="loading loading-spinner loading-xs"></span> Saving...`;
-            
-            // Simulate API Call
-            setTimeout(() => {
-                // Update Local Data
-                profile.first_name = dom.inputFirstName.value;
-                profile.last_name = dom.inputLastName.value;
-                profile.email = dom.inputEmail.value;
-                profile.phone_number = dom.inputPhone.value;
-                profile.location = dom.inputLocation.value;
+    function saveProfile() {
+        // Show saving state
+        dom.btnSave.innerHTML = `<span class="loading loading-spinner loading-xs"></span> Saving...`;
 
-                // Update Agent Data
-                if (dom.agentInputName.value) {
-                    profile.agent = {
-                        name: dom.agentInputName.value,
-                        phone: dom.agentInputPhone.value,
-                        email: dom.agentInputEmail.value,
-                        brokerage_company: dom.agentInputBrokerage.value
-                    };
-                }
+        // Simulate API Call
+        setTimeout(() => {
+            // Update Local Data
+            if (dom.inputFirstName) profile.first_name = dom.inputFirstName.value;
+            if (dom.inputLastName) profile.last_name = dom.inputLastName.value;
+            if (dom.inputEmail) profile.email = dom.inputEmail.value;
+            if (dom.inputPhone) profile.phone_number = dom.inputPhone.value;
+            if (dom.inputLocation) profile.location = dom.inputLocation.value;
 
-                // UI Updates
-                populateData();
-                setEditMode(false);
+            // Update Agent Data
+            if (dom.agentInputName && dom.agentInputName.value) {
+                profile.agent = {
+                    name: dom.agentInputName.value,
+                    phone: dom.agentInputPhone.value,
+                    email: dom.agentInputEmail.value,
+                    brokerage_company: dom.agentInputBrokerage.value
+                };
+            }
 
-                // Reset Button
-                dom.btnSave.innerHTML = `<i data-lucide="save" class="mr-2 h-4 w-4"></i> Save`;
-                lucide.createIcons();
+            // UI Updates
+            populateData();
+            setEditMode(false);
 
-                // Show Success Message
+            // Reset Button
+            dom.btnSave.innerHTML = `<i data-lucide="save" class="mr-2 h-4 w-4"></i> Save`;
+            if (window.lucide) lucide.createIcons();
+
+            // Show Success Message
+            if (dom.saveNotification) {
                 dom.saveNotification.className = "mt-4 alert alert-success text-sm";
                 dom.saveNotification.innerHTML = `<i data-lucide="check-circle" class="w-5 h-5"></i> <span>Profile updated successfully!</span>`;
                 dom.saveNotification.classList.remove('hidden');
-                lucide.createIcons();
+                if (window.lucide) lucide.createIcons();
 
                 setTimeout(() => {
                     dom.saveNotification.classList.add('hidden');
                 }, 3000);
+            }
 
-            }, 1000);
-        }
+        }, 1000);
+    }
 
-        // Run
-        init();
-    </script>
-</body>
-
-</html>
+    // Run
+    init();
+</script>
+{% endblock %}

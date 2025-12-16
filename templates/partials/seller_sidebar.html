@@ -1,0 +1,45 @@
+<div class="flex items-center justify-center h-16 px-6 border-b border-[var(--border)]">
+    <h1 class="font-heading text-xl font-bold text-[var(--foreground)]">
+        OTL Dashboard
+    </h1>
+</div>
+
+<div class="px-6 py-4 border-b border-[var(--border)]">
+    <div class="flex items-center space-x-3">
+        <div class="avatar placeholder">
+            <div class="bg-[var(--accent)] text-[var(--bg)] rounded-full w-10">
+                <span id="sidebar-avatar-initials" class="text-sm font-semibold">AS</span>
+            </div>
+        </div>
+        <div class="flex-1 min-w-0">
+            <p id="sidebar-user-name" class="text-sm font-medium text-[var(--foreground)] truncate">Alice Smith</p>
+            <p class="text-xs text-[var(--muted-foreground)] truncate capitalize">Seller</p>
+        </div>
+    </div>
+</div>
+
+<nav class="flex-1 px-4 py-6 space-y-2">
+    <a href="{% url 'seller_dashboard' %}"
+        class="flex items-center w-full px-4 py-2 text-sm font-medium rounded-md {% if active_page == 'dashboard' %}bg-[var(--accent)] text-[var(--bg)]{% else %}text-[var(--foreground)] hover:bg-[var(--accent)] hover:text-black transition-colors{% endif %}">
+        <i data-lucide="home" class="mr-3 h-4 w-4"></i> Dashboard
+    </a>
+    <a href="#"
+        class="flex items-center w-full px-4 py-2 text-sm font-medium rounded-md {% if active_page == 'properties' %}bg-[var(--accent)] text-[var(--bg)]{% else %}text-[var(--foreground)] hover:bg-[var(--accent)] hover:text-black transition-colors{% endif %}">
+        <i data-lucide="building" class="mr-3 h-4 w-4"></i> My Properties
+    </a>
+    <a href="#"
+        class="flex items-center w-full px-4 py-2 text-sm font-medium rounded-md {% if active_page == 'messages' %}bg-[var(--accent)] text-[var(--bg)]{% else %}text-[var(--foreground)] hover:bg-[var(--accent)] hover:text-black transition-colors{% endif %}">
+        <i data-lucide="message-square" class="mr-3 h-4 w-4"></i> Messages
+    </a>
+    <a href="{% url 'seller_settings' %}"
+        class="flex items-center w-full px-4 py-2 text-sm font-medium rounded-md {% if active_page == 'settings' %}bg-[var(--accent)] text-[var(--bg)]{% else %}text-[var(--foreground)] hover:bg-[var(--accent)] hover:text-black transition-colors{% endif %}">
+        <i data-lucide="settings" class="mr-3 h-4 w-4"></i> Settings
+    </a>
+</nav>
+
+<div class="p-4 border-t border-[var(--border)]">
+    <a href="{% url 'logout' %}"
+        class="flex items-center w-full px-4 py-2 text-sm font-medium rounded-md text-[var(--foreground)] hover:bg-yellow-500 hover:text-black transition-colors">
+        <i data-lucide="log-out" class="mr-3 h-4 w-4"></i> Sign Out
+    </a>
+</div>

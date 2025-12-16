@@ -1,333 +1,179 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Favorites | OTL Platform</title>
-    
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Arima:wght@100..700&display=swap" rel="stylesheet">
+{% extends 'buyer_base.html' %}
 
-    <script src="https://cdn.tailwindcss.com"></script>
+{% block title %}My Favorites | OTL Platform{% endblock %}
 
-    <script src="https://unpkg.com/lucide@latest"></script>
+{% block sidebar %}
+{% include 'partials/buyer_sidebar.html' with active_page='favorites' %}
+{% endblock %}
 
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['Arima', 'system-ui', 'sans-serif'],
-                        heading: ['Arima', 'system-ui', 'sans-serif'],
-                        body: ['Arima', 'system-ui', 'sans-serif'],
-                    },
-                    colors: {
-                        border: "var(--border)",
-                        input: "var(--input)",
-                        ring: "var(--ring)",
-                        background: "var(--background)",
-                        foreground: "var(--foreground)",
-                        primary: {
-                            DEFAULT: "var(--primary)",
-                            foreground: "var(--primary-foreground)",
-                        },
-                        muted: {
-                            DEFAULT: "var(--muted)",
-                            foreground: "var(--muted-foreground)",
-                        },
-                        accent: {
-                            DEFAULT: "var(--accent)",
-                            foreground: "var(--accent-foreground)",
-                            hover: "var(--accent-hover)",
-                        },
-                        card: {
-                            DEFAULT: "var(--card)",
-                            foreground: "var(--card-foreground)",
-                        },
-                    },
-                }
-            }
-        }
-    </script>
+{% block content %}
+<div class="space-y-2">
+    <h1 class="text-3xl font-bold text-[var(--foreground)]">My Favorites</h1>
+    <p class="text-[var(--muted-foreground)]">Manage your saved properties</p>
+</div>
 
-    <style>
-        :root {
-            --radius: 0.625rem;
-            --bg: #2a2a2a;
-            --card: #3a3a3a;
-            --muted: #c0c0c0;
-            --accent: #d4af37;
-            --accent-hover: #e0c066;
-            --border: #4a4a4a;
-
-            --background: #2a2a2a;
-            --foreground: #f3f4f6;
-            --card-foreground: #f3f4f6;
-            --popover: #3a3a3a;
-            --popover-foreground: #f3f4f6;
-            --primary: #d4af37;
-            --primary-foreground: #2a2a2a;
-            --secondary: #464646;
-            --secondary-foreground: #f3f4f6;
-            --muted: #464646;
-            --muted-foreground: #c0c0c0;
-            --accent-foreground: #2a2a2a;
-            --destructive: #dc2626;
-            --input: #464646;
-            --ring: #d4af37;
-        }
-
-        body {
-            background-color: var(--bg);
-            color: var(--foreground);
-            font-family: 'Arima', sans-serif;
-            line-height: 1.6;
-            -webkit-font-smoothing: antialiased;
-        }
-        
-        .sidebar-transition {
-            transition: transform 0.3s ease-in-out;
-        }
-
-        /* Hide scrollbar for cleaner look in some areas */
-        .no-scrollbar::-webkit-scrollbar {
-            display: none;
-        }
-        .no-scrollbar {
-            -ms-overflow-style: none;
-            scrollbar-width: none;
-        }
-    </style>
-</head>
-<body class="min-h-screen bg-[var(--bg)]">
-
-    <div class="lg:hidden fixed top-0 left-0 right-0 z-50 bg-[var(--card)] border-b border-[var(--border)] px-4 py-3 flex items-center justify-between">
-        <span class="font-bold text-lg text-[var(--foreground)]">OTL Dashboard</span>
-        <button id="mobile-menu-btn" class="p-2 rounded-md border border-[var(--border)] text-[var(--foreground)] hover:bg-[var(--accent)] hover:text-black transition-colors">
-            <i data-lucide="menu" class="w-5 h-5"></i>
-        </button>
+<div class="flex items-center justify-between">
+    <h2 class="text-xl font-semibold text-[var(--foreground)]">
+        Saved Properties (<span id="results-count">0</span>)
+    </h2>
+    <div class="flex items-center space-x-2">
+        <span class="text-sm text-[var(--muted-foreground)] hidden sm:inline">Sort by:</span>
+        <select id="sort-order"
+            class="bg-[var(--input)] border border-[var(--border)] text-[var(--foreground)] rounded px-2 py-1 text-sm focus:outline-none">
+            <option value="relevant">Default</option>
+            <option value="price-asc">Price: Low to High</option>
+            <option value="price-desc">Price: High to Low</option>
+            <option value="newest">Newest First</option>
+        </select>
     </div>
+</div>
 
-    <aside id="sidebar" class="fixed inset-y-0 left-0 z-40 w-64 bg-[var(--card)] border-r border-[var(--border)] transform -translate-x-full lg:translate-x-0 sidebar-transition flex flex-col">
-        <div class="flex items-center justify-center h-16 px-6 border-b border-[var(--border)]">
-            <h1 class="font-heading text-xl font-bold text-[var(--foreground)]">
-                OTL Dashboard
-            </h1>
-        </div>
+<div id="property-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+</div>
+{% endblock %}
 
-        <div class="px-6 py-4 border-b border-[var(--border)]">
-            <div class="flex items-center space-x-3">
-                <div class="w-10 h-10 bg-[var(--accent)] rounded-full flex items-center justify-center">
-                    <span class="text-[var(--bg)] font-semibold text-sm">JD</span>
-                </div>
-                <div class="flex-1 min-w-0">
-                    <p class="text-sm font-medium text-[var(--foreground)] truncate">John Doe</p>
-                    <p class="text-xs text-[var(--muted-foreground)] truncate capitalize">Buyer</p>
-                </div>
-            </div>
-        </div>
-
-        <nav class="flex-1 px-4 py-6 space-y-2">
-            <a href="{% url 'buyer_dashboard' %}" class="flex items-center w-full px-4 py-2 text-sm font-medium rounded-md text-[var(--foreground)] hover:bg-[var(--accent)] hover:text-black transition-colors">
-                <i data-lucide="home" class="mr-3 h-4 w-4"></i> Dashboard
-            </a>
-            <a href="{% url 'buyer_property_search' %}" class="flex items-center w-full px-4 py-2 text-sm font-medium rounded-md text-[var(--foreground)] hover:bg-[var(--accent)] hover:text-black transition-colors">
-                <i data-lucide="search" class="mr-3 h-4 w-4"></i> Property Search
-            </a>
-            <a href="{% url 'buyer_favorites' %}" class="flex items-center w-full px-4 py-2 text-sm font-medium rounded-md bg-[var(--accent)] text-[var(--bg)]">
-                <i data-lucide="heart" class="mr-3 h-4 w-4"></i> Favorites
-            </a>
-            <a href="#" class="flex items-center w-full px-4 py-2 text-sm font-medium rounded-md text-[var(--foreground)] hover:bg-[var(--accent)] hover:text-black transition-colors">
-                <i data-lucide="message-square" class="mr-3 h-4 w-4"></i> Messages
-            </a>
-            <a href="{% url 'buyer_settings' %}" class="flex items-center w-full px-4 py-2 text-sm font-medium rounded-md text-[var(--foreground)] hover:bg-[var(--accent)] hover:text-black transition-colors">
-                <i data-lucide="settings" class="mr-3 h-4 w-4"></i> Settings
-            </a>
-        </nav>
-
-        <div class="p-4 border-t border-[var(--border)]">
-            <a href="{% url 'login' %}" class="flex items-center w-full px-4 py-2 text-sm font-medium rounded-md text-[var(--foreground)] hover:bg-yellow-500 hover:text-black transition-colors">
-                <i data-lucide="log-out" class="mr-3 h-4 w-4"></i> Sign Out
-            </a>
-        </div>
-    </aside>
-
-    <div id="sidebar-overlay" class="fixed inset-0 bg-black/50 z-30 hidden lg:hidden"></div>
-
-    <div class="lg:pl-64 pt-16 lg:pt-0">
-        <main class="min-h-screen bg-[var(--bg)]">
-            <div class="w-full max-w-7xl mx-auto px-6 py-8 space-y-6">
-                
-                <div class="space-y-2">
-                    <h1 class="text-3xl font-bold text-[var(--foreground)]">My Favorites</h1>
-                    <p class="text-[var(--muted-foreground)]">Manage your saved properties</p>
-                </div>
-
-                <div class="flex items-center justify-between">
-                    <h2 class="text-xl font-semibold text-[var(--foreground)]">
-                        Saved Properties (<span id="results-count">0</span>)
-                    </h2>
-                    <div class="flex items-center space-x-2">
-                        <span class="text-sm text-[var(--muted-foreground)] hidden sm:inline">Sort by:</span>
-                        <select id="sort-order" class="bg-[var(--input)] border border-[var(--border)] text-[var(--foreground)] rounded px-2 py-1 text-sm focus:outline-none">
-                            <option value="relevant">Default</option>
-                            <option value="price-asc">Price: Low to High</option>
-                            <option value="price-desc">Price: High to Low</option>
-                            <option value="newest">Newest First</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div id="property-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    </div>
-
-            </div>
-        </main>
-    </div>
-
-    <script>
-        // --- MOCK DATA ---
-        const mockProperties = [
-            {
-                id: 1,
-                title: "Modern Downtown Condo",
-                location: "Downtown, City Center",
-                price: 450000,
-                bedrooms: 2,
-                bathrooms: 2,
-                sqft: 1200,
-                image: "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&q=80&w=300&h=200",
-                type: "condo",
-                status: "active",
-                features: ["Balcony", "Gym Access", "Parking"],
-                dateAdded: "2025-01-10"
-            },
-            {
-                id: 2,
-                title: "Spacious Family Home",
-                location: "Suburb Valley",
-                price: 650000,
-                bedrooms: 4,
-                bathrooms: 3,
-                sqft: 2400,
-                image: "https://images.unsplash.com/photo-1568605114967-8130f3a36994?auto=format&fit=crop&q=80&w=300&h=200",
-                type: "house",
-                status: "active",
-                features: ["Garden", "Garage", "Fireplace"],
-                dateAdded: "2025-01-12"
-            },
-            {
-                id: 3,
-                title: "Cozy Townhouse",
-                location: "Riverside District",
-                price: 380000,
-                bedrooms: 3,
-                bathrooms: 2,
-                sqft: 1600,
-                image: "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&q=80&w=300&h=200",
-                type: "townhouse",
-                status: "active",
-                features: ["Patio", "Storage", "Community Pool"],
-                dateAdded: "2025-01-05"
-            },
-            {
-                id: 4,
-                title: "Luxury Apartment",
-                location: "Arts District",
-                price: 720000,
-                bedrooms: 2,
-                bathrooms: 2,
-                sqft: 1400,
-                image: "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&q=80&w=300&h=200",
-                type: "apartment",
-                status: "active",
-                features: ["City Views", "Concierge", "Rooftop Access"],
-                dateAdded: "2025-01-15"
-            },
-            {
-                id: 5,
-                title: "Countryside Villa",
-                location: "Green Hills",
-                price: 850000,
-                bedrooms: 5,
-                bathrooms: 4,
-                sqft: 3500,
-                image: "https://images.unsplash.com/photo-1600596542815-2a4d9fddace7?auto=format&fit=crop&q=80&w=300&h=200",
-                type: "house",
-                status: "active",
-                features: ["Large Lot", "Pool", "Solar Panels"],
-                dateAdded: "2025-01-01"
-            },
-            {
-                id: 6,
-                title: "Studio Loft",
-                location: "Old Town",
-                price: 250000,
-                bedrooms: 1,
-                bathrooms: 1,
-                sqft: 800,
-                image: "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&q=80&w=300&h=200",
-                type: "apartment",
-                status: "active",
-                features: ["High Ceilings", "Exposed Brick", "Near Transit"],
-                dateAdded: "2025-01-14"
-            }
-        ];
-
-        // --- STATE ---
-        let favorites = [1, 3]; // Mock initial favorites
-        let currentSort = "relevant";
-
-        // --- DOM ELEMENTS ---
-        const dom = {
-            sidebar: document.getElementById('sidebar'),
-            overlay: document.getElementById('sidebar-overlay'),
-            mobileMenuBtn: document.getElementById('mobile-menu-btn'),
-            
-            grid: document.getElementById('property-grid'),
-            resultsCount: document.getElementById('results-count'),
-            
-            inputSort: document.getElementById('sort-order'),
-        };
-
-        // --- INITIALIZATION ---
-        function init() {
-            lucide.createIcons();
-            renderProperties();
-            setupEventListeners();
+{% block scripts %}
+<script>
+    // --- MOCK DATA ---
+    const mockProperties = [
+        {
+            id: 1,
+            title: "Modern Downtown Condo",
+            location: "Downtown, City Center",
+            price: 450000,
+            bedrooms: 2,
+            bathrooms: 2,
+            sqft: 1200,
+            image: "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&q=80&w=300&h=200",
+            type: "condo",
+            status: "active",
+            features: ["Balcony", "Gym Access", "Parking"],
+            dateAdded: "2025-01-10"
+        },
+        {
+            id: 2,
+            title: "Spacious Family Home",
+            location: "Suburb Valley",
+            price: 650000,
+            bedrooms: 4,
+            bathrooms: 3,
+            sqft: 2400,
+            image: "https://images.unsplash.com/photo-1568605114967-8130f3a36994?auto=format&fit=crop&q=80&w=300&h=200",
+            type: "house",
+            status: "active",
+            features: ["Garden", "Garage", "Fireplace"],
+            dateAdded: "2025-01-12"
+        },
+        {
+            id: 3,
+            title: "Cozy Townhouse",
+            location: "Riverside District",
+            price: 380000,
+            bedrooms: 3,
+            bathrooms: 2,
+            sqft: 1600,
+            image: "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&q=80&w=300&h=200",
+            type: "townhouse",
+            status: "active",
+            features: ["Patio", "Storage", "Community Pool"],
+            dateAdded: "2025-01-05"
+        },
+        {
+            id: 4,
+            title: "Luxury Apartment",
+            location: "Arts District",
+            price: 720000,
+            bedrooms: 2,
+            bathrooms: 2,
+            sqft: 1400,
+            image: "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&q=80&w=300&h=200",
+            type: "apartment",
+            status: "active",
+            features: ["City Views", "Concierge", "Rooftop Access"],
+            dateAdded: "2025-01-15"
+        },
+        {
+            id: 5,
+            title: "Countryside Villa",
+            location: "Green Hills",
+            price: 850000,
+            bedrooms: 5,
+            bathrooms: 4,
+            sqft: 3500,
+            image: "https://images.unsplash.com/photo-1600596542815-2a4d9fddace7?auto=format&fit=crop&q=80&w=300&h=200",
+            type: "house",
+            status: "active",
+            features: ["Large Lot", "Pool", "Solar Panels"],
+            dateAdded: "2025-01-01"
+        },
+        {
+            id: 6,
+            title: "Studio Loft",
+            location: "Old Town",
+            price: 250000,
+            bedrooms: 1,
+            bathrooms: 1,
+            sqft: 800,
+            image: "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&q=80&w=300&h=200",
+            type: "apartment",
+            status: "active",
+            features: ["High Ceilings", "Exposed Brick", "Near Transit"],
+            dateAdded: "2025-01-14"
         }
+    ];
 
-        // --- LOGIC ---
+    // --- STATE ---
+    let favorites = [1, 3]; // Mock initial favorites
+    let currentSort = "relevant";
 
-        function formatPrice(price) {
-            return new Intl.NumberFormat('en-US', {
-                style: 'currency',
-                currency: 'USD',
-                maximumFractionDigits: 0
-            }).format(price);
-        }
+    // --- DOM ELEMENTS ---
+    const dom = {
+        // Sidebar buttons REMOVED - handled by buyer_base.html
 
-        function getFavoriteProperties() {
-            return mockProperties.filter(p => favorites.includes(p.id))
+        grid: document.getElementById('property-grid'),
+        resultsCount: document.getElementById('results-count'),
+
+        inputSort: document.getElementById('sort-order'),
+    };
+
+    // --- INITIALIZATION ---
+    function init() {
+        // Lucide created by Base
+        renderProperties();
+        setupEventListeners();
+    }
+
+    // --- LOGIC ---
+
+    function formatPrice(price) {
+        return new Intl.NumberFormat('en-US', {
+            style: 'currency',
+            currency: 'USD',
+            maximumFractionDigits: 0
+        }).format(price);
+    }
+
+    function getFavoriteProperties() {
+        return mockProperties.filter(p => favorites.includes(p.id))
             .sort((a, b) => {
-                switch(currentSort) {
+                switch (currentSort) {
                     case "price-asc": return a.price - b.price;
                     case "price-desc": return b.price - a.price;
                     case "newest": return new Date(b.dateAdded) - new Date(a.dateAdded);
                     default: return 0; // relevance (id order)
                 }
             });
-        }
+    }
 
-        function renderProperties() {
-            const properties = getFavoriteProperties();
-            dom.resultsCount.textContent = properties.length;
-            dom.grid.innerHTML = "";
+    function renderProperties() {
+        const properties = getFavoriteProperties();
+        if (dom.resultsCount) dom.resultsCount.textContent = properties.length;
+        if (dom.grid) dom.grid.innerHTML = "";
 
-            if (properties.length === 0) {
-                dom.grid.innerHTML = `
+        if (!dom.grid) return;
+
+        if (properties.length === 0) {
+            dom.grid.innerHTML = `
                     <div class="col-span-1 md:col-span-2 lg:col-span-3 text-center py-12">
                         <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-[var(--muted)]/20 mb-4">
                             <i data-lucide="heart-off" class="w-8 h-8 text-[var(--muted-foreground)]"></i>
@@ -339,14 +185,14 @@
                         </a>
                     </div>
                 `;
-                lucide.createIcons();
-                return;
-            }
+            if (window.lucide) lucide.createIcons();
+            return;
+        }
 
-            properties.forEach(p => {
-                const card = document.createElement('div');
-                card.className = "bg-[var(--card)] rounded-lg border border-[var(--border)] overflow-hidden hover:shadow-lg transition-shadow group";
-                card.innerHTML = `
+        properties.forEach(p => {
+            const card = document.createElement('div');
+            card.className = "bg-[var(--card)] rounded-lg border border-[var(--border)] overflow-hidden hover:shadow-lg transition-shadow group";
+            card.innerHTML = `
                     <div class="relative">
                         <div class="aspect-video bg-gray-700 relative overflow-hidden">
                             <img src="${p.image}" alt="${p.title}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105">
@@ -406,45 +252,37 @@
                         </div>
                     </div>
                 `;
-                dom.grid.appendChild(card);
-            });
-            lucide.createIcons();
-        }
+            dom.grid.appendChild(card);
+        });
+        if (window.lucide) lucide.createIcons();
+    }
 
-        // --- ACTIONS ---
+    // --- ACTIONS ---
 
-        window.removeFavorite = (id) => {
-            favorites = favorites.filter(favId => favId !== id);
-            renderProperties();
-        };
+    window.removeFavorite = (id) => {
+        favorites = favorites.filter(favId => favId !== id);
+        renderProperties();
+    };
 
-        function updateSort() {
+    function updateSort() {
+        // Safeguard
+        if (dom.inputSort) {
             currentSort = dom.inputSort.value;
             renderProperties();
         }
+    }
 
-        // --- EVENT LISTENERS ---
-        function setupEventListeners() {
-            // Sidebar
-            const toggleSidebar = () => {
-                const isClosed = dom.sidebar.classList.contains('-translate-x-full');
-                if (isClosed) {
-                    dom.sidebar.classList.remove('-translate-x-full');
-                    dom.overlay.classList.remove('hidden');
-                } else {
-                    dom.sidebar.classList.add('-translate-x-full');
-                    dom.overlay.classList.add('hidden');
-                }
-            };
-            dom.mobileMenuBtn.addEventListener('click', toggleSidebar);
-            dom.overlay.addEventListener('click', toggleSidebar);
+    // --- EVENT LISTENERS ---
+    function setupEventListeners() {
+        // Sidebar Toggle REMOVED - managed by buyer_base.html
 
-            // Sort Change
+        // Sort Change
+        if (dom.inputSort) {
             dom.inputSort.addEventListener('change', updateSort);
         }
+    }
 
-        // Run
-        init();
-    </script>
-</body>
-</html>
+    // Run
+    init();
+</script>
+{% endblock %}
