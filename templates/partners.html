@@ -23,7 +23,7 @@
 {% endblock %}
 
 {% block content %}
-<div class="max-w-7xl mx-auto px-6 py-8">
+<div class="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
     <div class="text-center mb-8">
         <div class="flex items-center justify-center gap-3 mb-6">
@@ -43,22 +43,24 @@
     </div>
 
     <div class="card bg-[var(--card)] rounded-2xl border border-[var(--border)] p-6 mb-8 shadow-xl">
-        <div class="relative mb-4">
-            <i data-lucide="search"
-                class="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-[var(--muted-foreground)] z-10"></i>
-            <input type="text" id="partner-search-input"
-                placeholder="Search partners by name, city, county, address, business description, or serving area..."
-                class="input input-bordered w-full pl-12 pr-4 py-3 bg-[var(--muted)] border-[var(--border)] rounded-xl text-[var(--foreground)] placeholder-[var(--muted-foreground)] focus:outline-none focus:border-[var(--accent)] h-auto" />
+        <div class="flex flex-col md:flex-row gap-4 mb-4">
+            <div class="relative flex-grow">
+                <i data-lucide="search"
+                    class="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-[var(--muted-foreground)] z-10"></i>
+                <input type="text" id="partner-search-input"
+                    placeholder="Search partners by name, city, county, address, business description, or serving area..."
+                    class="input input-bordered w-full pl-12 pr-4 py-3 bg-[var(--muted)] border-[var(--border)] rounded-xl text-[var(--foreground)] placeholder-[var(--muted-foreground)] focus:outline-none focus:border-[var(--accent)] h-auto" />
+            </div>
+            
+            <button id="toggle-filters-btn"
+                class="btn btn-outline border-[var(--border)] text-[var(--foreground)] hover:bg-[var(--muted)] hover:text-[var(--foreground)] hover:border-[var(--border)] font-heading text-sm px-4 py-3 rounded-xl transition-colors h-auto min-h-0 flex-shrink-0">
+                <i data-lucide="filter" class="w-4 h-4"></i>
+                <span id="filter-btn-text">Filters</span>
+            </button>
         </div>
 
-        <div class="flex items-center justify-between mb-4">
-            <button id="toggle-filters-btn"
-                class="btn btn-outline border-[var(--border)] text-[var(--foreground)] hover:bg-[var(--muted)] hover:text-[var(--foreground)] hover:border-[var(--border)] font-heading text-sm px-4 py-2 rounded-lg transition-colors h-auto min-h-0">
-                <i data-lucide="filter" class="w-4 h-4"></i>
-                <span id="filter-btn-text">Show Filters</span>
-            </button>
-
-            <button id="clear-filters-btn"
+        <div class="flex justify-end mb-2">
+             <button id="clear-filters-btn"
                 class="hidden btn btn-ghost text-[var(--accent)] hover:bg-[var(--accent)]/10 font-heading text-sm px-3 py-2 rounded-lg transition-colors h-auto min-h-0">
                 <i data-lucide="x" class="w-4 h-4 mr-2"></i>
                 Clear Filters
@@ -481,7 +483,8 @@
         if (toggleFiltersBtn) {
             toggleFiltersBtn.addEventListener('click', () => {
                 filterOptions.classList.toggle('hidden');
-                filterBtnText.textContent = filterOptions.classList.contains('hidden') ? "Show Filters" : "Hide Filters";
+                // Removed dynamic text update to keep it simple "Filters" or icon only if preferred
+                // filterBtnText.textContent = filterOptions.classList.contains('hidden') ? "Show Filters" : "Hide Filters";
             });
         }
 
