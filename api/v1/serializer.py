@@ -3,9 +3,54 @@ from django.db import transaction
 from core.models import User
 from api.models import BuyerProfile, RealtorProfile, SellerProfile, PartnerProfile
 from django.contrib.auth import authenticate
+from django.contrib.auth.password_validation import validate_password
 from django.utils.translation import gettext_lazy as _
 from api.models import RealtorProfile
 from core.models import Subscription
+from django.utils import timezone
+from datetime import timedelta
+import secrets
+
+
+class UserResponseSerializer(serializers.ModelSerializer):
+    """
+    Standard serializer for returning user data in API responses
+    """
+    class Meta:
+        model = User
+        fields = ["id", "email", "first_name", "last_name", "phone_number", "role"]
+
+
+class VerifyOTPSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+    otp = serializers.CharField(max_length=8)  # Changed to 8 to match generation
+
+    def validate(self, attrs):
+        email = attrs.get('email')
+        otp = attrs.get('otp')
+
+        # 1. Check if user exists
+        try:
+            user = User.objects.get(email=email)
+        except User.DoesNotExist:
+            raise serializers.ValidationError({"email": "User with this email does not exist."})
+
+        # 2. Check if already active
+        if user.is_active:
+             raise serializers.ValidationError({"message": "Account is already verified."})
+
+        # 3. Check if OTP is expired
+        if user.otp_created_at and (timezone.now() > user.otp_created_at + timedelta(minutes=10)):
+            raise serializers.ValidationError({"otp": "OTP has expired. Please request a new one."})
+
+        # 4. Verify OTP (Safe Comparison)
+        # Handle case where DB otp might be None
+        if not user.otp or not secrets.compare_digest(str(user.otp), str(otp)):
+            raise serializers.ValidationError({"otp": "Invalid OTP."})
+
+        # Attach the user object to the validated data for the View to use
+        attrs['user'] = user
+        return attrs
 
 
 class SignupSerializer(serializers.ModelSerializer):
@@ -13,7 +58,7 @@ class SignupSerializer(serializers.ModelSerializer):
     Serializer for user signup
     """
 
-    password = serializers.CharField(write_only=True, min_length=8)
+    password = serializers.CharField(write_only=True, min_length=8, validators=[validate_password])
     role = serializers.ChoiceField(choices=User.UserRole.choices)
     license_number = serializers.CharField(required=False, allow_blank=True)
     company_brokerage = serializers.CharField(required=False, allow_blank=True)
@@ -152,17 +197,19 @@ class SignupSerializer(serializers.ModelSerializer):
         website_url = validated_data.pop("website_url", None)
         business_license_number = validated_data.pop("business_license_number", None)
 
-        # Create user with password (create_user handles hashing)
-        # Since USERNAME_FIELD = 'email', email is the first positional argument
+        # Create user using the manager's create_user method which handles hashing
+        # and email normalization
         email = validated_data.pop("email")
-        user = User(
-            username=email,  # Django still needs username field set
+        
+        # Ensure we pass the required fields
+        user = User.objects.create_user(
+            username=email,
             email=email,
+            password=password,
             role=role,
+            is_active=False,  # Set inactive until OTP verification
             **validated_data,
         )
-        user.set_password(password)
-        user.save()
 
         # Create profiles (validation ensures these values exist)
         if role == User.UserRole.BUYER:

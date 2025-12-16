@@ -1,27 +1,24 @@
-from rest_framework import status
+from rest_framework import status, generics
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
-from api.v1.serializer import SignupSerializer
-from api.v1.serializer import LoginSerializer
+from rest_framework.throttling import ScopedRateThrottle
+from api.v1.serializer import SignupSerializer, LoginSerializer, UserResponseSerializer, VerifyOTPSerializer
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
+from django.contrib.auth.models import update_last_login
 from core.models import User
+from core.mail import send_otp_email
+from django.db import transaction
 
 
 class SignupView(APIView):
     """
-    View for user signup - supports both GET (list users) and POST (create user)
+    View for user signup - POST (create user)
     """
 
     permission_classes = (AllowAny,)
-
-    def get(self, request):
-        """
-        Get all signup data (users)
-        """
-        users = User.objects.all().order_by("-created_at")
-        serializer = SignupSerializer(users, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = 'signup'
 
     def post(self, request):
         """
@@ -30,19 +27,55 @@ class SignupView(APIView):
         serializer = SignupSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = serializer.save()
+        
+        # Send OTP
+        send_otp_email(user.email)
+        
+        user_data = UserResponseSerializer(user).data
+        
         return Response(
             {
-                "message": "User created successfully",
-                "user": {
-                    "id": user.id,
-                    "email": user.email,
-                    "first_name": user.first_name,
-                    "last_name": user.last_name,
-                    "phone_number": user.phone_number,
-                    "role": user.role,
-                },
+                "message": "User created successfully. Please verify your email.",
+                "user": user_data,
             },
             status=status.HTTP_201_CREATED,
+        )
+
+
+class VerifyOTPView(generics.GenericAPIView):
+    """
+    View for verifying OTP with expiration and robust validation
+    """
+    permission_classes = (AllowAny,)
+    serializer_class = VerifyOTPSerializer
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = 'signup'
+
+    def post(self, request):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        
+        # Get the validated user from the serializer
+        user = serializer.validated_data['user']
+
+        # Atomic transaction ensures data integrity
+        with transaction.atomic():
+            user.is_active = True
+            user.otp = None 
+            user.otp_created_at = None # Clean up timestamp
+            user.save()
+
+        # Generate tokens
+        refresh = RefreshToken.for_user(user)
+        
+        return Response(
+            {
+                "message": "Email verified successfully",
+                "access_token": str(refresh.access_token),
+                "refresh_token": str(refresh),
+                "user": UserResponseSerializer(user).data
+            },
+            status=status.HTTP_200_OK
         )
 
 
@@ -52,28 +85,28 @@ class LoginView(APIView):
     """
 
     permission_classes = (AllowAny,)
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = 'login'
 
     def post(self, request):
         serializer = LoginSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = serializer.validated_data["user"]
 
+        # Update last login time
+        update_last_login(None, user)
+
         refresh = RefreshToken.for_user(user)
         access_token = str(refresh.access_token)
         refresh_token = str(refresh)
+        
+        user_data = UserResponseSerializer(user).data
 
         return Response(
             {
                 "access_token": access_token,
                 "refresh_token": refresh_token,
-                "user": {
-                    "id": user.id,
-                    "email": user.email,
-                    "first_name": user.first_name,
-                    "last_name": user.last_name,
-                    "phone_number": user.phone_number,
-                    "role": user.role,
-                },
+                "user": user_data,
             },
             status=status.HTTP_200_OK,
         )

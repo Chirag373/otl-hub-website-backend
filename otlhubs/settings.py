@@ -140,6 +140,16 @@ REST_FRAMEWORK = {
         "rest_framework_simplejwt.authentication.JWTAuthentication",
     ),
     "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.IsAuthenticated",),
+    "DEFAULT_THROTTLE_CLASSES": [
+        "rest_framework.throttling.AnonRateThrottle",
+        "rest_framework.throttling.UserRateThrottle",
+    ],
+    "DEFAULT_THROTTLE_RATES": {
+        "anon": "100/day",
+        "user": "1000/day",
+        "signup": "10/minute",
+        "login": "20/minute",
+    },
 }
 
 # JWT Settings
@@ -174,3 +184,12 @@ SIMPLE_JWT = {
 CORS_ALLOW_ALL_ORIGINS = (
     True  # Set to False in production and configure specific origins
 )
+
+# Email Settings
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = "smtp.ionos.com"
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = "info.signup@otlhub.net"
+EMAIL_HOST_PASSWORD = "SignupOTLGroup2025@!"
+DEFAULT_FROM_EMAIL = "OTL Platform <info.signup@otlhub.net>"

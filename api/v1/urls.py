@@ -1,5 +1,5 @@
 from django.urls import path
-from api.v1.auth import SignupView
+from api.v1.auth import SignupView, VerifyOTPView
 from api.v1.auth import LoginView
 from api.v1.views import BuyerProfileView, RealtorProfileView, SellerProfileView
 from rest_framework_simplejwt.views import TokenRefreshView, TokenBlacklistView
@@ -7,6 +7,7 @@ from rest_framework_simplejwt.views import TokenRefreshView, TokenBlacklistView
 urlpatterns = [
     # Auth
     path("auth/signup/", SignupView.as_view(), name="signup"),
+    path("auth/verify-otp/", VerifyOTPView.as_view(), name="verify-otp"),
     path("auth/login/", LoginView.as_view(), name="login"),
     path("auth/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
     path("auth/logout/", TokenBlacklistView.as_view(), name="token_blacklist"),
