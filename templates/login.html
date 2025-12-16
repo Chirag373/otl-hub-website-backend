@@ -52,7 +52,7 @@
 
                     <div class="text-center text-sm text-[var(--muted-foreground)]">
                         Don't have an account?
-                        <a href="signup.html"
+                        <a href="{% url 'signup' %}"
                             class="link link-hover text-[var(--accent)] hover:text-[var(--accent-hover)] font-medium">
                             Sign up here
                         </a>
@@ -107,7 +107,7 @@
                 submitBtn.classList.remove('opacity-70');
 
                 // Redirect to dashboard
-                window.location.href = 'buyer-dashboard.html';
+                window.location.href = "{% url 'buyer_dashboard' %}";
 
             }, 1500);
         });

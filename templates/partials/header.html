@@ -2,24 +2,24 @@
     <div class="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="navbar h-16 p-0">
             <div class="navbar-start">
-                <a href="index.html" class="font-heading text-xl sm:text-2xl text-[#f3f4f6] no-underline hover:text-[#f3f4f6]">
+                <a href="{% url 'index' %}" class="font-heading text-xl sm:text-2xl text-[#f3f4f6] no-underline hover:text-[#f3f4f6]">
                     OTL Platform
                 </a>
             </div>
 
             <div class="navbar-end hidden md:flex items-center gap-4">
                 <a class="btn btn-ghost font-heading text-base text-[#c0c0c0] hover:text-[#f3f4f6] hover:bg-transparent transition-colors"
-                    href="index.html">Home</a>
+                    href="{% url 'index' %}">Home</a>
                 <a class="btn btn-ghost font-heading text-base text-[#c0c0c0] hover:text-[#f3f4f6] hover:bg-transparent transition-colors"
-                    href="about.html">About Us</a>
+                    href="{% url 'about' %}">About Us</a>
                 <a class="btn btn-ghost font-heading text-base text-[#c0c0c0] hover:text-[#f3f4f6] hover:bg-transparent transition-colors"
-                    href="partners.html">Partners</a>
+                    href="{% url 'partners' %}">Partners</a>
 
-                <a href="signup.html"
+                <a href="{% url 'signup' %}"
                     class="btn btn-outline border-[#4a4a4a] text-[#c0c0c0] hover:bg-[#464646] hover:text-[#f3f4f6] font-heading font-normal h-auto py-2 min-h-0">
                     Sign Up
                 </a>
-                <a href="login.html">
+                <a href="{% url 'login' %}">
                     <button
                         class="btn bg-[#d4af37] hover:bg-[#e0c066] text-[#2a2a2a] border-none font-heading font-semibold h-auto py-2 min-h-0">
                         Login
@@ -45,18 +45,18 @@
                 </button>
             </div>
             <div class="flex flex-col gap-2">
-                <a href="index.html"
+                <a href="{% url 'index' %}"
                     class="btn btn-ghost justify-start font-heading text-base text-[#c0c0c0] hover:text-[#f3f4f6] hover:bg-[#464646]">Home</a>
-                <a href="about.html"
+                <a href="{% url 'about' %}"
                     class="btn btn-ghost justify-start font-heading text-base text-[#c0c0c0] hover:text-[#f3f4f6] hover:bg-[#464646]">About
                     Us</a>
-                <a href="partners.html"
+                <a href="{% url 'partners' %}"
                     class="btn btn-ghost justify-start font-heading text-base text-[#c0c0c0] hover:text-[#f3f4f6] hover:bg-[#464646]">Partners</a>
                 <div class="divider my-2 border-[#4a4a4a]"></div>
-                <a href="signup.html"
+                <a href="{% url 'signup' %}"
                     class="btn btn-ghost justify-start font-heading text-base text-[#c0c0c0] hover:text-[#f3f4f6] hover:bg-[#464646]">Sign
                     Up</a>
-                <a href="login.html"
+                <a href="{% url 'login' %}"
                     class="btn justify-start font-heading text-base bg-transparent text-[#d4af37] hover:text-[#e0c066] hover:bg-[#464646] font-semibold border-none shadow-none">
                     Login
                 </a>

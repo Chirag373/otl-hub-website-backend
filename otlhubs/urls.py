@@ -21,7 +21,8 @@ from core.views import (
     IndexView, AboutView, LoginView, SignupView,
     BuyerDashboardView, SellerDashboardView,
     RealtorDashboardView, PartnerDashboardView,
-    PartnersView, BuyerPropertySearchView, BuyerFavoritesView, BuyerSettingsView
+    PartnersView, BuyerPropertySearchView, BuyerFavoritesView, BuyerSettingsView,
+    TermsOfServiceView, PrivacyPolicyView
 )
 
 urlpatterns = [
@@ -30,18 +31,20 @@ urlpatterns = [
     
     # Core pages
     path("", IndexView.as_view(), name="index"),
-    path("index.html", IndexView.as_view(), name="index_html"), # For frontend template compatibility
-    path("about.html", AboutView.as_view(), name="about"),
-    path("partners.html", PartnersView.as_view(), name="partners"),
-    path("login.html", LoginView.as_view(), name="login"),
-    path("signup.html", SignupView.as_view(), name="signup"),
+    path("index", IndexView.as_view(), name="index_html"), # For frontend template compatibility
+    path("about", AboutView.as_view(), name="about"),
+    path("partners", PartnersView.as_view(), name="partners"),
+    path("login", LoginView.as_view(), name="login"),
+    path("signup", SignupView.as_view(), name="signup"),
+    path("terms-of-service", TermsOfServiceView.as_view(), name="terms_of_service"),
+    path("privacy-policy", PrivacyPolicyView.as_view(), name="privacy_policy"),
     
     # Dashboards
-    path("buyer-dashboard.html", BuyerDashboardView.as_view(), name="buyer_dashboard"),
-    path("buyer-property-search.html", BuyerPropertySearchView.as_view(), name="buyer_property_search"),
-    path("buyer-favorites.html", BuyerFavoritesView.as_view(), name="buyer_favorites"),
-    path("buyer-settings.html", BuyerSettingsView.as_view(), name="buyer_settings"),
-    path("seller-dashboard.html", SellerDashboardView.as_view(), name="seller_dashboard"),
-    path("realtor-dashboard.html", RealtorDashboardView.as_view(), name="realtor_dashboard"),
-    path("partner-dashboard.html", PartnerDashboardView.as_view(), name="partner_dashboard"),
+    path("buyer-dashboard", BuyerDashboardView.as_view(), name="buyer_dashboard"),
+    path("buyer-property-search", BuyerPropertySearchView.as_view(), name="buyer_property_search"),
+    path("buyer-favorites", BuyerFavoritesView.as_view(), name="buyer_favorites"),
+    path("buyer-settings", BuyerSettingsView.as_view(), name="buyer_settings"),
+    path("seller-dashboard", SellerDashboardView.as_view(), name="seller_dashboard"),
+    path("realtor-dashboard", RealtorDashboardView.as_view(), name="realtor_dashboard"),
+    path("partner-dashboard", PartnerDashboardView.as_view(), name="partner_dashboard"),
 ]

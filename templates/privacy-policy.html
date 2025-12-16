@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+
+{% block title %}Privacy Policy | OTL Platform{% endblock %}
+
+{% block extra_head %}
+<style>
+    .font-body {
+        font-family: "Arima", sans-serif;
+        font-size: 16px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-[var(--bg)]">
+    <div class="max-w-4xl mx-auto px-6 py-12">
+        <div class="card bg-[var(--card)] border border-[var(--border)] shadow-xl">
+            <div class="card-body p-8 font-body text-[var(--foreground)] space-y-6 leading-relaxed">
+                
+                <div class="mb-8">
+                    <h1 class="card-title font-heading text-3xl text-[var(--foreground)] mb-4">
+                        Privacy Policy
+                    </h1>
+                    <p class="font-heading text-xl text-[var(--accent)] mb-6">
+                        Last Updated: December 16, 2025
+                    </p>
+                </div>
+
+                <section>
+                    <h2 class="font-heading text-xl text-[var(--accent)] mb-3">1. Information Collection</h2>
+                    <p class="text-lg mb-6">
+                        We collect information from you when you register on our site, place an order, subscribe to our newsletter, respond to a survey or fill out a form.
+                    </p>
+                </section>
+
+                <section>
+                    <h2 class="font-heading text-xl text-[var(--accent)] mb-3">2. Use of Information</h2>
+                    <p class="text-lg mb-6">
+                        Any of the information we collect from you may be used in one of the following ways:
+                        <ul class="list-disc list-inside ml-4 mt-2">
+                            <li>To personalize your experience</li>
+                            <li>To improve our website</li>
+                            <li>To improve customer service</li>
+                            <li>To process transactions</li>
+                            <li>To send periodic emails</li>
+                        </ul>
+                    </p>
+                </section>
+
+                 <section>
+                    <h2 class="font-heading text-xl text-[var(--accent)] mb-3">3. Information Protection</h2>
+                    <p class="text-lg mb-6">
+                        We implement a variety of security measures to maintain the safety of your personal information when you place an order or enter, submit, or access your personal information.
+                    </p>
+                </section>
+
+                 <section>
+                    <h2 class="font-heading text-xl text-[var(--accent)] mb-3">4. Cookies</h2>
+                    <p class="text-lg mb-6">
+                        We use cookies to understand and save your preferences for future visits and compile aggregate data about site traffic and site interaction so that we can offer better site experiences and tools in the future.
+                    </p>
+                </section>
+                
+                 <section>
+                    <h2 class="font-heading text-xl text-[var(--accent)] mb-3">5. Third Party Links</h2>
+                    <p class="text-lg mb-6">
+                        Occasionally, at our discretion, we may include or offer third party products or services on our website. These third party sites have separate and independent privacy policies. We therefore have no responsibility or liability for the content and activities of these linked sites.
+                    </p>
+                </section>
+
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

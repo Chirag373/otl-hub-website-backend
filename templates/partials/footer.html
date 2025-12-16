@@ -2,15 +2,15 @@
     <div class="max-w-7xl mx-auto text-center">
         <p class="font-body text-base sm:text-lg text-[#c0c0c0] mb-4">© 2025 OTL Platform. All Rights Reserved.</p>
         <nav class="flex flex-wrap justify-center gap-4 font-heading text-sm sm:text-base">
-            <a class="text-[#c0c0c0] hover:text-[#f3f4f6]" href="index.html">Home</a>
+            <a class="text-[#c0c0c0] hover:text-[#f3f4f6]" href="{% url 'index' %}">Home</a>
             <span class="text-[#4a4a4a]">|</span>
-            <a class="text-[#c0c0c0] hover:text-[#f3f4f6]" href="about.html">About Us</a>
+            <a class="text-[#c0c0c0] hover:text-[#f3f4f6]" href="{% url 'about' %}">About Us</a>
             <span class="text-[#4a4a4a]">|</span>
-            <a class="text-[#c0c0c0] hover:text-[#f3f4f6]" href="login.html">Login</a>
+            <a class="text-[#c0c0c0] hover:text-[#f3f4f6]" href="{% url 'login' %}">Login</a>
             <span class="text-[#4a4a4a]">|</span>
-            <a class="text-[#c0c0c0] hover:text-[#f3f4f6]" href="#">Terms of Service</a>
+            <a class="text-[#c0c0c0] hover:text-[#f3f4f6]" href="{% url 'terms_of_service' %}">Terms of Service</a>
             <span class="text-[#4a4a4a]">|</span>
-            <a class="text-[#c0c0c0] hover:text-[#f3f4f6]" href="#">Privacy Policy</a>
+            <a class="text-[#c0c0c0] hover:text-[#f3f4f6]" href="{% url 'privacy_policy' %}">Privacy Policy</a>
         </nav>
     </div>
 </footer>

@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+
+{% block title %}Terms of Service | OTL Platform{% endblock %}
+
+{% block extra_head %}
+<style>
+    .font-body {
+        font-family: "Arima", sans-serif;
+        font-size: 16px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-[var(--bg)]">
+    <div class="max-w-4xl mx-auto px-6 py-12">
+        <div class="card bg-[var(--card)] border border-[var(--border)] shadow-xl">
+            <div class="card-body p-8 font-body text-[var(--foreground)] space-y-6 leading-relaxed">
+                
+                <div class="mb-8">
+                    <h1 class="card-title font-heading text-3xl text-[var(--foreground)] mb-4">
+                        Terms of Service
+                    </h1>
+                    <p class="font-heading text-xl text-[var(--accent)] mb-6">
+                        Effective Date: December 16, 2025
+                    </p>
+                </div>
+
+                <section>
+                    <h2 class="font-heading text-xl text-[var(--accent)] mb-3">1. Acceptance of Terms</h2>
+                    <p class="text-lg mb-6">
+                        By accessing and using this website, you accept and agree to be bound by the terms and provision of this agreement. In addition, when using these particular services, you shall be subject to any posted guidelines or rules applicable to such services.
+                    </p>
+                </section>
+
+                <section>
+                    <h2 class="font-heading text-xl text-[var(--accent)] mb-3">2. Provision of Services</h2>
+                    <p class="text-lg mb-6">
+                        You agree and acknowledge that the entitlement to modify, improve or discontinue any of its services at its sole discretion and without notice to you even if it may result in you being prevented from accessing any information contained in it.
+                    </p>
+                </section>
+
+                 <section>
+                    <h2 class="font-heading text-xl text-[var(--accent)] mb-3">3. Proprietary Rights</h2>
+                    <p class="text-lg mb-6">
+                        You acknowledge and agree that OTL Platform may contain proprietary and confidential information including trademarks, service marks and patents protected by intellectual property laws and international intellectual property treaties.
+                    </p>
+                </section>
+
+                 <section>
+                    <h2 class="font-heading text-xl text-[var(--accent)] mb-3">4. Termination of Agreement</h2>
+                    <p class="text-lg mb-6">
+                        The Terms of this agreement will continue to apply in perpetuity until terminated by either party without notice at any time for any reason. Terms that are to continue in perpetuity shall be unaffected by the termination of this agreement.
+                    </p>
+                </section>
+                
+                 <section>
+                    <h2 class="font-heading text-xl text-[var(--accent)] mb-3">5. Disclaimer of Warranties</h2>
+                    <p class="text-lg mb-6">
+                        You understand and agree that your use of this website is entirely at your own risk and that our services are provided "As Is" and "As Available".
+                    </p>
+                </section>
+
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

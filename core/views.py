@@ -35,3 +35,9 @@ class PartnerDashboardView(TemplateView):
 
 class PartnersView(TemplateView):
     template_name = "partners.html"
+
+class TermsOfServiceView(TemplateView):
+    template_name = "terms-of-service.html"
+
+class PrivacyPolicyView(TemplateView):
+    template_name = "privacy-policy.html"
