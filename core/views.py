@@ -12,39 +12,41 @@ class LoginView(TemplateView):
 class SignupView(TemplateView):
     template_name = "signup.html"
 
-class BuyerDashboardView(TemplateView):
+from django.contrib.auth.mixins import LoginRequiredMixin
+
+class BuyerDashboardView(LoginRequiredMixin, TemplateView):
     template_name = "buyer-dashboard.html"
 
-class BuyerPropertySearchView(TemplateView):
+class BuyerPropertySearchView(LoginRequiredMixin, TemplateView):
     template_name = "buyer-property-search.html"
 
-class BuyerFavoritesView(TemplateView):
+class BuyerFavoritesView(LoginRequiredMixin, TemplateView):
     template_name = "buyer-favorites.html"
 
-class BuyerSettingsView(TemplateView):
+class BuyerSettingsView(LoginRequiredMixin, TemplateView):
     template_name = "buyer-settings.html"
 
-class SellerDashboardView(TemplateView):
+class SellerDashboardView(LoginRequiredMixin, TemplateView):
     template_name = "seller-dashboard.html"
     extra_context = {'active_page': 'dashboard'}
 
-class SellerSettingsView(TemplateView):
+class SellerSettingsView(LoginRequiredMixin, TemplateView):
     template_name = "seller-settings.html"
     extra_context = {'active_page': 'settings'}
 
-class RealtorDashboardView(TemplateView):
+class RealtorDashboardView(LoginRequiredMixin, TemplateView):
     template_name = "realtor-dashboard.html"
     extra_context = {'active_page': 'dashboard'}
 
-class RealtorSettingsView(TemplateView):
+class RealtorSettingsView(LoginRequiredMixin, TemplateView):
     template_name = "realtor-settings.html"
     extra_context = {'active_page': 'settings'}
 
-class PartnerDashboardView(TemplateView):
+class PartnerDashboardView(LoginRequiredMixin, TemplateView):
     template_name = "partner-dashboard.html"
     extra_context = {'active_page': 'dashboard'}
 
-class PartnerSettingsView(TemplateView):
+class PartnerSettingsView(LoginRequiredMixin, TemplateView):
     template_name = "partner-settings.html"
     extra_context = {'active_page': 'settings'}
 

@@ -107,6 +107,8 @@ class VerifyOTPView(generics.GenericAPIView):
         )
 
 
+from django.contrib.auth import login
+
 class LoginView(APIView):
     """
     View for user login
@@ -121,8 +123,10 @@ class LoginView(APIView):
         serializer.is_valid(raise_exception=True)
         user = serializer.validated_data["user"]
 
-        # Update last login time
-        update_last_login(None, user)
+        # Log the user in to establish a Django session (cookies)
+        login(request, user)
+        
+        # update_last_login is handled by login() automatically
 
         refresh = RefreshToken.for_user(user)
         access_token = str(refresh.access_token)

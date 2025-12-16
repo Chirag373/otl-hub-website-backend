@@ -433,6 +433,9 @@ class RealtorProfileSerializer(serializers.ModelSerializer):
     )
     license_number = serializers.CharField(required=False, allow_blank=True)
     experience = serializers.SerializerMethodField()
+    years_of_experience = serializers.ChoiceField(
+        choices=RealtorProfile.ExperienceLevel.choices, required=False, write_only=True
+    )
     description = serializers.CharField(required=False, allow_blank=True)
 
     # Nested serializer for subscription
@@ -450,6 +453,7 @@ class RealtorProfileSerializer(serializers.ModelSerializer):
             "brokerage_company",
             "license_number",
             "experience",
+            "years_of_experience",
             "description",
             "subscription",
         ]
@@ -523,6 +527,9 @@ class SellerProfileSerializer(serializers.ModelSerializer):
 
     # Property details
     property_type = serializers.SerializerMethodField()
+    property_type_input = serializers.ChoiceField(
+        choices=SellerProfile.PropertyType.choices, required=False, write_only=True, source='property_type'
+    )
     property_description = serializers.CharField(required=False, allow_blank=True)
     estimated_value = serializers.DecimalField(
         max_digits=12, decimal_places=2, required=False, allow_null=True
@@ -530,7 +537,15 @@ class SellerProfileSerializer(serializers.ModelSerializer):
 
     # Selling details
     reason_for_selling = serializers.SerializerMethodField()
+    reason_for_selling_input = serializers.ChoiceField(
+        choices=SellerProfile.ReasonForSelling.choices, required=False, write_only=True, source='reason_for_selling'
+    )
+    
     selling_type = serializers.SerializerMethodField()
+    selling_type_input = serializers.ChoiceField(
+        choices=SellerProfile.SellingType.choices, required=False, write_only=True, source='selling_type'
+    )
+    
     leaseback_required = serializers.BooleanField(required=False)
 
     # Nested serializer for subscription
@@ -552,10 +567,13 @@ class SellerProfileSerializer(serializers.ModelSerializer):
             "zip_code",
             "county",
             "property_type",
+            "property_type_input",
             "property_description",
             "estimated_value",
             "reason_for_selling",
+            "reason_for_selling_input",
             "selling_type",
+            "selling_type_input",
             "leaseback_required",
             "subscription",
         ]
@@ -618,6 +636,8 @@ class SellerProfileSerializer(serializers.ModelSerializer):
         instance.state = validated_data.get("state", instance.state)
         instance.zip_code = validated_data.get("zip_code", instance.zip_code)
         instance.county = validated_data.get("county", instance.county)
+        
+        # NOTE: because we use source='...', the key in validated_data is the model field name (e.g. 'property_type'), not '_input'
         instance.property_type = validated_data.get(
             "property_type", instance.property_type
         )

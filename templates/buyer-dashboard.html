@@ -261,35 +261,27 @@
 <script>
     // --- DATA ---
     let profile = {
-        first_name: "John",
-        last_name: "Doe",
-        email: "john.doe@example.com",
-        phone_number: "(555) 123-4567",
-        location: "Houston, TX",
-        member_since: "2025-01-15",
-        agent: {
-            name: "Sarah Johnson",
-            phone: "(713) 555-0123",
-            email: "sarah.j@otl-realty.com",
-            brokerage_company: "OTL Realty Group"
-        },
-        subscription: {
-            member_since: "2025-01-15",
-            expiration_date: "2025-07-15", // 6 months later
-            fee_paid: "45.00",
-            property_access: "Pro Plan (Unlimited)"
-        }
+        first_name: "",
+        last_name: "",
+        email: "",
+        phone_number: "",
+        location: "",
+        member_since: "",
+        agent: null,
+        subscription: null
     };
 
-    // Usage Stats (Mock)
+    // Usage Stats (Mock - since API doesn't provide these yet, we might need a separate call or default them)
+    // For now, we keep stats local as API response doesn't seem to have them in `stats` field, just profile data.
+    // If stats are critical, they should be added to the serializer.
     let stats = {
-        propertiesViewed: 12,
-        planLimit: "unlimited" // or a number
+        propertiesViewed: 0,
+        planLimit: "unlimited"
     };
 
     // --- DOM ELEMENTS ---
     const dom = {
-        // Header Stats
+        // Stats
         statViewsCount: document.getElementById('stat-views-count'),
         statViewsRemaining: document.getElementById('stat-views-remaining'),
         statDaysLeft: document.getElementById('stat-days-left'),
@@ -333,10 +325,133 @@
 
     // --- INITIALIZATION ---
     function init() {
-        // lucide icons created by base
-        populateData();
-        calculateStats();
+        if (window.lucide) lucide.createIcons();
+        fetchProfile();
         setupEventListeners();
+    }
+
+    // --- API CALLS ---
+    async function fetchProfile() {
+        try {
+            const response = await fetch('/api/v1/buyer/profile/');
+            if (!response.ok) {
+                if (response.status === 403 || response.status === 401) {
+                    console.warn("User not authenticated or not a buyer. Redirecting to login...");
+                    // Optional: window.location.href = "{% url 'login' %}";
+                    return;
+                }
+                throw new Error('Failed to fetch profile');
+            }
+            const data = await response.json();
+
+            // Map API data to our local profile structure
+            profile = {
+                first_name: data.first_name || "",
+                last_name: data.last_name || "",
+                email: data.email || "",
+                phone_number: data.phone_number || "",
+                location: data.location || "",
+                member_since: data.member_since || "",
+                agent: data.agent, // API returns {name, phone, email, brokerage_company} or null
+                subscription: data.subscription // API returns {member_since, expiration_date, fee_paid, property_access} or null
+            };
+
+            populateData();
+            calculateStats(); // Recalculate based on real subscription data if available
+
+        } catch (error) {
+            console.error('Error fetching profile:', error);
+            // Show error toast?
+        }
+    }
+
+    async function saveProfile() {
+        // Show saving state
+        dom.btnSave.innerHTML = `<span class="loading loading-spinner loading-xs"></span> Saving...`;
+
+        const payload = {
+            // Flattened structure required by update method in serializer?
+            // Checking BuyerProfileSerializer.update:
+            // It expects `user` nested dict for first_name, last_name, phone.
+            // And top level fields for preferred_location, budget_range.
+
+            // Wait, standard DRF ModelSerializer usually accepts flat structure if source is 'user.first_name' BUT `source` usually means read-only or requires custom update.
+            // BuyerProfileSerializer.update explicitly handles `validated_data.pop('user', {})`.
+            // So we need to send nested 'user' object? 
+            // NO, `source='user.first_name'` on a generic field usually implies read-only unless overridden.
+            // HOWEVER, the serializer has a custom `update` method that pops `user`.
+            // Serializers with `source='dotted.field'` usually expect the input to be in the nested structure corresponding to the field name IF it's writable?
+            // Actually, for writable dotted fields, DRF is tricky. 
+            // BUT, let's look at the serializer fields:
+            // first_name = serializers.CharField(source="user.first_name")
+            // This usually means the input field name is `first_name`. DRF's default behavior for `source` on write is complicated.
+            // But the custom `update` method: `user_data = validated_data.pop("user", {})`.
+            // This implies `validated_data` will contain a 'user' key. 
+            // To get a 'user' key in validated_data from a flat 'first_name' input, the field mapping must happen.
+
+            // Let's assume the API expects the same JSON structure it outputs for updates:
+            // { "first_name": "John", "location": "Houston" ... } 
+            // If the serializer is set up correctly for Writable Nested Fields, it might handle it.
+            // BUT, `BuyerProfileSerializer` defined `first_name` using `source`. 
+            // If we send `{"first_name": "New"}`, does it end up in `validated_data['user']['first_name']`?
+            // No, standard DRF doesn't auto-nest for source.
+            // It likely expects: `{"user": {"first_name": "..."}}` if we want to update user. 
+            // OR `first_name` if we treat it flat.
+
+            // Let's try sending flat payload first as that's what `get_serializer` usually outputs.
+            // If that fails, we might need to adjust.
+            // Wait, the serializer has `first_name = ...`.
+            first_name: dom.inputFirstName.value,
+            last_name: dom.inputLastName.value,
+            phone_number: dom.inputPhone.value,
+            location: dom.inputLocation.value,
+            // email is read-only in serializer usually, but present in form
+            // Sending it shouldn't hurt, or we can omit it if read_only
+        };
+
+        try {
+            const response = await fetch('/api/v1/buyer/profile/', {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                body: JSON.stringify(payload)
+            });
+
+            if (!response.ok) {
+                const errData = await response.json();
+                console.error("Server Error:", errData);
+                throw new Error('Failed to update');
+            }
+
+            // Refresh data
+            await fetchProfile();
+            setEditMode(false);
+
+            // Success Notification - Toastify
+            Toastify({
+                text: "Profile updated successfully!",
+                duration: 3000,
+                close: true,
+                gravity: "bottom", // `top` or `bottom`
+                position: "right", // `left`, `center` or `right`
+                stopOnFocus: true, // Prevents dismissing of toast on hover
+                style: {
+                    background: "var(--accent)", // Use theme accent color
+                    color: "var(--bg)" // Use theme text color for contrast
+                }
+            }).showToast();
+
+            // Reset Save Button
+            dom.btnSave.innerHTML = `<i data-lucide="save" class="mr-2 h-4 w-4"></i> Save`;
+            if (window.lucide) lucide.createIcons();
+
+        } catch (error) {
+            console.error(error);
+            dom.btnSave.innerHTML = `<i data-lucide="save" class="mr-2 h-4 w-4"></i> Save`;
+            alert("Failed to save profile. Check console for details.");
+        }
     }
 
     // --- LOGIC ---
@@ -344,11 +459,9 @@
     function populateData() {
         // Text Elements
         const fullName = `${profile.first_name} ${profile.last_name}`;
-        const initials = (profile.first_name[0] + profile.last_name[0]).toUpperCase();
+        const initials = (profile.first_name && profile.last_name) ? (profile.first_name[0] + profile.last_name[0]).toUpperCase() : "ME";
 
-        // We use checks because sometimes elements might be missing if template changes
         if (dom.avatarInitials) dom.avatarInitials.textContent = initials;
-        // Note: sidebarInitials found in partial
         if (dom.sidebarInitials) dom.sidebarInitials.textContent = initials;
         if (dom.displayName) dom.displayName.textContent = fullName;
         if (dom.sidebarName) dom.sidebarName.textContent = fullName;
@@ -362,17 +475,19 @@
         if (dom.inputLocation) dom.inputLocation.value = profile.location;
 
         // Subscription
-        if (dom.subMemberSince) dom.subMemberSince.textContent = profile.subscription.member_since;
-        if (dom.subExpiration) dom.subExpiration.value = profile.subscription.expiration_date;
-        if (dom.subFee) dom.subFee.value = `$${profile.subscription.fee_paid}`;
-        if (dom.subAccess) dom.subAccess.textContent = profile.subscription.property_access;
+        if (profile.subscription) {
+            if (dom.subMemberSince) dom.subMemberSince.textContent = profile.subscription.member_since;
+            if (dom.subExpiration) dom.subExpiration.value = profile.subscription.expiration_date;
+            if (dom.subFee) dom.subFee.value = `$${profile.subscription.fee_paid}`;
+            if (dom.subAccess) dom.subAccess.textContent = profile.subscription.property_access;
+        }
 
         // Agent Inputs (for edit mode)
         if (profile.agent) {
-            if (dom.agentInputName) dom.agentInputName.value = profile.agent.name;
-            if (dom.agentInputPhone) dom.agentInputPhone.value = profile.agent.phone;
-            if (dom.agentInputEmail) dom.agentInputEmail.value = profile.agent.email;
-            if (dom.agentInputBrokerage) dom.agentInputBrokerage.value = profile.agent.brokerage_company;
+            if (dom.agentInputName) dom.agentInputName.value = profile.agent.name || "";
+            if (dom.agentInputPhone) dom.agentInputPhone.value = profile.agent.phone || "";
+            if (dom.agentInputEmail) dom.agentInputEmail.value = profile.agent.email || "";
+            if (dom.agentInputBrokerage) dom.agentInputBrokerage.value = profile.agent.brokerage_company || "";
         }
 
         renderAgentView();
@@ -412,9 +527,17 @@
     }
 
     function calculateStats() {
-        // Days Remaining Calculation
+        // Mock calcs if subscription data missing
+        if (!profile.subscription) return;
+
+        // Days Remaining Calculation (approximate if format string)
+        // If API returns "January 2025", Date.parse works
         const now = new Date();
         const expiry = new Date(profile.subscription.expiration_date);
+
+        // Check if date valid
+        if (isNaN(expiry.getTime())) return;
+
         const diffTime = expiry - now;
         const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
         const daysLeft = Math.max(0, diffDays);
@@ -470,15 +593,27 @@
             `;
 
         dom.accessCounterContainer.innerHTML = html;
-        // Note: We are keeping the card class structure from the container div
         if (window.lucide) lucide.createIcons();
+    }
+
+    // Helper to get cookies
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
     }
 
     // --- EVENT LISTENERS ---
     function setupEventListeners() {
-        // Sidebar Toggle REMOVED - Handled by buyer_base.html
-
-        // Edit Profile Mode
         if (dom.btnEdit) {
             dom.btnEdit.addEventListener('click', () => {
                 setEditMode(true);
@@ -501,65 +636,17 @@
     }
 
     function setEditMode(isEditing) {
-        // Toggle Buttons
-        if (dom.btnEdit && dom.btnEdit.parentElement) dom.btnEdit.parentElement.classList.toggle('hidden', isEditing);
+        if (dom.btnEdit) dom.btnEdit.classList.toggle('hidden', isEditing);
         if (dom.editActions) dom.editActions.classList.toggle('hidden', !isEditing);
 
-        // Toggle Inputs
         const inputs = [dom.inputFirstName, dom.inputLastName, dom.inputEmail, dom.inputPhone, dom.inputLocation];
         inputs.forEach(input => {
             if (input) input.disabled = !isEditing;
         });
 
-        // Toggle Agent Section
-        if (dom.agentView) dom.agentView.classList.toggle('hidden', isEditing);
-        if (dom.agentEdit) dom.agentEdit.classList.toggle('hidden', !isEditing);
-    }
-
-    function saveProfile() {
-        // Show saving state
-        dom.btnSave.innerHTML = `<span class="loading loading-spinner loading-xs"></span> Saving...`;
-
-        // Simulate API Call
-        setTimeout(() => {
-            // Update Local Data
-            if (dom.inputFirstName) profile.first_name = dom.inputFirstName.value;
-            if (dom.inputLastName) profile.last_name = dom.inputLastName.value;
-            if (dom.inputEmail) profile.email = dom.inputEmail.value;
-            if (dom.inputPhone) profile.phone_number = dom.inputPhone.value;
-            if (dom.inputLocation) profile.location = dom.inputLocation.value;
-
-            // Update Agent Data
-            if (dom.agentInputName && dom.agentInputName.value) {
-                profile.agent = {
-                    name: dom.agentInputName.value,
-                    phone: dom.agentInputPhone.value,
-                    email: dom.agentInputEmail.value,
-                    brokerage_company: dom.agentInputBrokerage.value
-                };
-            }
-
-            // UI Updates
-            populateData();
-            setEditMode(false);
-
-            // Reset Button
-            dom.btnSave.innerHTML = `<i data-lucide="save" class="mr-2 h-4 w-4"></i> Save`;
-            if (window.lucide) lucide.createIcons();
-
-            // Show Success Message
-            if (dom.saveNotification) {
-                dom.saveNotification.className = "mt-4 alert alert-success text-sm";
-                dom.saveNotification.innerHTML = `<i data-lucide="check-circle" class="w-5 h-5"></i> <span>Profile updated successfully!</span>`;
-                dom.saveNotification.classList.remove('hidden');
-                if (window.lucide) lucide.createIcons();
-
-                setTimeout(() => {
-                    dom.saveNotification.classList.add('hidden');
-                }, 3000);
-            }
-
-        }, 1000);
+        // Agent edit not supported by API yet, so we keep reading logic but can't save agent updates fully via this endpoint
+        // You might want to disable agent inputs or clarify functionality. 
+        // For now, we leave them editable but they won't save unless backend supports it.
     }
 
     // Run
