@@ -2,6 +2,7 @@ from django.urls import path
 from api.v1.auth import SignupView, VerifyOTPView
 from api.v1.auth import LoginView
 from api.v1.views import BuyerProfileView, RealtorProfileView, SellerProfileView
+from api.v1.payment import CreateStripeCheckoutSessionView
 from rest_framework_simplejwt.views import TokenRefreshView, TokenBlacklistView
 
 urlpatterns = [
@@ -13,4 +14,5 @@ urlpatterns = [
     path("buyer/profile/", BuyerProfileView.as_view(), name="buyer-profile"),
     path("realtor/profile/", RealtorProfileView.as_view(), name="realtor-profile"),
     path("seller/profile/", SellerProfileView.as_view(), name="seller-profile"),
+    path("create-checkout-session/", CreateStripeCheckoutSessionView.as_view(), name="create-checkout-session"),
 ]

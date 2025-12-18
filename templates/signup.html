@@ -28,29 +28,45 @@
                             <div class="grid grid-cols-2 gap-3 sm:gap-4">
                                 <button type="button" onclick="selectUserType('buyer')" id="btn-buyer"
                                     class="user-type-btn btn h-auto min-h-0 block p-3 sm:p-4 rounded-lg border-2 text-left transition-all border-[var(--accent)] bg-[var(--accent)]/10 hover:bg-[var(--accent)]/20 hover:border-[var(--accent)]">
-                                    <div class="font-heading text-base sm:text-lg text-[var(--foreground)] mb-1 normal-case">Buyer</div>
-                                    <div class="text-xs sm:text-sm text-[var(--muted-foreground)] font-normal normal-case whitespace-normal">Looking to purchase
+                                    <div
+                                        class="font-heading text-base sm:text-lg text-[var(--foreground)] mb-1 normal-case">
+                                        Buyer</div>
+                                    <div
+                                        class="text-xs sm:text-sm text-[var(--muted-foreground)] font-normal normal-case whitespace-normal">
+                                        Looking to purchase
                                         properties</div>
                                 </button>
                                 <button type="button" onclick="selectUserType('realtor')" id="btn-realtor"
                                     class="user-type-btn btn btn-outline h-auto min-h-0 block p-3 sm:p-4 rounded-lg border-2 border-[var(--border)] hover:border-[var(--accent)]/50 text-left transition-all">
-                                    <div class="font-heading text-base sm:text-lg text-[var(--foreground)] mb-1 normal-case">Realtor
+                                    <div
+                                        class="font-heading text-base sm:text-lg text-[var(--foreground)] mb-1 normal-case">
+                                        Realtor
                                     </div>
-                                    <div class="text-xs sm:text-sm text-[var(--muted-foreground)] font-normal normal-case whitespace-normal">Licensed real estate
+                                    <div
+                                        class="text-xs sm:text-sm text-[var(--muted-foreground)] font-normal normal-case whitespace-normal">
+                                        Licensed real estate
                                         professional</div>
                                 </button>
                                 <button type="button" onclick="selectUserType('seller')" id="btn-seller"
                                     class="user-type-btn btn btn-outline h-auto min-h-0 block p-3 sm:p-4 rounded-lg border-2 border-[var(--border)] hover:border-[var(--accent)]/50 text-left transition-all">
-                                    <div class="font-heading text-base sm:text-lg text-[var(--foreground)] mb-1 normal-case">Seller
+                                    <div
+                                        class="font-heading text-base sm:text-lg text-[var(--foreground)] mb-1 normal-case">
+                                        Seller
                                     </div>
-                                    <div class="text-xs sm:text-sm text-[var(--muted-foreground)] font-normal normal-case whitespace-normal">Want to sell your
+                                    <div
+                                        class="text-xs sm:text-sm text-[var(--muted-foreground)] font-normal normal-case whitespace-normal">
+                                        Want to sell your
                                         property</div>
                                 </button>
                                 <button type="button" onclick="selectUserType('partner')" id="btn-partner"
                                     class="user-type-btn btn btn-outline h-auto min-h-0 block p-3 sm:p-4 rounded-lg border-2 border-[var(--border)] hover:border-[var(--accent)]/50 text-left transition-all">
-                                    <div class="font-heading text-base sm:text-lg text-[var(--foreground)] mb-1 normal-case">Partner
+                                    <div
+                                        class="font-heading text-base sm:text-lg text-[var(--foreground)] mb-1 normal-case">
+                                        Partner
                                     </div>
-                                    <div class="text-xs sm:text-sm text-[var(--muted-foreground)] font-normal normal-case whitespace-normal">Business partner or
+                                    <div
+                                        class="text-xs sm:text-sm text-[var(--muted-foreground)] font-normal normal-case whitespace-normal">
+                                        Business partner or
                                         service provider</div>
                                 </button>
                             </div>
@@ -91,7 +107,8 @@
                             </div>
                             <div class="form-control w-full">
                                 <label class="label">
-                                    <span class="label-text text-[var(--foreground)] font-medium">Confirm Password *</span>
+                                    <span class="label-text text-[var(--foreground)] font-medium">Confirm Password
+                                        *</span>
                                 </label>
                                 <input type="password" placeholder="Confirm your password" required
                                     class="input input-bordered w-full bg-[var(--input)] border-[var(--border)] text-[var(--foreground)] focus:outline-none focus:border-[var(--accent)]">
@@ -142,25 +159,27 @@
 {% endblock %}
 
 {% block extra_scripts %}
-    <!-- OTP Modal -->
-    <dialog id="otp_modal" class="modal">
-        <div class="modal-box bg-[var(--card)] border border-[var(--border)]">
-            <h3 class="font-heading text-lg font-bold text-[var(--foreground)]">Verify Your Email</h3>
-            <p class="py-4 text-[var(--muted-foreground)]">Please enter the 8-digit code sent to your email address.</p>
-            <div class="form-control w-full">
-                <input type="text" id="otp-input" placeholder="Enter 8-digit code" maxlength="8"
-                    class="input input-bordered w-full text-center tracking-[0.5em] text-xl font-mono bg-[var(--input)] border-[var(--border)] text-[var(--foreground)] focus:outline-none focus:border-[var(--accent)]">
-            </div>
-            <div id="otp-error" class="text-error text-sm mt-2 hidden"></div>
-            <div class="modal-action">
-                <button type="button" onclick="verifyOTP()" id="verify-btn" class="btn bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-[var(--bg)] border-none">Verify</button>
-            </div>
+<!-- OTP Modal -->
+<dialog id="otp_modal" class="modal">
+    <div class="modal-box bg-[var(--card)] border border-[var(--border)]">
+        <h3 class="font-heading text-lg font-bold text-[var(--foreground)]">Verify Your Email</h3>
+        <p class="py-4 text-[var(--muted-foreground)]">Please enter the 8-digit code sent to your email address.</p>
+        <div class="form-control w-full">
+            <input type="text" id="otp-input" placeholder="Enter 8-digit code" maxlength="8"
+                class="input input-bordered w-full text-center tracking-[0.5em] text-xl font-mono bg-[var(--input)] border-[var(--border)] text-[var(--foreground)] focus:outline-none focus:border-[var(--accent)]">
         </div>
-    </dialog>
+        <div id="otp-error" class="text-error text-sm mt-2 hidden"></div>
+        <div class="modal-action">
+            <button type="button" onclick="verifyOTP()" id="verify-btn"
+                class="btn bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-[var(--bg)] border-none">Verify</button>
+        </div>
+    </div>
+</dialog>
 
-    <script>
+<script>
     // --- STATE ---
     let currentUserType = 'buyer';
+    let selectedBuyerPlan = 'pro'; // Default to pro
     let signedUpEmail = '';
 
     // --- DOM ELEMENTS ---
@@ -371,12 +390,34 @@
     }
 
     function renderBuyerPlans() {
-        // CHANGED: grid-cols-2 -> grid-cols-1 sm:grid-cols-2
-        // This ensures cards stack on mobile but side-by-side on tablet+
-        // Also adjusted margin top on "Recommended" badge for mobile spacing
+        const isBasic = selectedBuyerPlan === 'basic';
+        const isPro = selectedBuyerPlan === 'pro';
+
+        // Styles
+        const basicCardClass = isBasic
+            ? "bg-gradient-to-br from-[var(--accent)]/20 to-[var(--accent)]/10 border-[var(--accent)] shadow-lg scale-105"
+            : "bg-[var(--muted)]/30 border-[var(--border)] hover:border-[var(--accent)]/30 hover:scale-105";
+
+        const proCardClass = isPro
+            ? "bg-gradient-to-br from-[var(--accent)]/20 to-[var(--accent)]/10 border-[var(--accent)] shadow-lg scale-105"
+            : "bg-[var(--muted)]/30 border-[var(--border)] hover:border-[var(--accent)]/30 hover:scale-105";
+
+        const basicCheck = isBasic
+            ? `<div class="absolute -top-2 -right-2 bg-green-500 text-white rounded-full p-1"><i data-lucide="check" class="w-4 h-4"></i></div>`
+            : '';
+
+        const proCheck = isPro
+            ? `<div class="absolute -top-2 -right-2 bg-green-500 text-white rounded-full p-1"><i data-lucide="check" class="w-4 h-4"></i></div>`
+            : '';
+
+        const pricingText = isPro
+            ? '<span class="font-semibold text-[var(--accent)]">Selected:</span> Pro - $50 + $99 setup fee'
+            : '<span class="font-semibold text-[var(--accent)]">Selected:</span> Basic - $25 + $99 setup fee';
+
         return `
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6 mt-2">
-                <button class="relative text-center p-4 rounded-lg border-2 transition-all cursor-pointer bg-[var(--muted)]/30 border-[var(--border)] hover:border-[var(--accent)]/30 hover:scale-105">
+                <button type="button" onclick="selectBuyerPlan('basic')" class="relative text-center p-4 rounded-lg border-2 transition-all cursor-pointer ${basicCardClass}">
+                    ${basicCheck}
                     <div class="font-bold text-[var(--foreground)] text-lg mb-1">Basic</div>
                     <div class="text-sm text-[var(--muted-foreground)] mb-2">1 Property Access</div>
                     <div class="space-y-1">
@@ -385,12 +426,10 @@
                     </div>
                 </button>
 
-                <button class="relative mt-4 sm:mt-0 text-center p-4 rounded-lg border-2 transition-all cursor-pointer bg-gradient-to-br from-[var(--accent)]/20 to-[var(--accent)]/10 border-[var(--accent)] shadow-lg sm:scale-105 hover:scale-105">
+                <button type="button" onclick="selectBuyerPlan('pro')" class="relative mt-4 sm:mt-0 text-center p-4 rounded-lg border-2 transition-all cursor-pointer ${proCardClass}">
+                    ${proCheck}
                     <div class="absolute -top-4 left-1/2 transform -translate-x-1/2 z-10 w-max">
                         <div class="badge bg-[var(--accent)] border-none text-white px-3 py-1 text-xs font-bold shadow-lg">RECOMMENDED</div>
-                    </div>
-                    <div class="absolute -top-2 -right-2 bg-green-500 text-white rounded-full p-1">
-                        <i data-lucide="check" class="w-4 h-4"></i>
                     </div>
                     <div class="font-bold text-[var(--foreground)] text-lg mb-1">Pro</div>
                     <div class="text-sm text-[var(--muted-foreground)] mb-2">3 Properties Access</div>
@@ -403,10 +442,15 @@
             
             <div class="mb-6 p-3 bg-[var(--accent)]/10 rounded-lg border border-[var(--accent)]/20 text-center">
                 <p class="text-sm text-[var(--foreground)]">
-                    <span class="font-semibold text-[var(--accent)]">Selected:</span> Pro - $50 + $99 setup fee
+                    ${pricingText}
                 </p>
             </div>
         `;
+    }
+
+    function selectBuyerPlan(plan) {
+        selectedBuyerPlan = plan;
+        renderPricingPlan('buyer'); // Re-render to update classes
     }
 
     function renderSinglePlan(type) {
@@ -504,7 +548,7 @@
         const expanded = document.getElementById('features-expanded');
         const btnText = document.getElementById('features-btn-text');
         const btnIcon = document.getElementById('features-btn-icon');
-        
+
         if (expanded.classList.contains('hidden')) {
             // Expand
             expanded.classList.remove('hidden');
@@ -561,7 +605,7 @@
         e.preventDefault();
         const btn = document.getElementById('submit-btn');
         const originalBtnText = btn.innerHTML;
-        
+
         // Reset previous errors
         document.querySelectorAll('.error-message').forEach(el => el.remove());
         document.querySelectorAll('.input-error').forEach(el => el.classList.remove('input-error'));
@@ -569,7 +613,7 @@
         // Basic validation
         const password = document.querySelector('input[type="password"]').value;
         const confirmPassword = document.querySelectorAll('input[type="password"]')[1].value;
-        
+
         if (password !== confirmPassword) {
             Toastify({
                 text: "Passwords do not match!",
@@ -627,7 +671,7 @@
                 const areas = document.querySelector('input[placeholder="Cities or regions you serve"]');
                 const website = document.querySelector('input[placeholder="https://yourwebsite.com"]');
                 const license = document.querySelector('input[placeholder="Business license number"]');
-                
+
                 if (company) formData.company_name = company.value;
                 if (type) formData.partnership_type = type.value.toUpperCase().replace(/-/g, '_');
                 if (areas) formData.service_areas = areas.value;
@@ -651,10 +695,10 @@
                 btn.innerHTML = originalBtnText;
                 btn.classList.remove('opacity-70');
                 btn.disabled = false;
-                
+
                 signedUpEmail = formData.email;
                 document.getElementById('otp_modal').showModal();
-                
+
                 Toastify({
                     text: "Account created! Please verify your email.",
                     duration: 3000,
@@ -679,7 +723,7 @@
                         const errorText = Array.isArray(value) ? value.join(', ') : value;
                         // Not formatting key here to keep it simple, or capitalize it
                         const formattedKey = key.charAt(0).toUpperCase() + key.slice(1).replace(/_/g, ' ');
-                        
+
                         Toastify({
                             text: `${formattedKey}: ${errorText}`,
                             duration: 5000,
@@ -694,7 +738,7 @@
                         }).showToast();
                     }
                 } else {
-                     Toastify({
+                    Toastify({
                         text: "Registration failed. Please try again.",
                         duration: 3000,
                         close: true,
@@ -713,8 +757,8 @@
             btn.disabled = false;
             btn.innerHTML = originalBtnText;
             btn.classList.remove('opacity-70');
-            
-             Toastify({
+
+            Toastify({
                 text: "An error occurred. Please try again later.",
                 duration: 3000,
                 close: true,
@@ -779,9 +823,9 @@
             if (response.ok) {
                 // Success
                 document.getElementById('otp_modal').close();
-                
+
                 Toastify({
-                    text: "Email verified successfully! Redirecting to login...",
+                    text: "Email verified! Initiating payment...",
                     duration: 3000,
                     close: true,
                     gravity: "bottom",
@@ -792,9 +836,43 @@
                     }
                 }).showToast();
 
-                setTimeout(() => {
-                    window.location.href = "{% url 'login' %}?message=signup-success";
-                }, 1500);
+                // Call Stripe Checkout
+                try {
+                    const accessToken = data.access_token;
+                    const checkoutResponse = await fetch('/api/v1/create-checkout-session/', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': getCookie('csrftoken'),
+                            'Authorization': `Bearer ${accessToken}`
+                        },
+                        body: JSON.stringify({
+                            plan_name: selectedBuyerPlan // Use selected plan
+                        })
+                    });
+
+                    const checkoutData = await checkoutResponse.json();
+
+                    if (checkoutResponse.ok && checkoutData.url) {
+                        window.location.href = checkoutData.url;
+                    } else {
+                        throw new Error(checkoutData.error || "Failed to initiate payment");
+                    }
+                } catch (paymentError) {
+                    console.error("Payment Error:", paymentError);
+                    Toastify({
+                        text: "Payment initialization failed. Please login to complete payment.",
+                        duration: 5000,
+                        close: true,
+                        gravity: "bottom",
+                        position: "right",
+                        style: { background: "var(--destructive)" }
+                    }).showToast();
+
+                    setTimeout(() => {
+                        window.location.href = "{% url 'login' %}";
+                    }, 2000);
+                }
 
             } else {
                 errorDiv.textContent = data.error || "Verification failed. Please try again.";
