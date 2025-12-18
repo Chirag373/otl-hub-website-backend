@@ -23,9 +23,9 @@
         class="flex items-center w-full px-4 py-2 text-sm font-medium rounded-md {% if active_page == 'dashboard' %}bg-[var(--accent)] text-[var(--bg)]{% else %}text-[var(--foreground)] hover:bg-[var(--accent)] hover:text-black transition-colors{% endif %}">
         <i data-lucide="home" class="mr-3 h-4 w-4"></i> Dashboard
     </a>
-    <a href="#"
+    <a href="{% url 'seller_property' %}"
         class="flex items-center w-full px-4 py-2 text-sm font-medium rounded-md {% if active_page == 'properties' %}bg-[var(--accent)] text-[var(--bg)]{% else %}text-[var(--foreground)] hover:bg-[var(--accent)] hover:text-black transition-colors{% endif %}">
-        <i data-lucide="building" class="mr-3 h-4 w-4"></i> My Properties
+        <i data-lucide="building" class="mr-3 h-4 w-4"></i> My Property
     </a>
     <a href="#"
         class="flex items-center w-full px-4 py-2 text-sm font-medium rounded-md {% if active_page == 'messages' %}bg-[var(--accent)] text-[var(--bg)]{% else %}text-[var(--foreground)] hover:bg-[var(--accent)] hover:text-black transition-colors{% endif %}">

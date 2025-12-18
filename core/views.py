@@ -30,6 +30,10 @@ class SellerDashboardView(LoginRequiredMixin, TemplateView):
     template_name = "seller-dashboard.html"
     extra_context = {'active_page': 'dashboard'}
 
+class SellerPropertyView(LoginRequiredMixin, TemplateView):
+    template_name = "seller-property.html"
+    extra_context = {'active_page': 'properties'}
+
 class SellerSettingsView(LoginRequiredMixin, TemplateView):
     template_name = "seller-settings.html"
     extra_context = {'active_page': 'settings'}

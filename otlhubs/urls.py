@@ -19,7 +19,7 @@ from django.contrib import admin
 from django.urls import path, include
 from core.views import (
     IndexView, AboutView, LoginView, SignupView,
-    BuyerDashboardView, SellerDashboardView, SellerSettingsView,
+    BuyerDashboardView, SellerDashboardView, SellerSettingsView, SellerPropertyView,
     RealtorDashboardView, RealtorSettingsView, PartnerDashboardView, PartnerSettingsView,
     PartnersView, BuyerPropertySearchView, BuyerFavoritesView, BuyerSettingsView,
     TermsOfServiceView, PrivacyPolicyView
@@ -48,6 +48,7 @@ urlpatterns = [
     path("buyer/favorites", BuyerFavoritesView.as_view(), name="buyer_favorites"),
     path("buyer/settings", BuyerSettingsView.as_view(), name="buyer_settings"),
     path("seller/dashboard", SellerDashboardView.as_view(), name="seller_dashboard"),
+    path("seller/property", SellerPropertyView.as_view(), name="seller_property"),
     path("seller/settings", SellerSettingsView.as_view(), name="seller_settings"),
     path("realtor/dashboard", RealtorDashboardView.as_view(), name="realtor_dashboard"),
     path("realtor/settings", RealtorSettingsView.as_view(), name="realtor_settings"),

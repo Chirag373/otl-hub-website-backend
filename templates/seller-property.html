@@ -1,0 +1,467 @@
+{% extends 'seller_base.html' %}
+
+{% block title %}My Property | OTL Platform{% endblock %}
+
+{% block content %}
+<div class="flex items-center justify-between">
+    <div>
+        <h1 class="text-3xl font-bold text-[var(--foreground)]">My Property Listing</h1>
+        <p class="text-[var(--muted-foreground)]">Preview and manage your property listing</p>
+    </div>
+</div>
+
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <div class="bg-[var(--card)] rounded-lg border border-[var(--border)] p-6">
+        <div class="flex items-center space-x-3">
+            <div class="p-2 bg-green-100 rounded-lg">
+                <i data-lucide="check-circle" class="h-5 w-5 text-green-600"></i>
+            </div>
+            <div>
+                <p class="text-sm text-[var(--muted-foreground)]">Status</p>
+                <p id="stat-status" class="text-2xl font-bold text-[var(--foreground)] capitalize">Active</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="bg-[var(--card)] rounded-lg border border-[var(--border)] p-6">
+        <div class="flex items-center space-x-3">
+            <div class="p-2 bg-purple-100 rounded-lg">
+                <i data-lucide="eye" class="h-5 w-5 text-purple-600"></i>
+            </div>
+            <div>
+                <p class="text-sm text-[var(--muted-foreground)]">Total Views</p>
+                <p id="stat-views" class="text-2xl font-bold text-[var(--foreground)]">234</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="bg-[var(--card)] rounded-lg border border-[var(--border)] p-6">
+        <div class="flex items-center space-x-3">
+            <div class="p-2 bg-blue-100 rounded-lg">
+                <i data-lucide="message-square" class="h-5 w-5 text-blue-600"></i>
+            </div>
+            <div>
+                <p class="text-sm text-[var(--muted-foreground)]">Offers Received</p>
+                <p id="stat-offers" class="text-2xl font-bold text-[var(--foreground)]">3</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="bg-[var(--card)] rounded-lg border border-[var(--border)] overflow-hidden shadow-lg">
+    <div class="relative">
+        <div class="aspect-video bg-gray-700 relative w-full md:w-1/2 mx-auto overflow-hidden">
+            <div class="absolute inset-0 bg-gradient-to-br from-gray-700 to-gray-900 flex items-center justify-center">
+                <i data-lucide="home" class="w-16 h-16 text-gray-500"></i>
+            </div>
+            
+            <div class="absolute top-4 left-4 flex items-center space-x-2">
+                <div class="w-2 h-2 bg-green-500 rounded-full"></div>
+                <span class="px-3 py-1 text-sm font-medium rounded capitalize bg-green-100 text-green-800">
+                    active
+                </span>
+            </div>
+            <div class="absolute top-4 right-4">
+                <button class="p-2 bg-white/80 hover:bg-white rounded-md transition-colors text-black">
+                    <i data-lucide="edit" class="h-4 w-4"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="p-6 space-y-6">
+        <div>
+            <h2 id="prop-title" class="text-2xl font-bold text-[var(--foreground)] mb-2">Beautiful Family Home</h2>
+            <div class="flex items-center text-[var(--muted-foreground)]">
+                <i data-lucide="map-pin" class="h-4 w-4 mr-2"></i>
+                <span id="prop-location">Springfield, IL</span>
+            </div>
+        </div>
+
+        <div class="flex flex-wrap items-center justify-between gap-4 pb-6 border-b border-[var(--border)]">
+            <div>
+                <p class="text-sm text-[var(--muted-foreground)] mb-1">Listing Price</p>
+                <p id="prop-price" class="text-3xl font-bold text-[var(--foreground)]">$425,000</p>
+            </div>
+            <div class="flex items-center space-x-6 text-[var(--muted-foreground)]">
+                <div class="text-center">
+                    <p id="prop-beds" class="text-2xl font-bold text-[var(--foreground)]">4</p>
+                    <p class="text-sm">Bedrooms</p>
+                </div>
+                <div class="text-center">
+                    <p id="prop-baths" class="text-2xl font-bold text-[var(--foreground)]">3</p>
+                    <p class="text-sm">Bathrooms</p>
+                </div>
+                <div class="text-center">
+                    <p id="prop-sqft" class="text-2xl font-bold text-[var(--foreground)]">2,800</p>
+                    <p class="text-sm">Sqft</p>
+                </div>
+                <div class="text-center">
+                    <p id="prop-garage" class="text-2xl font-bold text-[var(--foreground)]">2</p>
+                    <p class="text-sm">Garage</p>
+                </div>
+            </div>
+        </div>
+
+        <div>
+            <h3 class="text-lg font-semibold text-[var(--foreground)] mb-3">Key Features</h3>
+            <div id="prop-features-list" class="flex flex-wrap gap-2">
+                </div>
+        </div>
+
+        <div class="p-4 bg-[var(--muted)]/30 rounded-lg">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm text-[var(--muted-foreground)] mb-1">Your Realtor</p>
+                    <p id="realtor-name" class="text-lg font-semibold text-[var(--foreground)]">Jennifer Martinez</p>
+                    <p class="text-sm text-[var(--muted-foreground)] mt-1">
+                        <span id="realtor-phone">(555) 123-4567</span> • <span id="realtor-email">jennifer@premierrealty.com</span>
+                    </p>
+                </div>
+                <div class="flex space-x-2">
+                    <button class="flex items-center px-3 py-2 text-sm border border-[var(--border)] rounded-md hover:bg-[var(--muted)] text-[var(--foreground)]">
+                        <i data-lucide="phone" class="h-4 w-4 mr-2"></i> Call
+                    </button>
+                    <button class="flex items-center px-3 py-2 text-sm border border-[var(--border)] rounded-md hover:bg-[var(--muted)] text-[var(--foreground)]">
+                        <i data-lucide="message-square" class="h-4 w-4 mr-2"></i> Message
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="flex space-x-3">
+            <button class="flex-1 flex items-center justify-center px-4 py-3 bg-[var(--accent)] text-[var(--bg)] font-semibold rounded-md hover:bg-[var(--accent-hover)] transition-colors">
+                <i data-lucide="edit" class="h-4 w-4 mr-2"></i> Edit Listing
+            </button>
+            <button class="flex-1 flex items-center justify-center px-4 py-3 bg-[var(--card)] text-[var(--foreground)] border border-[var(--border)] rounded-md hover:bg-[var(--muted)] transition-colors">
+                <i data-lucide="eye" class="h-4 w-4 mr-2"></i> Preview Listing
+            </button>
+        </div>
+    </div>
+</div>
+
+<div class="bg-[var(--card)] rounded-lg border border-[var(--border)] p-6">
+    <div class="flex items-center justify-between mb-6">
+        <div>
+            <h2 class="text-2xl font-bold text-[var(--foreground)]">Property Features</h2>
+            <p class="text-[var(--muted-foreground)]">Select the features that best describe your property</p>
+        </div>
+        <div id="features-actions">
+            </div>
+    </div>
+
+    <div id="features-view-container" class="space-y-6">
+        </div>
+
+    <div id="features-edit-container" class="hidden bg-[var(--muted)]/10 rounded-lg p-6 space-y-8">
+        </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // --- CONSTANTS & OPTIONS ---
+    const PROPERTY_TYPE_OPTIONS = ["Single Family", "Condo", "Townhome", "Apartment unit"];
+    const FLOORING_OPTIONS = ["Hardwood floor", "Luxury vinyl floor", "Carpet", "Ceramic tile"];
+    const KITCHEN_COUNTERTOP_OPTIONS = ["Granite", "Wood"];
+    const COMMUNITY_AMENITIES_OPTIONS = ["Golf course community", "Swimming pool", "Study room", "Shed"];
+    const FOUNDATION_OPTIONS = ["Slab", "Pier & Beam", "Post"];
+    const HEATING_OPTIONS = ["Gas", "Electric"];
+    const COOLING_OPTIONS = ["Central", "Electric"];
+    const APPLIANCES_OPTIONS = ["Dishwasher", "Gas cooktop", "Disposal", "Electric cooktop", "Built-in oven"];
+
+    // --- STATE ---
+    let property = {
+        id: 1,
+        title: "Beautiful Family Home",
+        location: "Springfield, IL",
+        price: 425000,
+        status: "active",
+        views: 234,
+        offers: 3,
+        bedrooms: 4,
+        bathrooms: 3,
+        sqft: 2800,
+        garage: 2,
+        listingDate: "2024-01-15",
+        features: ["Garden", "Fireplace", "Updated Kitchen"],
+        structuredFeatures: {
+            propertyType: ["Single Family"],
+            flooring: "Hardwood floor",
+            kitchenCountertop: "Granite",
+            communityAmenities: ["Swimming pool", "Study room"],
+            foundation: "Slab",
+            heating: "Gas",
+            cooling: "Central",
+            fireplace: true,
+            appliances: ["Dishwasher", "Gas cooktop", "Built-in oven"],
+        },
+        realtorName: "Jennifer Martinez",
+        realtorPhone: "(555) 123-4567",
+        realtorEmail: "jennifer@premierrealty.com"
+    };
+
+    let isEditingFeatures = false;
+    let editedFeatures = JSON.parse(JSON.stringify(property.structuredFeatures)); // Deep copy
+
+    // --- DOM ELEMENTS ---
+    const dom = {
+        // Stats & Info
+        statStatus: document.getElementById('stat-status'),
+        statViews: document.getElementById('stat-views'),
+        statOffers: document.getElementById('stat-offers'),
+        propTitle: document.getElementById('prop-title'),
+        propLocation: document.getElementById('prop-location'),
+        propPrice: document.getElementById('prop-price'),
+        propBeds: document.getElementById('prop-beds'),
+        propBaths: document.getElementById('prop-baths'),
+        propSqft: document.getElementById('prop-sqft'),
+        propGarage: document.getElementById('prop-garage'),
+        propFeaturesList: document.getElementById('prop-features-list'),
+        realtorName: document.getElementById('realtor-name'),
+        realtorPhone: document.getElementById('realtor-phone'),
+        realtorEmail: document.getElementById('realtor-email'),
+
+        // Features Section
+        featuresActions: document.getElementById('features-actions'),
+        featuresViewContainer: document.getElementById('features-view-container'),
+        featuresEditContainer: document.getElementById('features-edit-container')
+    };
+
+    // --- INITIALIZATION ---
+    function init() {
+        if (window.lucide) lucide.createIcons();
+        renderHeaderInfo();
+        renderFeaturesSection();
+        // Removed setupEventListeners as sidebar is handled by base
+    }
+
+    // --- RENDER FUNCTIONS ---
+
+    function renderHeaderInfo() {
+        dom.statStatus.textContent = property.status;
+        dom.statViews.textContent = property.views;
+        dom.statOffers.textContent = property.offers;
+        
+        dom.propTitle.textContent = property.title;
+        dom.propLocation.textContent = property.location;
+        dom.propPrice.textContent = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0 }).format(property.price);
+        
+        dom.propBeds.textContent = property.bedrooms;
+        dom.propBaths.textContent = property.bathrooms;
+        dom.propSqft.textContent = property.sqft.toLocaleString();
+        dom.propGarage.textContent = property.garage;
+
+        dom.propFeaturesList.innerHTML = property.features.map(f => `
+            <span class="px-3 py-1 bg-[var(--muted)]/30 text-[var(--foreground)] text-sm rounded-full">${f}</span>
+        `).join('');
+
+        dom.realtorName.textContent = property.realtorName;
+        dom.realtorPhone.textContent = property.realtorPhone;
+        dom.realtorEmail.textContent = property.realtorEmail;
+    }
+
+    function renderFeaturesSection() {
+        // Render Actions (Edit vs Save/Cancel)
+        if (isEditingFeatures) {
+            dom.featuresActions.innerHTML = `
+                <div class="flex space-x-2">
+                    <button id="btn-cancel-features" class="px-4 py-2 border border-[var(--border)] rounded-md text-[var(--foreground)] hover:bg-[var(--muted)]">Cancel</button>
+                    <button id="btn-save-features" class="px-4 py-2 bg-[var(--accent)] text-[var(--bg)] rounded-md hover:bg-[var(--accent-hover)]">Save Features</button>
+                </div>
+            `;
+        } else {
+            dom.featuresActions.innerHTML = `
+                <button id="btn-edit-features" class="flex items-center px-4 py-2 bg-[var(--card)] border border-[var(--border)] text-[var(--foreground)] rounded-md hover:bg-[var(--muted)]">
+                    <i data-lucide="edit" class="h-4 w-4 mr-2"></i> Edit Features
+                </button>
+            `;
+        }
+
+        // Toggle Containers
+        dom.featuresViewContainer.classList.toggle('hidden', isEditingFeatures);
+        dom.featuresEditContainer.classList.toggle('hidden', !isEditingFeatures);
+
+        if (isEditingFeatures) {
+            renderEditForm();
+        } else {
+            renderViewMode();
+        }
+        
+        // Re-bind listeners for dynamic buttons
+        bindFeatureActionListeners();
+        if (window.lucide) lucide.createIcons();
+    }
+
+    function renderViewMode() {
+        const sf = property.structuredFeatures;
+        let html = '';
+
+        const createSection = (title, items) => {
+            if (!items || (Array.isArray(items) && items.length === 0)) return '';
+            const badges = Array.isArray(items) 
+                ? items.map(i => `<span class="px-3 py-1 bg-[var(--muted)]/30 text-[var(--foreground)] text-sm rounded-full">${i}</span>`).join('')
+                : `<span class="px-3 py-1 bg-[var(--muted)]/30 text-[var(--foreground)] text-sm rounded-full">${items}</span>`;
+            
+            return `
+                <div>
+                    <h3 class="text-lg font-semibold text-[var(--foreground)] mb-3">${title}</h3>
+                    <div class="flex flex-wrap gap-2">${badges}</div>
+                </div>
+            `;
+        };
+
+        html += createSection('Property Type', sf.propertyType);
+        html += createSection('Flooring', sf.flooring);
+        html += createSection('Kitchen Countertop', sf.kitchenCountertop);
+        html += createSection('Community & Amenities', sf.communityAmenities);
+        html += createSection('Foundation', sf.foundation);
+
+        // Heating & Cooling Combined
+        const hvacItems = [];
+        if(sf.fireplace) hvacItems.push('Fireplace');
+        if(sf.heating) hvacItems.push(`Heating: ${sf.heating}`);
+        if(sf.cooling) hvacItems.push(`Cooling: ${sf.cooling}`);
+        
+        if(hvacItems.length > 0) {
+            html += `
+                <div>
+                    <h3 class="text-lg font-semibold text-[var(--foreground)] mb-3">Heating & Cooling</h3>
+                    <div class="flex flex-wrap gap-2">
+                        ${hvacItems.map(i => `<span class="px-3 py-1 bg-[var(--muted)]/30 text-[var(--foreground)] text-sm rounded-full">${i}</span>`).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        html += createSection('Appliances', sf.appliances);
+
+        dom.featuresViewContainer.innerHTML = html || '<p class="text-[var(--muted-foreground)]">No features listed.</p>';
+    }
+
+    function renderEditForm() {
+        // Helper for Selects
+        const createSelect = (id, label, options, value) => `
+            <div class="space-y-2">
+                <label class="text-sm font-medium text-[var(--foreground)]">${label}</label>
+                <select id="${id}" class="w-full px-3 py-2 bg-[var(--input)] border border-[var(--border)] rounded-md text-[var(--foreground)] focus:outline-none focus:border-[var(--accent)]">
+                    <option value="">Select ${label}</option>
+                    ${options.map(opt => `<option value="${opt}" ${opt === value ? 'selected' : ''}>${opt}</option>`).join('')}
+                </select>
+            </div>
+        `;
+
+        // Helper for Checkboxes (Single)
+        const createCheckbox = (id, label, checked) => `
+            <div class="flex items-center space-x-2">
+                <input type="checkbox" id="${id}" class="rounded border-[var(--border)] text-[var(--accent)] focus:ring-[var(--accent)]" ${checked ? 'checked' : ''}>
+                <label for="${id}" class="text-sm font-normal text-[var(--foreground)] cursor-pointer">${label}</label>
+            </div>
+        `;
+
+        // Helper for Group Checkboxes
+        const createCheckboxGroup = (groupId, title, options, selectedValues) => `
+            <div>
+                <h3 class="text-lg font-semibold text-[var(--foreground)] mb-4">${title}</h3>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    ${options.map(opt => `
+                        <div class="flex items-center space-x-2">
+                            <input type="checkbox" data-group="${groupId}" value="${opt}" id="${groupId}-${opt.replace(/\s+/g, '-')}" 
+                                class="rounded border-[var(--border)] text-[var(--accent)] focus:ring-[var(--accent)]" 
+                                ${selectedValues.includes(opt) ? 'checked' : ''}>
+                            <label for="${groupId}-${opt.replace(/\s+/g, '-')}" class="text-sm font-normal text-[var(--foreground)] cursor-pointer">${opt}</label>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        `;
+
+        let html = '';
+        
+        html += createCheckboxGroup('propType', 'Property Type', PROPERTY_TYPE_OPTIONS, editedFeatures.propertyType || []);
+        html += `<div class="pt-4 border-t border-[var(--border)]">` + createSelect('input-flooring', 'Flooring', FLOORING_OPTIONS, editedFeatures.flooring) + `</div>`;
+        html += `<div class="pt-4 border-t border-[var(--border)]">` + createSelect('input-counter', 'Kitchen Countertop', KITCHEN_COUNTERTOP_OPTIONS, editedFeatures.kitchenCountertop) + `</div>`;
+        html += `<div class="pt-4 border-t border-[var(--border)]">` + createCheckboxGroup('amenities', 'Community & Amenities', COMMUNITY_AMENITIES_OPTIONS, editedFeatures.communityAmenities || []) + `</div>`;
+        html += `<div class="pt-4 border-t border-[var(--border)]">` + createSelect('input-foundation', 'Foundation', FOUNDATION_OPTIONS, editedFeatures.foundation) + `</div>`;
+        
+        // Heating & Cooling
+        html += `
+            <div class="pt-4 border-t border-[var(--border)]">
+                <h3 class="text-lg font-semibold text-[var(--foreground)] mb-4">Heating & Cooling</h3>
+                <div class="space-y-4">
+                    ${createCheckbox('input-fireplace', 'Fireplace', editedFeatures.fireplace)}
+                    ${createSelect('input-heating', 'Heating', HEATING_OPTIONS, editedFeatures.heating)}
+                    ${createSelect('input-cooling', 'Cooling', COOLING_OPTIONS, editedFeatures.cooling)}
+                </div>
+            </div>
+        `;
+
+        html += `<div class="pt-4 border-t border-[var(--border)]">` + createCheckboxGroup('appliances', 'Appliances', APPLIANCES_OPTIONS, editedFeatures.appliances || []) + `</div>`;
+
+        dom.featuresEditContainer.innerHTML = html;
+    }
+
+    // --- EVENT HANDLERS ---
+
+    function bindFeatureActionListeners() {
+        const btnEdit = document.getElementById('btn-edit-features');
+        const btnCancel = document.getElementById('btn-cancel-features');
+        const btnSave = document.getElementById('btn-save-features');
+
+        if (btnEdit) {
+            btnEdit.addEventListener('click', () => {
+                isEditingFeatures = true;
+                editedFeatures = JSON.parse(JSON.stringify(property.structuredFeatures)); // Reset edit state to current props
+                renderFeaturesSection();
+            });
+        }
+
+        if (btnCancel) {
+            btnCancel.addEventListener('click', () => {
+                isEditingFeatures = false;
+                renderFeaturesSection();
+            });
+        }
+
+        if (btnSave) {
+            btnSave.addEventListener('click', () => {
+                saveFeatures();
+            });
+        }
+    }
+
+    function saveFeatures() {
+        // Harvest data from inputs
+        
+        // 1. Single Selects
+        editedFeatures.flooring = document.getElementById('input-flooring').value;
+        editedFeatures.kitchenCountertop = document.getElementById('input-counter').value;
+        editedFeatures.foundation = document.getElementById('input-foundation').value;
+        editedFeatures.heating = document.getElementById('input-heating').value;
+        editedFeatures.cooling = document.getElementById('input-cooling').value;
+        
+        // 2. Single Checkboxes
+        editedFeatures.fireplace = document.getElementById('input-fireplace').checked;
+
+        // 3. Group Checkboxes
+        const getGroupValues = (groupId) => {
+            return Array.from(document.querySelectorAll(`input[data-group="${groupId}"]:checked`)).map(cb => cb.value);
+        };
+
+        editedFeatures.propertyType = getGroupValues('propType');
+        editedFeatures.communityAmenities = getGroupValues('amenities');
+        editedFeatures.appliances = getGroupValues('appliances');
+
+        // Save to main property object
+        property.structuredFeatures = JSON.parse(JSON.stringify(editedFeatures));
+        
+        // Switch mode
+        isEditingFeatures = false;
+        renderFeaturesSection();
+    }
+
+    // Run
+    init();
+</script>
+{% endblock %}
+
