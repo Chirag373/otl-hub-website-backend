@@ -170,6 +170,17 @@ class SellerProfile(models.Model):
         validators=[MinValueValidator(0)],
     )
 
+    # Extended Property Details
+    bedrooms = models.IntegerField(default=0, help_text=_("Number of bedrooms"))
+    bathrooms = models.DecimalField(
+        max_digits=4, decimal_places=1, default=0, help_text=_("Number of bathrooms")
+    )
+    sqft = models.IntegerField(default=0, help_text=_("Square footage"))
+    garage_spaces = models.IntegerField(default=0, help_text=_("Garage spaces"))
+    
+    # Detailed Features (JSON)
+    property_features = models.JSONField(default=dict, blank=True, help_text=_("Structured property features"))
+
     # Selling Details
     reason_for_selling = models.CharField(
         max_length=50,
@@ -206,6 +217,16 @@ class SellerProfile(models.Model):
 
     def __str__(self):
         return f"Seller Profile: {self.user.email}"
+
+
+class PropertyImage(models.Model):
+    seller_profile = models.ForeignKey(SellerProfile, on_delete=models.CASCADE, related_name='images')
+    image = models.ImageField(upload_to='property_images/')
+    is_primary = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = "property_images"
 
 
 class PartnerProfile(models.Model):

@@ -1,4 +1,7 @@
 from django.views.generic import TemplateView
+from django.contrib.auth.mixins import LoginRequiredMixin
+import json
+from django.core.serializers.json import DjangoJSONEncoder
 
 class IndexView(TemplateView):
     template_name = "index.html"
@@ -11,8 +14,6 @@ class LoginView(TemplateView):
 
 class SignupView(TemplateView):
     template_name = "signup.html"
-
-from django.contrib.auth.mixins import LoginRequiredMixin
 
 class BuyerDashboardView(LoginRequiredMixin, TemplateView):
     template_name = "buyer-dashboard.html"
@@ -33,6 +34,22 @@ class SellerDashboardView(LoginRequiredMixin, TemplateView):
 class SellerPropertyView(LoginRequiredMixin, TemplateView):
     template_name = "seller-property.html"
     extra_context = {'active_page': 'properties'}
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        if hasattr(self.request.user, 'seller_profile'):
+            context['seller_profile'] = self.request.user.seller_profile
+            
+            try:
+                # Import here to avoid potential circular imports during app startup
+                from api.v1.serializer import SellerProfileSerializer
+                serializer = SellerProfileSerializer(self.request.user.seller_profile)
+                context['seller_profile_json'] = json.dumps(serializer.data, cls=DjangoJSONEncoder)
+            except Exception as e:
+                print(f"Error serializing seller profile: {e}")
+                context['seller_profile_json'] = "{}"
+            
+        return context
 
 class SellerSettingsView(LoginRequiredMixin, TemplateView):
     template_name = "seller-settings.html"

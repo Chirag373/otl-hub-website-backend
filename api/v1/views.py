@@ -1,4 +1,4 @@
-from rest_framework.generics import RetrieveUpdateAPIView
+from rest_framework.generics import RetrieveUpdateAPIView, DestroyAPIView
 from rest_framework.permissions import IsAuthenticated
 from api.v1.serializer import (
     BuyerProfileSerializer,
@@ -6,9 +6,10 @@ from api.v1.serializer import (
     SellerProfileSerializer,
 )
 from core.permissions import IsBuyer, IsRealtor, IsSeller
-from api.models import BuyerProfile, RealtorProfile, SellerProfile
+from api.models import BuyerProfile, RealtorProfile, SellerProfile, PropertyImage
 from rest_framework.response import Response
 from rest_framework import status
+from django.shortcuts import get_object_or_404
 
 # Create your views here.
 
@@ -68,10 +69,7 @@ class RealtorProfileView(RetrieveUpdateAPIView):
         self.perform_update(serializer)
 
         return Response(
-            {
-                "message": "Realtor profile updated successfully",
-                "data": serializer.data,
-            },
+            {"message": "Realtor profile updated successfully", "data": serializer.data},
             status=status.HTTP_200_OK,
         )
 
@@ -104,3 +102,18 @@ class SellerProfileView(RetrieveUpdateAPIView):
             {"message": "Seller profile updated successfully", "data": serializer.data},
             status=status.HTTP_200_OK,
         )
+
+
+class PropertyImageDeleteView(DestroyAPIView):
+    """
+    View to delete a specific property image
+    """
+    permission_classes = [IsAuthenticated, IsSeller]
+    queryset = PropertyImage.objects.all()
+    
+    def get_queryset(self):
+        # Ensure user can only delete their own images
+        return PropertyImage.objects.filter(seller_profile__user=self.request.user)
+
+    def delete(self, request, *args, **kwargs):
+        return super().destroy(request, *args, **kwargs)

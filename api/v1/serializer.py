@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from django.db import transaction
 from core.models import User, PendingSignup
-from api.models import BuyerProfile, RealtorProfile, SellerProfile, PartnerProfile
+from api.models import BuyerProfile, RealtorProfile, SellerProfile, PartnerProfile, PropertyImage
 from django.contrib.auth import authenticate
 from django.contrib.auth.password_validation import validate_password
 from django.utils.translation import gettext_lazy as _
@@ -10,6 +10,7 @@ from core.models import Subscription
 from django.utils import timezone
 from datetime import timedelta
 import secrets
+import json
 
 
 class UserResponseSerializer(serializers.ModelSerializer):
@@ -482,6 +483,7 @@ class RealtorProfileSerializer(serializers.ModelSerializer):
             return None
 
     def update(self, instance, validated_data):
+        print(f"DEBUG: validated_data keys: {validated_data.keys()}")
         user_data = validated_data.pop("user", {})
         user = instance.user
 
@@ -503,6 +505,12 @@ class RealtorProfileSerializer(serializers.ModelSerializer):
         instance.save()
 
         return instance
+
+
+class PropertyImageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PropertyImage
+        fields = ["id", "image", "is_primary"]
 
 
 class SellerProfileSerializer(serializers.ModelSerializer):
@@ -527,12 +535,27 @@ class SellerProfileSerializer(serializers.ModelSerializer):
 
     # Property details
     property_type = serializers.SerializerMethodField()
+    property_type_val = serializers.CharField(source='property_type', read_only=True)
     property_type_input = serializers.ChoiceField(
         choices=SellerProfile.PropertyType.choices, required=False, write_only=True, source='property_type'
     )
     property_description = serializers.CharField(required=False, allow_blank=True)
     estimated_value = serializers.DecimalField(
         max_digits=12, decimal_places=2, required=False, allow_null=True
+    )
+
+    # Extended Property Details
+    bedrooms = serializers.IntegerField(required=False)
+    bathrooms = serializers.DecimalField(max_digits=4, decimal_places=1, required=False)
+    sqft = serializers.IntegerField(required=False)
+    garage_spaces = serializers.IntegerField(required=False)
+    property_features = serializers.JSONField(required=False)
+    
+    images = PropertyImageSerializer(many=True, read_only=True)
+    upload_images = serializers.ListField(
+        child=serializers.ImageField(allow_empty_file=False, use_url=False),
+        write_only=True,
+        required=False
     )
 
     # Selling details
@@ -550,6 +573,8 @@ class SellerProfileSerializer(serializers.ModelSerializer):
 
     # Nested serializer for subscription
     subscription = serializers.SerializerMethodField()
+    
+    has_active_listing = serializers.BooleanField(required=False)
 
     class Meta:
         model = SellerProfile
@@ -567,15 +592,24 @@ class SellerProfileSerializer(serializers.ModelSerializer):
             "zip_code",
             "county",
             "property_type",
+            "property_type_val",
             "property_type_input",
             "property_description",
             "estimated_value",
+            "bedrooms",
+            "bathrooms",
+            "sqft",
+            "garage_spaces",
+            "property_features",
+            "images",
+            "upload_images",
             "reason_for_selling",
             "reason_for_selling_input",
             "selling_type",
             "selling_type_input",
             "leaseback_required",
             "subscription",
+            "has_active_listing",
         ]
 
     def get_property_type(self, obj):
@@ -618,6 +652,7 @@ class SellerProfileSerializer(serializers.ModelSerializer):
             return None
 
     def update(self, instance, validated_data):
+        print(f"DEBUG: validated_data keys: {validated_data.keys()}")
         user_data = validated_data.pop("user", {})
         user = instance.user
 
@@ -647,6 +682,22 @@ class SellerProfileSerializer(serializers.ModelSerializer):
         instance.estimated_value = validated_data.get(
             "estimated_value", instance.estimated_value
         )
+        
+        # New fields
+        instance.bedrooms = validated_data.get("bedrooms", instance.bedrooms)
+        instance.bathrooms = validated_data.get("bathrooms", instance.bathrooms)
+        instance.sqft = validated_data.get("sqft", instance.sqft)
+        instance.garage_spaces = validated_data.get("garage_spaces", instance.garage_spaces)
+        
+        # Safe JSON handling for property_features
+        property_features = validated_data.get("property_features", instance.property_features)
+        if isinstance(property_features, str):
+            try:
+                property_features = json.loads(property_features)
+            except json.JSONDecodeError:
+                pass # Keep as string or handle error
+        instance.property_features = property_features
+        
         instance.reason_for_selling = validated_data.get(
             "reason_for_selling", instance.reason_for_selling
         )
@@ -656,6 +707,21 @@ class SellerProfileSerializer(serializers.ModelSerializer):
         instance.leaseback_required = validated_data.get(
             "leaseback_required", instance.leaseback_required
         )
+        
+        if 'has_active_listing' in validated_data:
+            instance.has_active_listing = validated_data.get('has_active_listing')
+            
         instance.save()
+        
+        # Image Upload Handling
+        upload_images = validated_data.pop('upload_images', None)
+        if upload_images:
+            # Check limit
+            current_count = instance.images.count()
+            if current_count + len(upload_images) > 6:
+                raise serializers.ValidationError("Maximum 6 images allowed.")
+                
+            for image in upload_images:
+                PropertyImage.objects.create(seller_profile=instance, image=image)
 
         return instance
