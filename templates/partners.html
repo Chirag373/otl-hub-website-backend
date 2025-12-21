@@ -19,6 +19,14 @@
         -webkit-box-orient: vertical;
         overflow: hidden;
     }
+
+    /* Modal Backdrop Blur */
+    #contact_modal::backdrop,
+    .modal-backdrop {
+        backdrop-filter: blur(5px);
+        background-color: rgba(0, 0, 0, 0.3) !important;
+        /* Semi-transparent overlay */
+    }
 </style>
 {% endblock %}
 
@@ -51,7 +59,7 @@
                     placeholder="Search partners by name, city, county, address, business description, or serving area..."
                     class="input input-bordered w-full pl-12 pr-4 py-3 bg-[var(--muted)] border-[var(--border)] rounded-xl text-[var(--foreground)] placeholder-[var(--muted-foreground)] focus:outline-none focus:border-[var(--accent)] h-auto" />
             </div>
-            
+
             <button id="toggle-filters-btn"
                 class="btn btn-outline border-[var(--border)] text-[var(--foreground)] hover:bg-[var(--muted)] hover:text-[var(--foreground)] hover:border-[var(--border)] font-heading text-sm px-4 py-3 rounded-xl transition-colors h-auto min-h-0 flex-shrink-0">
                 <i data-lucide="filter" class="w-4 h-4"></i>
@@ -60,7 +68,7 @@
         </div>
 
         <div class="flex justify-end mb-2">
-             <button id="clear-filters-btn"
+            <button id="clear-filters-btn"
                 class="hidden btn btn-ghost text-[var(--accent)] hover:bg-[var(--accent)]/10 font-heading text-sm px-3 py-2 rounded-lg transition-colors h-auto min-h-0">
                 <i data-lucide="x" class="w-4 h-4 mr-2"></i>
                 Clear Filters
@@ -102,8 +110,7 @@
             </div>
         </div>
 
-        <div id="active-filters-display"
-            class="hidden flex flex-wrap gap-2 mt-4 pt-4 border-t border-[var(--border)]">
+        <div id="active-filters-display" class="hidden flex flex-wrap gap-2 mt-4 pt-4 border-t border-[var(--border)]">
             <span class="font-heading text-sm text-[var(--muted-foreground)] flex items-center">
                 Active filters:
             </span>
@@ -124,135 +131,53 @@
     <div id="partners-container">
     </div>
 
+    <!-- Contact Modal -->
+    <dialog id="contact_modal" class="modal">
+        <div class="modal-box bg-[var(--card)] border border-[var(--border)]">
+            <h3 class="font-bold text-lg text-[var(--foreground)]" id="modal-partner-name">Contact Partner</h3>
+            <div class="py-4 space-y-4">
+                <div class="flex items-center gap-3">
+                    <div class="p-2 bg-[var(--accent)]/10 rounded-lg">
+                        <i data-lucide="mail" class="w-5 h-5 text-[var(--accent)]"></i>
+                    </div>
+                    <div>
+                        <p class="text-sm text-[var(--muted-foreground)]">Email Address</p>
+                        <a href="#" id="modal-partner-email"
+                            class="text-[var(--foreground)] hover:text-[var(--accent)] transition-colors font-medium"></a>
+                    </div>
+                </div>
+                <div class="flex items-center gap-3">
+                    <div class="p-2 bg-[var(--accent)]/10 rounded-lg">
+                        <i data-lucide="phone" class="w-5 h-5 text-[var(--accent)]"></i>
+                    </div>
+                    <div>
+                        <p class="text-sm text-[var(--muted-foreground)]">Phone Number</p>
+                        <a href="#" id="modal-partner-phone"
+                            class="text-[var(--foreground)] hover:text-[var(--accent)] transition-colors font-medium"></a>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-action">
+                <form method="dialog">
+                    <button class="btn btn-ghost text-[var(--foreground)]">Close</button>
+                    <a href="#" id="modal-email-btn"
+                        class="btn bg-[var(--accent)] text-white hover:bg-[var(--accent-hover)] border-none">Send
+                        Email</a>
+                </form>
+            </div>
+        </div>
+        <form method="dialog" class="modal-backdrop">
+            <button>close</button>
+        </form>
+    </dialog>
+
 </div>
 {% endblock %}
 
 {% block extra_scripts %}
 <script>
     // --- DATA ---
-    // Sourced from src/lib/partner-data.ts
-    const samplePartners = [
-        {
-            id: "1",
-            firstName: "Sarah",
-            lastName: "Johnson",
-            title: "Senior Partner",
-            category: "Real Estate Agent",
-            licensedIn: "TX",
-            phone: "(713) 555-0123",
-            email: "sarah.johnson@otl-partner.com",
-            city: "Houston",
-            county: "Harris County",
-            companyAddress: "1234 Main Street, Houston, TX 77001",
-            businessDescription: "Sarah Johnson is Houston's premier luxury real estate specialist...",
-            review: "Outstanding service and market knowledge. Sarah helped us find our dream home in River Oaks!",
-            servingCities: "Houston, Bellaire, West University Place, River Oaks, Memorial, Katy, Sugar Land, The Woodlands",
-            office: "OTL Houston Central",
-            experience: "15+ years",
-            languages: ["English", "Spanish"],
-            bio: "Sarah Johnson has been helping clients find their dream properties for over 15 years. Specializing in luxury homes..."
-        },
-        {
-            id: "2",
-            firstName: "Michael",
-            lastName: "Rodriguez",
-            title: "Associate Partner",
-            category: "Real Estate Agent",
-            licensedIn: "TX",
-            phone: "(214) 555-0456",
-            email: "michael.rodriguez@otl-partner.com",
-            city: "Dallas",
-            county: "Dallas County",
-            companyAddress: "5678 Oak Avenue, Dallas, TX 75201",
-            businessDescription: "Michael Rodriguez is a dedicated real estate professional specializing in first-time home buyers...",
-            review: "Michael made our first home buying experience stress-free and enjoyable. Highly recommend!",
-            servingCities: "Dallas, Fort Worth, Arlington, Plano, Irving, Garland, Grand Prairie, Mesquite, Carrollton",
-            office: "OTL Dallas Metro",
-            experience: "8+ years",
-            languages: ["English", "Spanish"],
-            bio: "Michael Rodriguez specializes in helping first-time buyers and families relocate to the Dallas area..."
-        },
-        {
-            id: "3",
-            firstName: "Emily",
-            lastName: "Chen",
-            title: "Associate Partner",
-            category: "Real Estate Agent",
-            licensedIn: "TX",
-            phone: "(512) 555-0789",
-            email: "emily.chen@otl-partner.com",
-            city: "Austin",
-            county: "Travis County",
-            companyAddress: "9012 Tech Boulevard, Austin, TX 78701",
-            businessDescription: "Emily Chen is Austin's leading tech district specialist...",
-            review: "Emily understood exactly what we needed in Austin's competitive market. Found us the perfect tech-savvy home!",
-            servingCities: "Austin, Round Rock, Cedar Park, Georgetown, Pflugerville, Leander, Manor, Buda, Kyle",
-            office: "OTL Austin Tech",
-            experience: "6+ years",
-            languages: ["English", "Mandarin"],
-            bio: "Emily Chen focuses on Austin's growing tech district and modern architectural homes..."
-        },
-        {
-            id: "4",
-            firstName: "David",
-            lastName: "Thompson",
-            title: "Senior Partner",
-            category: "Real Estate Agent",
-            licensedIn: "TX",
-            phone: "(210) 555-0321",
-            email: "david.thompson@otl-partner.com",
-            city: "San Antonio",
-            county: "Bexar County",
-            companyAddress: "3456 Historic Plaza, San Antonio, TX 78201",
-            businessDescription: "David Thompson is San Antonio's premier historic properties and military relocation expert...",
-            review: "David's expertise in historic properties is unmatched. He helped us preserve and restore our 1920s home beautifully!",
-            servingCities: "San Antonio, New Braunfels, Schertz, Cibolo, Converse, Live Oak, Universal City, Alamo Heights, Terrell Hills",
-            office: "OTL San Antonio Historic",
-            experience: "20+ years",
-            languages: ["English"],
-            bio: "With over 20 years of experience, David Thompson is the go-to expert for historic properties and military relocations..."
-        },
-        {
-            id: "5",
-            firstName: "Lisa",
-            lastName: "Martinez",
-            title: "Associate Partner",
-            category: "Real Estate Agent",
-            licensedIn: "TX",
-            phone: "(817) 555-0654",
-            email: "lisa.martinez@otl-partner.com",
-            city: "Fort Worth",
-            county: "Tarrant County",
-            companyAddress: "7890 Western Drive, Fort Worth, TX 76101",
-            businessDescription: "Lisa Martinez is Fort Worth's leading suburban and new construction specialist...",
-            review: "Lisa guided us through the entire new construction process. Our home is exactly what we dreamed of!",
-            servingCities: "Fort Worth, Arlington, Mansfield, Burleson, North Richland Hills, Hurst, Euless, Bedford, Keller",
-            office: "OTL Fort Worth West",
-            experience: "10+ years",
-            languages: ["English", "Spanish"],
-            bio: "Lisa Martinez specializes in suburban family homes and new construction. Her knowledge of Fort Worth's growing communities..."
-        },
-        {
-            id: "6",
-            firstName: "Robert",
-            lastName: "Kim",
-            title: "Associate Partner",
-            category: "Real Estate Agent",
-            licensedIn: "TX",
-            phone: "(469) 555-0987",
-            email: "robert.kim@otl-partner.com",
-            city: "Plano",
-            county: "Collin County",
-            companyAddress: "1111 Corporate Center, Plano, TX 75001",
-            businessDescription: "Robert Kim is Plano's premier corporate relocation and luxury property specialist...",
-            review: "Robert handled our corporate relocation seamlessly. Professional, efficient, and truly understands business needs!",
-            servingCities: "Plano, Frisco, McKinney, Allen, Richardson, Garland, Sachse, Murphy, Parker",
-            office: "OTL Plano Corporate",
-            experience: "12+ years",
-            languages: ["English", "Korean"],
-            bio: "Robert Kim works extensively with corporate clients and specializes in luxury condominiums and investment properties in Plano..."
-        }
-    ];
+    let partners = [];
 
     const categoryOrder = [
         "Lender",
@@ -291,34 +216,74 @@
         if (window.lucide) {
             lucide.createIcons();
         }
-        renderPartners();
+        fetchPartners();
         setupEventListeners();
+    }
+
+    // --- API ---
+    async function fetchPartners() {
+        try {
+            partnersContainer.innerHTML = '<div class="text-center py-8"><span class="loading loading-spinner loading-lg text-[var(--accent)]"></span></div>';
+
+            const response = await fetch('/api/v1/partners/');
+            if (!response.ok) throw new Error("Failed to fetch partners");
+
+            const data = await response.json();
+
+            // Map API data to frontend format
+            partners = data.map(p => ({
+                id: p.email, // Use email as unique ID if ID not available
+                firstName: p.first_name,
+                lastName: p.last_name,
+                title: "Partner", // Generic title
+                category: p.partnership_type_display,
+                licensedIn: p.business_license_number ? "TX" : "N/A", // Assume TX based on context
+                phone: p.phone_number,
+                email: p.email,
+                city: p.service_areas ? p.service_areas.split(',')[0].trim() : "Unknown", // Naive parse
+                county: "", // Not available
+                companyAddress: p.website_url, // Use website as address fallback for display
+                businessDescription: `Professional ${p.partnership_type_display} serving ${p.service_areas}`,
+                review: "Top rated professional.", // Mock
+                servingCities: p.service_areas,
+                office: p.company_name,
+                experience: `Member since ${p.member_since}`,
+                languages: ["English"], // Default
+                bio: `Contact ${p.first_name} for your ${p.partnership_type_display} needs.`,
+                licenseNumber: p.business_license_number
+            }));
+
+            renderPartners();
+
+        } catch (error) {
+            console.error(error);
+            partnersContainer.innerHTML = `<div class="alert alert-error">Failed to load partners. Please try again later.</div>`;
+        }
     }
 
     // --- FILTER LOGIC ---
     function getFilteredPartners() {
-        return samplePartners.filter(partner => {
+        return partners.filter(partner => {
             const searchLower = filters.search.toLowerCase();
             const matchesSearch =
                 `${partner.firstName} ${partner.lastName}`.toLowerCase().includes(searchLower) ||
-                partner.city.toLowerCase().includes(searchLower) ||
-                partner.county.toLowerCase().includes(searchLower) ||
-                partner.office.toLowerCase().includes(searchLower) ||
-                partner.companyAddress.toLowerCase().includes(searchLower) ||
-                partner.businessDescription.toLowerCase().includes(searchLower) ||
-                partner.servingCities.toLowerCase().includes(searchLower) ||
-                partner.bio.toLowerCase().includes(searchLower);
+                (partner.city && partner.city.toLowerCase().includes(searchLower)) ||
+                (partner.office && partner.office.toLowerCase().includes(searchLower)) ||
+                (partner.businessDescription && partner.businessDescription.toLowerCase().includes(searchLower)) ||
+                (partner.servingCities && partner.servingCities.toLowerCase().includes(searchLower));
 
-            const matchesLocation = !filters.location || filters.location === "All Locations" || partner.city === filters.location;
-            const matchesLanguage = !filters.language || partner.languages.includes(filters.language);
+            const matchesLocation = !filters.location || filters.location === "All Locations" || (partner.city && partner.city.includes(filters.location)) || (partner.servingCities && partner.servingCities.includes(filters.location));
+
+            // Simplified language filter since we don't have real language data yet
+            const matchesLanguage = !filters.language || (partner.languages && partner.languages.includes(filters.language));
 
             return matchesSearch && matchesLocation && matchesLanguage;
         });
     }
 
-    function groupPartners(partners) {
+    function groupPartners(partnersList) {
         const groups = {};
-        partners.forEach(partner => {
+        partnersList.forEach(partner => {
             const key = partner.category || "Other";
             if (!groups[key]) groups[key] = [];
             groups[key].push(partner);
@@ -387,6 +352,13 @@
     }
 
     function createPartnerCardHtml(partner) {
+        // Safe stringify for onclick
+        const partnerData = JSON.stringify({
+            name: `${partner.firstName} ${partner.lastName}`,
+            email: partner.email,
+            phone: partner.phone
+        }).replace(/"/g, '&quot;');
+
         return `
             <article class="card bg-[var(--card)] rounded-xl overflow-hidden border border-[var(--border)] shadow-md hover:shadow-lg transition-all duration-300 hover:border-[var(--accent)]/30">
                 <div class="card-body p-5">
@@ -412,7 +384,7 @@
                                 </div>
                                 <div class="flex items-center gap-2 text-sm text-[var(--muted-foreground)]">
                                     <i data-lucide="map-pin" class="w-4 h-4"></i>
-                                    <span>${partner.city}, ${partner.county}</span>
+                                    <span>${partner.city} ${partner.county ? ', ' + partner.county : ''}</span>
                                 </div>
                             </div>
                             <div class="mb-3">
@@ -421,11 +393,7 @@
                                     <span class="line-clamp-1">${partner.office}</span>
                                 </div>
                             </div>
-                            <div class="mb-4">
-                                <p class="text-sm text-[var(--muted-foreground)]">
-                                    <span class="font-medium">Languages:</span> ${partner.languages.join(", ")}
-                                </p>
-                            </div>
+                            <!-- Languages Hidden if mock -->
                         </div>
                     </div>
                     <div class="mb-4 px-0">
@@ -433,13 +401,11 @@
                             <div class="text-sm text-[var(--foreground)] leading-relaxed line-clamp-2">
                                 ${partner.bio}
                             </div>
-                            <button class="btn btn-link btn-xs no-underline flex items-center gap-1 mt-2 text-[var(--accent)] hover:text-[var(--accent-hover)] transition-colors font-medium p-0 h-auto min-h-0">
-                                <i data-lucide="file-text" class="w-3 h-3"></i> Show More
-                            </button>
+                            <!-- Show More removed for brevity if no real modal -->
                         </div>
                     </div>
                     <div class="card-actions border-t border-[var(--border)] pt-4 mt-0">
-                        <button class="btn btn-block font-heading text-sm font-semibold bg-gradient-to-r from-[var(--accent)] to-[var(--accent-hover)] text-white border-none rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center">
+                        <button onclick="handleContactClick(${partnerData})" class="btn btn-block font-heading text-sm font-semibold bg-gradient-to-r from-[var(--accent)] to-[var(--accent-hover)] text-white border-none rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center">
                             <i data-lucide="mail" class="w-4 h-4 mr-2"></i> Contact
                         </button>
                     </div>
@@ -447,6 +413,28 @@
             </article>
         `;
     }
+
+    function handleContactClick(data) {
+        document.getElementById('modal-partner-name').textContent = `Contact ${data.name}`;
+
+        const emailLink = document.getElementById('modal-partner-email');
+        emailLink.textContent = data.email || "Not Available";
+        emailLink.href = data.email ? `mailto:${data.email}` : "#";
+
+        const phoneLink = document.getElementById('modal-partner-phone');
+        phoneLink.textContent = data.phone || "Not Available";
+        phoneLink.href = data.phone ? `tel:${data.phone}` : "#";
+
+        const sendBtn = document.getElementById('modal-email-btn');
+        sendBtn.href = data.email ? `mailto:${data.email}` : "#";
+        if (!data.email) sendBtn.classList.add('btn-disabled');
+        else sendBtn.classList.remove('btn-disabled');
+
+        document.getElementById('contact_modal').showModal();
+    }
+
+    // Expose to global scope for onclick
+    window.handleContactClick = handleContactClick;
 
     function updateUIControls() {
         // Toggle Clear button logic
@@ -483,8 +471,6 @@
         if (toggleFiltersBtn) {
             toggleFiltersBtn.addEventListener('click', () => {
                 filterOptions.classList.toggle('hidden');
-                // Removed dynamic text update to keep it simple "Filters" or icon only if preferred
-                // filterBtnText.textContent = filterOptions.classList.contains('hidden') ? "Show Filters" : "Hide Filters";
             });
         }
 

@@ -64,3 +64,20 @@ class IsSeller(BasePermission):
 
         role = getattr(user, "role", None)
         return role == User.UserRole.SELLER
+
+
+class IsPartner(BasePermission):
+    """
+    Allows access only to users with role == User.UserRole.PARTNER.
+    """
+
+    message = "Only partners can access this resource."
+
+    def has_permission(self, request, view):
+        user = getattr(request, "user", None)
+        if not user or not user.is_authenticated:
+            return False
+
+        role = getattr(user, "role", None)
+        return role == User.UserRole.PARTNER
+

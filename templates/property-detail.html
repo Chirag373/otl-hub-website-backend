@@ -1,0 +1,344 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Property Details | OTL Platform{% endblock %}
+
+{% block extra_head %}
+<!-- Swiper CSS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+<style>
+    .property-detail-swiper {
+        width: 100%;
+        height: 500px;
+        border-radius: 1rem;
+    }
+
+    .property-detail-swiper .swiper-slide {
+        text-align: center;
+        background: #000;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .property-detail-swiper .swiper-slide img {
+        display: block;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .swiper-button-next,
+    .swiper-button-prev {
+        color: white;
+        background: rgba(0, 0, 0, 0.5);
+        border-radius: 50%;
+        width: 3rem;
+        height: 3rem;
+    }
+
+    .swiper-button-next:after,
+    .swiper-button-prev:after {
+        font-size: 1.2rem;
+        font-weight: bold;
+    }
+
+    .feature-card {
+        transition: transform 0.2s;
+    }
+
+    .feature-card:hover {
+        transform: translateY(-2px);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="bg-[var(--bg)] min-h-screen pb-16">
+    <!-- Breadcrumb -->
+    <div class="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <div class="text-sm breadcrumbs text-[var(--muted-foreground)]">
+            <ul>
+                <li><a href="/" class="hover:text-[var(--accent)]">Home</a></li>
+                <li><a href="/buyer/property-search" class="hover:text-[var(--accent)]">Properties</a></li>
+                <li class="text-[var(--foreground)]">Property Details</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Loading State -->
+    <div id="loading-state" class="flex justify-center items-center h-[50vh]">
+        <span class="loading loading-spinner loading-lg text-[var(--accent)]"></span>
+    </div>
+
+    <!-- Error State -->
+    <div id="error-state" class="hidden flex flex-col justify-center items-center h-[50vh] text-center px-4">
+        <i data-lucide="alert-circle" class="w-16 h-16 text-red-500 mb-4"></i>
+        <h2 class="text-2xl font-bold text-[var(--foreground)] mb-2">Unavailable</h2>
+        <p class="text-[var(--muted-foreground)] mb-6">This property could not be found or has been removed.</p>
+        <a href="/buyer/property-search"
+            class="btn btn-outline text-[var(--foreground)] hover:bg-[var(--accent)] hover:text-white hover:border-[var(--accent)]">
+            Return to Search
+        </a>
+    </div>
+
+    <!-- Content (Hidden initially) -->
+    <main id="property-content" class="hidden max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8">
+
+        <!-- Header Section -->
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
+            <div>
+                <h1 id="prop-price" class="font-heading text-4xl md:text-5xl font-bold text-[var(--accent)] mb-2">$0
+                </h1>
+                <div class="flex items-center gap-2 text-[var(--muted-foreground)]">
+                    <i data-lucide="map-pin" class="w-5 h-5"></i>
+                    <span id="prop-address" class="text-lg font-medium">Loading address...</span>
+                </div>
+            </div>
+            <div class="flex gap-3">
+                <button
+                    class="btn btn-outline gap-2 text-[var(--foreground)] hover:bg-[var(--muted)] border-[var(--border)]">
+                    <i data-lucide="share-2" class="w-4 h-4"></i> Share
+                </button>
+                <button
+                    class="btn btn-outline gap-2 text-[var(--foreground)] hover:bg-[var(--muted)] border-[var(--border)]">
+                    <i data-lucide="heart" class="w-4 h-4"></i> Save
+                </button>
+            </div>
+        </div>
+
+        <!-- Image Gallery & Stats -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
+            <!-- Left: Image Slider -->
+            <div class="lg:col-span-2 space-y-4">
+                <div class="swiper property-detail-swiper">
+                    <div class="swiper-wrapper" id="swiper-wrapper">
+                        <!-- Slides injected via JS -->
+                    </div>
+                    <div class="swiper-button-next"></div>
+                    <div class="swiper-button-prev"></div>
+                    <div class="swiper-pagination"></div>
+                </div>
+            </div>
+
+            <!-- Right: Quick Stats & Contact -->
+            <div class="space-y-6">
+                <!-- Key Details Card -->
+                <div class="card bg-[var(--card)] border border-[var(--border)] p-6 shadow-sm">
+                    <h3 class="font-heading text-xl font-bold text-[var(--foreground)] mb-6">Property Overview</h3>
+
+                    <div class="grid grid-cols-2 gap-y-6">
+                        <div class="flex flex-col">
+                            <span class="text-[var(--muted-foreground)] text-sm mb-1">Bedrooms</span>
+                            <div class="flex items-center gap-2 text-[var(--foreground)] font-bold text-xl">
+                                <i data-lucide="bed" class="w-5 h-5 text-[var(--accent)]"></i> <span
+                                    id="prop-beds">-</span>
+                            </div>
+                        </div>
+                        <div class="flex flex-col">
+                            <span class="text-[var(--muted-foreground)] text-sm mb-1">Bathrooms</span>
+                            <div class="flex items-center gap-2 text-[var(--foreground)] font-bold text-xl">
+                                <i data-lucide="bath" class="w-5 h-5 text-[var(--accent)]"></i> <span
+                                    id="prop-baths">-</span>
+                            </div>
+                        </div>
+                        <div class="flex flex-col">
+                            <span class="text-[var(--muted-foreground)] text-sm mb-1">Square Feet</span>
+                            <div class="flex items-center gap-2 text-[var(--foreground)] font-bold text-xl">
+                                <i data-lucide="square" class="w-5 h-5 text-[var(--accent)]"></i> <span
+                                    id="prop-sqft">-</span>
+                            </div>
+                        </div>
+                        <div class="flex flex-col">
+                            <span class="text-[var(--muted-foreground)] text-sm mb-1">Type</span>
+                            <div class="flex items-center gap-2 text-[var(--foreground)] font-bold text-xl">
+                                <i data-lucide="home" class="w-5 h-5 text-[var(--accent)]"></i> <span
+                                    id="prop-type">-</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="divider"></div>
+
+                    <div class="flex gap-2 mb-2">
+                        <span class="badge badge-lg bg-green-100 text-green-700 border-none font-bold">For Sale</span>
+                        <span
+                            class="badge badge-lg bg-[var(--muted)] text-[var(--muted-foreground)] border-none font-medium"
+                            id="prop-added">-</span>
+                    </div>
+                </div>
+
+                <!-- Contact Card -->
+                <div class="card bg-[var(--card)] border border-[var(--border)] p-6 shadow-sm">
+                    <h3 class="font-heading text-xl font-bold text-[var(--foreground)] mb-4">Interested?</h3>
+                    <p class="text-[var(--muted-foreground)] text-sm mb-6">Contact the seller directly to schedule a
+                        viewing or ask questions.</p>
+                    <button
+                        class="btn btn-lg w-full bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-white border-none mb-3">
+                        Contact Seller
+                    </button>
+                    <button
+                        class="btn btn-lg w-full btn-outline text-[var(--foreground)] border-[var(--border)] hover:bg-[var(--muted)]">
+                        Schedule Tour
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Description & Details -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-16">
+            <div class="lg:col-span-2 space-y-8">
+                <!-- Description -->
+                <div class="space-y-4">
+                    <h2 class="font-heading text-2xl font-bold text-[var(--foreground)]">About this home</h2>
+                    <p id="prop-description" class="text-[var(--muted-foreground)] leading-relaxed text-lg">
+                        <!-- Description injected here -->
+                    </p>
+                </div>
+
+                <!-- Features Grid -->
+                <div>
+                    <h2 class="font-heading text-2xl font-bold text-[var(--foreground)] mb-6">Features & Amenities</h2>
+                    <div id="prop-features" class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                        <!-- Features injected here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sidebar: Map or Extra Info -->
+            <div class="lg:col-span-1">
+                <div class="card bg-[var(--muted)]/10 border border-[var(--border)] p-6 rounded-xl">
+                    <h3 class="font-heading text-lg font-bold text-[var(--foreground)] mb-4">Location</h3>
+                    <div class="bg-gray-800 rounded-lg h-64 flex items-center justify-center mb-4">
+                        <span class="text-gray-400 text-sm">Map View Placeholder</span>
+                    </div>
+                    <p id="prop-location-detail" class="text-[var(--muted-foreground)] text-sm"></p>
+                </div>
+            </div>
+        </div>
+
+    </main>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<!-- Swiper JS -->
+<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+<script>
+    async function loadPropertyDetails() {
+        // Parse ID from URL query params
+        const urlParams = new URLSearchParams(window.location.search);
+        const propertyId = urlParams.get('id');
+
+        if (!propertyId) {
+            showError();
+            return;
+        }
+
+        try {
+            // Re-use the existing search endpoint but filter by specific ID if possible, 
+            // OR fetch list and find. Since we don't have a public "Retrieve" endpoint for single property yet without auth,
+            // we will utilize the existing list endpoint with a filter if supported, or just client-side filter.
+            //Ideally, we should have /api/v1/public/properties/<id>, but for now:
+            const response = await fetch('/api/v1/buyer/property-search/');
+            if (!response.ok) throw new Error('API Error');
+
+            const data = await response.json();
+            // Find property in the list (Not efficient for prod, but works for MVP unless we add a specific retrieve endpoint)
+            const property = data.find(p => p.id == propertyId);
+
+            if (!property) {
+                showError();
+                return;
+            }
+
+            renderProperty(property);
+
+        } catch (err) {
+            console.error(err);
+            showError();
+        }
+    }
+
+    function renderProperty(p) {
+        document.getElementById('loading-state').classList.add('hidden');
+        document.getElementById('property-content').classList.remove('hidden');
+
+        // Basic Info
+        document.getElementById('prop-price').textContent = p.price ? `$${Number(p.price).toLocaleString()}` : "$ -";
+        document.getElementById('prop-address').textContent = p.title || "Address Hidden";
+        document.getElementById('prop-location-detail').textContent = p.location || "";
+
+        // Stats
+        document.getElementById('prop-beds').textContent = p.bedrooms || 0;
+        document.getElementById('prop-baths').textContent = p.bathrooms || 0;
+        document.getElementById('prop-sqft').textContent = p.sqft ? Number(p.sqft).toLocaleString() : "-";
+        document.getElementById('prop-type').textContent = p.type || "Home";
+
+        // Date
+        const date = p.dateAdded ? new Date(p.dateAdded).toLocaleDateString() : 'Recently';
+        document.getElementById('prop-added').textContent = `Listed ${date}`;
+
+        // Description - Assuming 'description' field exists or we fallback
+        const desc = p.description || p.property_description || "No description provided for this property.";
+        document.getElementById('prop-description').textContent = desc;
+
+        // Images (Swiper)
+        const swiperWrapper = document.getElementById('swiper-wrapper');
+        let images = [];
+        if (p.images && p.images.length > 0) {
+            images = p.images;
+        } else if (p.image) {
+            images = [p.image];
+        } else {
+            images = ['/static/images/hero-bg.jpg'];
+        }
+
+        swiperWrapper.innerHTML = images.map(img => `
+            <div class="swiper-slide">
+                <img src="${img}" alt="Property Image" />
+            </div>
+        `).join('');
+
+        // Initialize Swiper
+        new Swiper('.property-detail-swiper', {
+            loop: images.length > 1,
+            navigation: {
+                nextEl: '.swiper-button-next',
+                prevEl: '.swiper-button-prev',
+            },
+            pagination: {
+                el: '.swiper-pagination',
+                clickable: true,
+            },
+        });
+
+        // Features
+        // Assuming features is Array or JSON object
+        const featuresContainer = document.getElementById('prop-features');
+        let features = [];
+        // Handle various potential formats for features
+        if (Array.isArray(p.features)) features = p.features;
+        else if (typeof p.features === 'object' && p.features !== null) features = Object.values(p.features);
+
+        if (features.length === 0) features = ["Air Conditioning", "Heating", "Parking"]; // Mock if empty
+
+        featuresContainer.innerHTML = features.map(f => `
+            <div class="flex items-center gap-3 p-3 bg-[var(--card)] border border-[var(--border)] rounded-lg feature-card">
+                <i data-lucide="check-circle" class="w-5 h-5 text-green-500"></i>
+                <span class="text-[var(--foreground)] font-medium text-sm capitalize">${f.toString().replace(/_/g, ' ')}</span>
+            </div>
+        `).join('');
+
+        // Re-init icons
+        if (window.lucide) lucide.createIcons();
+    }
+
+    function showError() {
+        document.getElementById('loading-state').classList.add('hidden');
+        document.getElementById('error-state').classList.remove('hidden');
+    }
+
+    document.addEventListener('DOMContentLoaded', loadPropertyDetails);
+</script>
+{% endblock %}

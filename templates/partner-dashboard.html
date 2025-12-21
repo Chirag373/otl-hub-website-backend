@@ -221,25 +221,7 @@
 {% block scripts %}
 <script>
     // --- DATA ---
-    let profile = {
-        firstName: "Sarah",
-        lastName: "Johnson",
-        email: "sarah.johnson@business.com",
-        phone: "(555) 123-4567",
-        companyName: "Johnson Home Services",
-        partnershipType: "Home Inspector",
-        serviceAreas: "Houston, TX",
-        website: "https://johnsonhomeservices.com",
-        businessLicense: "TX-HI-12345",
-        experience: "12 years",
-        joinDate: "March 2022",
-        bio: "Professional home inspection services with over 12 years of experience serving the Houston area. Certified and licensed to provide comprehensive property assessments.",
-        membership: {
-            level: "Business Partner",
-            feePaid: "$398.00",
-            expirationDate: "March 2025"
-        }
-    };
+    let profile = {};
 
     // --- DOM ELEMENTS ---
     const dom = {
@@ -263,6 +245,7 @@
         inputAreas: document.getElementById('input-areas'),
         inputLicense: document.getElementById('input-license'),
         inputWebsite: document.getElementById('input-website'),
+        // These fields are in template but not model yet
         inputExperience: document.getElementById('input-experience'),
         inputBio: document.getElementById('input-bio'),
 
@@ -282,23 +265,146 @@
     // --- INITIALIZATION ---
     function init() {
         if (window.lucide) lucide.createIcons();
-        populateData();
+        fetchProfile();
         setupEventListeners();
+    }
+
+    // --- UTILS ---
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    // --- API CALLS ---
+    async function fetchProfile() {
+        try {
+            const response = await fetch('/api/v1/partner/profile/');
+            if (!response.ok) {
+                if (response.status === 403 || response.status === 401) {
+                    window.location.href = "{% url 'login' %}";
+                    return;
+                }
+                throw new Error('Failed to fetch profile');
+            }
+            const data = await response.json();
+
+            // Map API data to local profile object
+            profile = {
+                firstName: data.first_name,
+                lastName: data.last_name,
+                email: data.email,
+                phone: data.phone_number,
+                companyName: data.company_name,
+                partnershipType: data.partnership_type, // Use display value if needed
+                partnershipTypeDisplay: data.partnership_type_display,
+                serviceAreas: data.service_areas,
+                website: data.website_url,
+                businessLicense: data.business_license_number,
+                joinDate: data.member_since,
+                // Missing fields
+                experience: "",
+                bio: "",
+                membership: data.subscription ? {
+                    level: data.subscription.property_access, // Reuse property access or similar
+                    feePaid: data.subscription.fee_paid ? `$${data.subscription.fee_paid}` : "$0.00",
+                    expirationDate: data.subscription.expiration_date
+                } : {
+                    level: "Inactive",
+                    feePaid: "$0.00",
+                    expirationDate: "--"
+                }
+            };
+
+            populateData();
+        } catch (error) {
+            console.error("Error fetching profile:", error);
+            // Optional: Show error toast
+        }
+    }
+
+    async function saveProfile() {
+        dom.btnSave.innerHTML = `<span class="loading loading-spinner loading-xs"></span> Saving...`;
+
+        const payload = {
+            user: {
+                first_name: dom.inputFirstName.value,
+                last_name: dom.inputLastName.value,
+                phone_number: dom.inputPhone.value
+            },
+            company_name: dom.inputCompany.value,
+            partnership_type: dom.inputType.value,
+            service_areas: dom.inputAreas.value,
+            website_url: dom.inputWebsite.value,
+            business_license_number: dom.inputLicense.value,
+            // bio/experience not in model yet
+        };
+
+        try {
+            const csrftoken = getCookie('csrftoken');
+            const response = await fetch('/api/v1/partner/profile/', {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrftoken
+                },
+                body: JSON.stringify(payload)
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                // Refresh data to ensure sync
+                await fetchProfile();
+
+                setEditMode(false);
+                dom.btnSave.innerHTML = `<i data-lucide="save" class="mr-2 h-4 w-4"></i> Save`;
+                if (window.lucide) lucide.createIcons();
+
+                // Success Message
+                dom.saveNotification.className = "mt-4 alert alert-success text-sm";
+                dom.saveNotification.innerHTML = `<i data-lucide="check-circle" class="w-5 h-5"></i> <span>Profile updated successfully!</span>`;
+                dom.saveNotification.classList.remove('hidden');
+                if (window.lucide) lucide.createIcons();
+
+                setTimeout(() => {
+                    dom.saveNotification.classList.add('hidden');
+                }, 3000);
+            } else {
+                throw new Error("Failed to update");
+            }
+
+        } catch (e) {
+            console.error(e);
+            dom.btnSave.innerHTML = `<i data-lucide="save" class="mr-2 h-4 w-4"></i> Save`;
+            if (window.lucide) lucide.createIcons();
+            alert("Failed to save profile changes.");
+        }
     }
 
     // --- LOGIC ---
 
     function populateData() {
+        if (!profile.firstName) return;
+
         // Text Elements
         const fullName = `${profile.firstName} ${profile.lastName}`;
-        const initials = (profile.firstName[0] + profile.lastName[0]).toUpperCase();
+        const initials = ((profile.firstName?.[0] || '') + (profile.lastName?.[0] || '')).toUpperCase();
 
         if (dom.avatarInitials) dom.avatarInitials.textContent = initials;
         if (dom.sidebarInitials) dom.sidebarInitials.textContent = initials;
         if (dom.displayName) dom.displayName.textContent = fullName;
         if (dom.sidebarName) dom.sidebarName.textContent = fullName;
         if (dom.memberSince) dom.memberSince.textContent = `Partner since ${profile.joinDate}`;
-        if (dom.displayRole) dom.displayRole.textContent = profile.partnershipType;
+        if (dom.displayRole) dom.displayRole.textContent = profile.partnershipTypeDisplay || profile.partnershipType;
 
         // Inputs
         if (dom.inputFirstName) dom.inputFirstName.value = profile.firstName;
@@ -310,13 +416,13 @@
         if (dom.inputAreas) dom.inputAreas.value = profile.serviceAreas;
         if (dom.inputLicense) dom.inputLicense.value = profile.businessLicense;
         if (dom.inputWebsite) dom.inputWebsite.value = profile.website;
-        if (dom.inputExperience) dom.inputExperience.value = profile.experience;
-        if (dom.inputBio) dom.inputBio.value = profile.bio;
+        if (dom.inputExperience) dom.inputExperience.value = profile.experience || "";
+        if (dom.inputBio) dom.inputBio.value = profile.bio || "";
 
         // Status
         if (dom.statusSince) dom.statusSince.textContent = profile.joinDate;
-        if (dom.statusRenewal) dom.statusRenewal.value = profile.membership.expirationDate;
-        if (dom.statusFee) dom.statusFee.value = profile.membership.feePaid;
+        if (dom.statusRenewal && profile.membership) dom.statusRenewal.value = profile.membership.expirationDate;
+        if (dom.statusFee && profile.membership) dom.statusFee.value = profile.membership.feePaid;
     }
 
     // --- EVENT LISTENERS ---
@@ -339,42 +445,9 @@
 
         const inputs = document.querySelectorAll('#profile-form input, #profile-form textarea');
         inputs.forEach(input => input.disabled = !isEditing);
-    }
 
-    function saveProfile() {
-        dom.btnSave.innerHTML = `<span class="loading loading-spinner loading-xs"></span> Saving...`;
-
-        setTimeout(() => {
-            // Update Local Data
-            profile.firstName = dom.inputFirstName.value;
-            profile.lastName = dom.inputLastName.value;
-            profile.email = dom.inputEmail.value;
-            profile.phone = dom.inputPhone.value;
-            profile.companyName = dom.inputCompany.value;
-            profile.partnershipType = dom.inputType.value;
-            profile.serviceAreas = dom.inputAreas.value;
-            profile.businessLicense = dom.inputLicense.value;
-            profile.website = dom.inputWebsite.value;
-            profile.experience = dom.inputExperience.value;
-            profile.bio = dom.inputBio.value;
-
-            // UI Updates
-            populateData();
-            setEditMode(false);
-
-            dom.btnSave.innerHTML = `<i data-lucide="save" class="mr-2 h-4 w-4"></i> Save`;
-            if (window.lucide) lucide.createIcons();
-
-            // Success Message
-            dom.saveNotification.className = "mt-4 alert alert-success text-sm";
-            dom.saveNotification.innerHTML = `<i data-lucide="check-circle" class="w-5 h-5"></i> <span>Profile updated successfully!</span>`;
-            dom.saveNotification.classList.remove('hidden');
-            if (window.lucide) lucide.createIcons();
-
-            setTimeout(() => {
-                dom.saveNotification.classList.add('hidden');
-            }, 3000);
-        }, 1000);
+        // Email is usually read-only
+        if (dom.inputEmail) dom.inputEmail.disabled = true;
     }
 
     init();

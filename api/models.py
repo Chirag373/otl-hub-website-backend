@@ -53,6 +53,17 @@ class BuyerProfile(models.Model):
     )
     subscription_start_date = models.DateTimeField(null=True, blank=True)
     subscription_end_date = models.DateTimeField(null=True, blank=True)
+    is_active_subscription = models.BooleanField(default=False)
+    stripe_customer_id = models.CharField(max_length=255, blank=True, null=True)
+    stripe_subscription_id = models.CharField(max_length=255, blank=True, null=True)
+
+    # Favorite Properties
+    favorites = models.ManyToManyField(
+        'SellerProfile', 
+        related_name='favorited_by', 
+        blank=True,
+        help_text=_("Properties favorited by this buyer")
+    )
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -262,7 +273,7 @@ class PartnerProfile(models.Model):
     )
 
     # Subscription details
-    subscription_active = models.BooleanField(default=False)
+    is_active_subscription = models.BooleanField(default=False)
     subscription_start_date = models.DateTimeField(null=True, blank=True)
 
     created_at = models.DateTimeField(auto_now_add=True)

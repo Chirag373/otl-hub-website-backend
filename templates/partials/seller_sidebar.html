@@ -8,11 +8,11 @@
     <div class="flex items-center space-x-3">
         <div class="avatar placeholder">
             <div class="bg-[var(--accent)] text-[var(--bg)] rounded-full w-10">
-                <span id="sidebar-avatar-initials" class="text-sm font-semibold">AS</span>
+                <span id="sidebar-avatar-initials" class="text-sm font-semibold">{{ request.user.first_name|first }}{{ request.user.last_name|first }}</span>
             </div>
         </div>
         <div class="flex-1 min-w-0">
-            <p id="sidebar-user-name" class="text-sm font-medium text-[var(--foreground)] truncate">Alice Smith</p>
+            <p id="sidebar-user-name" class="text-sm font-medium text-[var(--foreground)] truncate">{{ request.user.first_name }} {{ request.user.last_name }}</p>
             <p class="text-xs text-[var(--muted-foreground)] truncate capitalize">Seller</p>
         </div>
     </div>

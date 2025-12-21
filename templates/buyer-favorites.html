@@ -34,113 +34,97 @@
 
 {% block scripts %}
 <script>
-    // --- MOCK DATA ---
-    const mockProperties = [
-        {
-            id: 1,
-            title: "Modern Downtown Condo",
-            location: "Downtown, City Center",
-            price: 450000,
-            bedrooms: 2,
-            bathrooms: 2,
-            sqft: 1200,
-            image: "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&q=80&w=300&h=200",
-            type: "condo",
-            status: "active",
-            features: ["Balcony", "Gym Access", "Parking"],
-            dateAdded: "2025-01-10"
-        },
-        {
-            id: 2,
-            title: "Spacious Family Home",
-            location: "Suburb Valley",
-            price: 650000,
-            bedrooms: 4,
-            bathrooms: 3,
-            sqft: 2400,
-            image: "https://images.unsplash.com/photo-1568605114967-8130f3a36994?auto=format&fit=crop&q=80&w=300&h=200",
-            type: "house",
-            status: "active",
-            features: ["Garden", "Garage", "Fireplace"],
-            dateAdded: "2025-01-12"
-        },
-        {
-            id: 3,
-            title: "Cozy Townhouse",
-            location: "Riverside District",
-            price: 380000,
-            bedrooms: 3,
-            bathrooms: 2,
-            sqft: 1600,
-            image: "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&q=80&w=300&h=200",
-            type: "townhouse",
-            status: "active",
-            features: ["Patio", "Storage", "Community Pool"],
-            dateAdded: "2025-01-05"
-        },
-        {
-            id: 4,
-            title: "Luxury Apartment",
-            location: "Arts District",
-            price: 720000,
-            bedrooms: 2,
-            bathrooms: 2,
-            sqft: 1400,
-            image: "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&q=80&w=300&h=200",
-            type: "apartment",
-            status: "active",
-            features: ["City Views", "Concierge", "Rooftop Access"],
-            dateAdded: "2025-01-15"
-        },
-        {
-            id: 5,
-            title: "Countryside Villa",
-            location: "Green Hills",
-            price: 850000,
-            bedrooms: 5,
-            bathrooms: 4,
-            sqft: 3500,
-            image: "https://images.unsplash.com/photo-1600596542815-2a4d9fddace7?auto=format&fit=crop&q=80&w=300&h=200",
-            type: "house",
-            status: "active",
-            features: ["Large Lot", "Pool", "Solar Panels"],
-            dateAdded: "2025-01-01"
-        },
-        {
-            id: 6,
-            title: "Studio Loft",
-            location: "Old Town",
-            price: 250000,
-            bedrooms: 1,
-            bathrooms: 1,
-            sqft: 800,
-            image: "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&q=80&w=300&h=200",
-            type: "apartment",
-            status: "active",
-            features: ["High Ceilings", "Exposed Brick", "Near Transit"],
-            dateAdded: "2025-01-14"
-        }
-    ];
-
     // --- STATE ---
-    let favorites = [1, 3]; // Mock initial favorites
+    let favorites = []; // Stores the favorites fetched from API
     let currentSort = "relevant";
+    let carouselState = {}; // Stores current index for each property ID: { 1: 0, 2: 1 }
 
     // --- DOM ELEMENTS ---
     const dom = {
-        // Sidebar buttons REMOVED - handled by buyer_base.html
-
         grid: document.getElementById('property-grid'),
         resultsCount: document.getElementById('results-count'),
-
         inputSort: document.getElementById('sort-order'),
     };
 
     // --- INITIALIZATION ---
     function init() {
-        // Lucide created by Base
-        renderProperties();
+        if (window.lucide) lucide.createIcons();
+        fetchFavorites();
         setupEventListeners();
+    }
+
+    // --- UTILS ---
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    // --- API CALLS ---
+    async function fetchFavorites() {
+        if (dom.grid) {
+            dom.grid.innerHTML = `
+                <div class="col-span-1 md:col-span-2 lg:col-span-3 text-center py-12">
+                     <span class="loading loading-spinner loading-lg text-[var(--accent)]"></span>
+                </div>
+            `;
+        }
+
+        try {
+            const response = await fetch(`/api/v1/buyer/favorites/`);
+            if (!response.ok) {
+                if (response.status === 403 || response.status === 401) {
+                    window.location.href = "{% url 'login' %}";
+                    return;
+                }
+                throw new Error('Failed to fetch favorites');
+            }
+            favorites = await response.json();
+            renderProperties();
+        } catch (error) {
+            console.error(error);
+            if (dom.grid) {
+                dom.grid.innerHTML = `
+                   <div class="col-span-1 md:col-span-2 lg:col-span-3 text-center py-12 text-red-500">
+                        <p>Error loading favorites.</p>
+                   </div>
+                `;
+            }
+        }
+    }
+
+    async function removeFavorite(id) {
+        if (!confirm('Are you sure you want to remove this property from favorites?')) return;
+
+        try {
+            const csrftoken = getCookie('csrftoken');
+            const response = await fetch(`/api/v1/buyer/favorites/${id}/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrftoken
+                }
+            });
+
+            if (response.ok) {
+                // Remove from local list and re-render
+                favorites = favorites.filter(p => p.id !== id);
+                renderProperties();
+            } else {
+                console.error("Failed to remove favorite");
+            }
+        } catch (e) {
+            console.error(e);
+        }
     }
 
     // --- LOGIC ---
@@ -153,20 +137,20 @@
         }).format(price);
     }
 
-    function getFavoriteProperties() {
-        return mockProperties.filter(p => favorites.includes(p.id))
-            .sort((a, b) => {
-                switch (currentSort) {
-                    case "price-asc": return a.price - b.price;
-                    case "price-desc": return b.price - a.price;
-                    case "newest": return new Date(b.dateAdded) - new Date(a.dateAdded);
-                    default: return 0; // relevance (id order)
-                }
-            });
+    function getSortedProperties() {
+        // Create a copy to sort
+        return [...favorites].sort((a, b) => {
+            switch (currentSort) {
+                case "price-asc": return (parseFloat(a.price) || 0) - (parseFloat(b.price) || 0);
+                case "price-desc": return (parseFloat(b.price) || 0) - (parseFloat(a.price) || 0);
+                case "newest": return new Date(b.dateAdded) - new Date(a.dateAdded);
+                default: return 0;
+            }
+        });
     }
 
     function renderProperties() {
-        const properties = getFavoriteProperties();
+        const properties = getSortedProperties();
         if (dom.resultsCount) dom.resultsCount.textContent = properties.length;
         if (dom.grid) dom.grid.innerHTML = "";
 
@@ -190,21 +174,54 @@
         }
 
         properties.forEach(p => {
+            // Default images handling
+            let images = p.images || [];
+            if (images.length === 0) {
+                if (p.image) images = [p.image];
+                else images = ["https://placehold.co/600x400?text=No+Image"];
+            }
+
+            // Initialize state if new
+            if (carouselState[p.id] === undefined) {
+                carouselState[p.id] = 0;
+            }
+            if (carouselState[p.id] >= images.length) carouselState[p.id] = 0;
+
+            const currentImg = images[carouselState[p.id]];
+            const hasMultiple = images.length > 1;
+
             const card = document.createElement('div');
             card.className = "bg-[var(--card)] rounded-lg border border-[var(--border)] overflow-hidden hover:shadow-lg transition-shadow group";
             card.innerHTML = `
                     <div class="relative">
-                        <div class="aspect-video bg-gray-700 relative overflow-hidden">
-                            <img src="${p.image}" alt="${p.title}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105">
-                            <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-60"></div>
+                        <div class="aspect-video bg-gray-700 relative overflow-hidden group/image">
+                            <img src="${currentImg}" alt="${p.title}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" id="img-${p.id}">
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-60 pointer-events-none"></div>
                             
                             <button onclick="removeFavorite(${p.id})" class="absolute top-2 right-2 p-2 rounded-full bg-black/40 hover:bg-black/60 transition-colors z-10 text-white" title="Remove from Favorites">
                                 <i data-lucide="x" class="w-4 h-4"></i>
                             </button>
+
+                             ${hasMultiple ? `
+                                <button onclick="prevImage(${p.id}, ${images.length})" 
+                                    class="absolute left-2 top-1/2 -translate-y-1/2 p-1.5 rounded-full bg-black/50 text-white hover:bg-black/70 transition-opacity opacity-0 group-hover/image:opacity-100 z-10"
+                                    title="Previous Image">
+                                    <i data-lucide="chevron-left" class="w-5 h-5"></i>
+                                </button>
+                                <button onclick="nextImage(${p.id}, ${images.length})" 
+                                    class="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 rounded-full bg-black/50 text-white hover:bg-black/70 transition-opacity opacity-0 group-hover/image:opacity-100 z-10"
+                                    title="Next Image">
+                                    <i data-lucide="chevron-right" class="w-5 h-5"></i>
+                                </button>
+                                <div class="absolute bottom-2 right-2 px-2 py-0.5 bg-black/60 rounded text-[10px] text-white font-medium pointer-events-none z-10">
+                                    <span id="counter-${p.id}">${carouselState[p.id] + 1}</span>/${images.length}
+                                </div>
+                            ` : ''}
+
                         </div>
-                        <div class="absolute bottom-2 left-2">
+                        <div class="absolute bottom-2 left-2 pointer-events-none z-10">
                             <span class="px-2 py-1 bg-[var(--accent)] text-[var(--bg)] text-xs font-bold rounded capitalize shadow-md">
-                                ${p.type}
+                                ${p.type || 'Property'}
                             </span>
                         </div>
                     </div>
@@ -224,7 +241,7 @@
 
                         <div class="flex items-center justify-between border-t border-[var(--border)] pt-3 mt-2">
                             <span class="text-xl font-bold text-[var(--accent)]">
-                                ${formatPrice(p.price)}
+                                ${formatPrice(p.price || 0)}
                             </span>
                         </div>
                         
@@ -235,11 +252,11 @@
                         </div>
 
                         <div class="flex flex-wrap gap-1 pt-1">
-                            ${p.features.slice(0, 3).map(f => `
+                            ${p.features && p.features.length > 0 ? p.features.slice(0, 3).map(f => `
                                 <span class="px-2 py-1 bg-[var(--muted)]/20 text-[var(--muted-foreground)] text-xs rounded border border-[var(--border)]">
                                     ${f}
                                 </span>
-                            `).join('')}
+                            `).join('') : '<span class="text-xs text-[var(--muted-foreground)] text-xs">No features</span>'}
                         </div>
 
                         <div class="flex space-x-2 pt-2">
@@ -252,20 +269,43 @@
                         </div>
                     </div>
                 `;
+
+            // Store images
+            window.propertyData = window.propertyData || {};
+            window.propertyData[p.id] = images;
+
             dom.grid.appendChild(card);
         });
         if (window.lucide) lucide.createIcons();
     }
 
-    // --- ACTIONS ---
-
-    window.removeFavorite = (id) => {
-        favorites = favorites.filter(favId => favId !== id);
-        renderProperties();
+    // --- CAROUSEL ACTIONS ---
+    window.nextImage = (id, total) => {
+        if (!carouselState[id]) carouselState[id] = 0;
+        carouselState[id] = (carouselState[id] + 1) % total;
+        updateCardImage(id);
     };
 
+    window.prevImage = (id, total) => {
+        if (!carouselState[id]) carouselState[id] = 0;
+        carouselState[id] = (carouselState[id] - 1 + total) % total;
+        updateCardImage(id);
+    };
+
+    function updateCardImage(id) {
+        const imgEl = document.getElementById(`img-${id}`);
+        const counterEl = document.getElementById(`counter-${id}`);
+        const images = window.propertyData[id];
+
+        if (imgEl && images) {
+            imgEl.src = images[carouselState[id]];
+        }
+        if (counterEl) {
+            counterEl.textContent = carouselState[id] + 1;
+        }
+    }
+
     function updateSort() {
-        // Safeguard
         if (dom.inputSort) {
             currentSort = dom.inputSort.value;
             renderProperties();
@@ -274,9 +314,6 @@
 
     // --- EVENT LISTENERS ---
     function setupEventListeners() {
-        // Sidebar Toggle REMOVED - managed by buyer_base.html
-
-        // Sort Change
         if (dom.inputSort) {
             dom.inputSort.addEventListener('change', updateSort);
         }

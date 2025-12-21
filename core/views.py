@@ -21,6 +21,9 @@ class BuyerDashboardView(LoginRequiredMixin, TemplateView):
 class BuyerPropertySearchView(LoginRequiredMixin, TemplateView):
     template_name = "buyer-property-search.html"
 
+class PropertyDetailView(TemplateView):
+    template_name = "property-detail.html"
+
 class BuyerFavoritesView(LoginRequiredMixin, TemplateView):
     template_name = "buyer-favorites.html"
 

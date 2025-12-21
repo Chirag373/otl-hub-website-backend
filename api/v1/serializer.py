@@ -601,6 +601,7 @@ class SellerProfileSerializer(serializers.ModelSerializer):
             "sqft",
             "garage_spaces",
             "property_features",
+            "property_features",
             "images",
             "upload_images",
             "reason_for_selling",
@@ -611,6 +612,51 @@ class SellerProfileSerializer(serializers.ModelSerializer):
             "subscription",
             "has_active_listing",
         ]
+
+
+class PropertySearchSerializer(serializers.ModelSerializer):
+    """
+    Serializer for publicly searching properties (SellerProfiles)
+    """
+    id = serializers.IntegerField(read_only=True) # Use profile ID for consistency with favorites lookup
+    title = serializers.SerializerMethodField()
+    location = serializers.SerializerMethodField()
+    price = serializers.DecimalField(source='estimated_value', max_digits=12, decimal_places=2, read_only=True)
+    image = serializers.SerializerMethodField()
+    images = serializers.SerializerMethodField()
+    type = serializers.CharField(source='property_type', read_only=True)
+    features = serializers.JSONField(source='property_features', read_only=True)
+    dateAdded = serializers.DateTimeField(source='created_at', read_only=True)
+    
+    class Meta:
+        model = SellerProfile
+        fields = [
+            'id', 'title', 'location', 'price', 
+            'bedrooms', 'bathrooms', 'sqft', 
+            'image', 'images', 'type', 'features', 'dateAdded'
+        ]
+
+    def get_title(self, obj):
+        if obj.street_address:
+            return obj.street_address
+        return f"Property in {obj.city}" if obj.city else "Unlisted Address"
+
+    def get_location(self, obj):
+        parts = [p for p in [obj.city, obj.state] if p]
+        return ", ".join(parts) if parts else "Location N/A"
+
+    def get_image(self, obj):
+        # optimistically get primary image, or first available
+        primary_img = obj.images.filter(is_primary=True).first()
+        if not primary_img:
+            primary_img = obj.images.first()
+        
+        if primary_img and primary_img.image:
+            return primary_img.image.url
+        return None # Frontend can show placeholder
+
+    def get_images(self, obj):
+        return [img.image.url for img in obj.images.all() if img.image]
 
     def get_property_type(self, obj):
         """Get formatted property type display"""
@@ -725,3 +771,78 @@ class SellerProfileSerializer(serializers.ModelSerializer):
                 PropertyImage.objects.create(seller_profile=instance, image=image)
 
         return instance
+
+
+class PartnerProfileSerializer(serializers.ModelSerializer):
+    """Serializer for Partner Profile data"""
+    first_name = serializers.CharField(source="user.first_name")
+    last_name = serializers.CharField(source="user.last_name")
+    email = serializers.EmailField(source="user.email", read_only=True)
+    phone_number = serializers.CharField(source="user.phone_number")
+    role = serializers.CharField(source="user.role", read_only=True)
+    member_since = serializers.DateTimeField(
+        source="user.date_joined", read_only=True, format="%B %Y"
+    )
+    
+    partnership_type_display = serializers.CharField(source='get_partnership_type_display', read_only=True)
+
+    # Nested serializer for subscription
+    subscription = serializers.SerializerMethodField()
+
+    class Meta:
+        model = PartnerProfile
+        fields = [
+            "first_name",
+            "last_name",
+            "email",
+            "phone_number",
+            "role",
+            "member_since",
+            "company_name",
+            "partnership_type",
+            "partnership_type_display",
+            "service_areas",
+            "website_url",
+            "business_license_number",
+            "subscription",
+        ]
+
+    def get_subscription(self, obj):
+        """Get active subscription information"""
+        try:
+            subscription = (
+                Subscription.objects.filter(user=obj.user, payment_status="COMPLETED")
+                .order_by("-start_date")
+                .first()
+            )
+
+            if subscription:
+                return SubscriptionSerializer(subscription).data
+            return None
+        except Subscription.DoesNotExist:
+            return None
+
+    def update(self, instance, validated_data):
+        user_data = validated_data.pop("user", {})
+        user = instance.user
+
+        user.first_name = user_data.get("first_name", user.first_name)
+        user.last_name = user_data.get("last_name", user.last_name)
+        user.phone_number = user_data.get("phone_number", user.phone_number)
+        user.save()
+
+        instance.company_name = validated_data.get("company_name", instance.company_name)
+        instance.partnership_type = validated_data.get(
+            "partnership_type", instance.partnership_type
+        )
+        instance.service_areas = validated_data.get(
+            "service_areas", instance.service_areas
+        )
+        instance.website_url = validated_data.get("website_url", instance.website_url)
+        instance.business_license_number = validated_data.get(
+            "business_license_number", instance.business_license_number
+        )
+        instance.save()
+
+        return instance
+

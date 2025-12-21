@@ -124,111 +124,21 @@
 
 {% block scripts %}
 <script>
-    // --- MOCK DATA ---
-    const mockProperties = [
-        {
-            id: 1,
-            title: "Modern Downtown Condo",
-            location: "Downtown, City Center",
-            price: 450000,
-            bedrooms: 2,
-            bathrooms: 2,
-            sqft: 1200,
-            image: "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&q=80&w=300&h=200",
-            type: "condo",
-            status: "active",
-            features: ["Balcony", "Gym Access", "Parking"],
-            dateAdded: "2025-01-10"
-        },
-        {
-            id: 2,
-            title: "Spacious Family Home",
-            location: "Suburb Valley",
-            price: 650000,
-            bedrooms: 4,
-            bathrooms: 3,
-            sqft: 2400,
-            image: "https://images.unsplash.com/photo-1568605114967-8130f3a36994?auto=format&fit=crop&q=80&w=300&h=200",
-            type: "house",
-            status: "active",
-            features: ["Garden", "Garage", "Fireplace"],
-            dateAdded: "2025-01-12"
-        },
-        {
-            id: 3,
-            title: "Cozy Townhouse",
-            location: "Riverside District",
-            price: 380000,
-            bedrooms: 3,
-            bathrooms: 2,
-            sqft: 1600,
-            image: "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&q=80&w=300&h=200",
-            type: "townhouse",
-            status: "active",
-            features: ["Patio", "Storage", "Community Pool"],
-            dateAdded: "2025-01-05"
-        },
-        {
-            id: 4,
-            title: "Luxury Apartment",
-            location: "Arts District",
-            price: 720000,
-            bedrooms: 2,
-            bathrooms: 2,
-            sqft: 1400,
-            image: "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&q=80&w=300&h=200",
-            type: "apartment",
-            status: "active",
-            features: ["City Views", "Concierge", "Rooftop Access"],
-            dateAdded: "2025-01-15"
-        },
-        {
-            id: 5,
-            title: "Countryside Villa",
-            location: "Green Hills",
-            price: 850000,
-            bedrooms: 5,
-            bathrooms: 4,
-            sqft: 3500,
-            image: "https://images.unsplash.com/photo-1600596542815-2a4d9fddace7?auto=format&fit=crop&q=80&w=300&h=200",
-            type: "house",
-            status: "active",
-            features: ["Large Lot", "Pool", "Solar Panels"],
-            dateAdded: "2025-01-01"
-        },
-        {
-            id: 6,
-            title: "Studio Loft",
-            location: "Old Town",
-            price: 250000,
-            bedrooms: 1,
-            bathrooms: 1,
-            sqft: 800,
-            image: "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&q=80&w=300&h=200",
-            type: "apartment",
-            status: "active",
-            features: ["High Ceilings", "Exposed Brick", "Near Transit"],
-            dateAdded: "2025-01-14"
-        }
-    ];
-
     // --- STATE ---
-    let favorites = [1, 3]; // Mock initial favorites
+    let favorites = []; // Array of favorite IDs
     let currentFilters = {
         keywords: "",
         location: "",
         type: "",
-        priceMin: 0,
-        priceMax: Infinity,
-        beds: 0,
-        baths: 0,
+        priceMin: "",
+        priceMax: "",
+        beds: "",
+        baths: "",
         sort: "relevant"
     };
 
     // --- DOM ELEMENTS ---
     const dom = {
-        // Sidebar buttons REMOVED from here, but still need to define grid etc
-
         grid: document.getElementById('property-grid'),
         resultsCount: document.getElementById('results-count'),
 
@@ -250,10 +160,122 @@
 
     // --- INITIALIZATION ---
     function init() {
-        // Lucide created by Base
-        renderProperties();
+        if (window.lucide) lucide.createIcons();
+        // Fetch favorites first, then properties
+        fetchFavoriteIds().then(() => {
+            fetchProperties();
+        });
         setupEventListeners();
     }
+
+    // --- UTILS ---
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    // --- API CALLS ---
+    async function fetchFavoriteIds() {
+        try {
+            const response = await fetch(`/api/v1/buyer/favorites/`);
+            if (response.ok) {
+                const data = await response.json();
+                favorites = data.map(p => p.id);
+            }
+        } catch (e) {
+            console.error("Failed to fetch favorites", e);
+        }
+    }
+
+    async function fetchProperties() {
+        if (dom.grid) {
+            dom.grid.innerHTML = `
+                <div class="col-span-1 md:col-span-2 lg:col-span-3 text-center py-12">
+                     <span class="loading loading-spinner loading-lg text-[var(--accent)]"></span>
+                </div>
+            `;
+        }
+
+        // Build Query Params
+        const params = new URLSearchParams();
+        if (currentFilters.keywords) params.append('keywords', currentFilters.keywords);
+        if (currentFilters.location) params.append('location', currentFilters.location);
+        if (currentFilters.type) params.append('type', currentFilters.type);
+        if (currentFilters.priceMin) params.append('price_min', currentFilters.priceMin);
+        if (currentFilters.priceMax && currentFilters.priceMax !== Infinity) params.append('price_max', currentFilters.priceMax);
+        if (currentFilters.beds) params.append('beds', currentFilters.beds);
+        if (currentFilters.baths) params.append('baths', currentFilters.baths);
+        if (currentFilters.sort && currentFilters.sort !== 'relevant') params.append('sort', currentFilters.sort);
+
+        try {
+            const response = await fetch(`/api/v1/buyer/property-search/?${params.toString()}`);
+            if (!response.ok) {
+                if (response.status === 403 || response.status === 401) {
+                    console.warn("User not authenticated. Redirecting...");
+                    window.location.href = "{% url 'login' %}";
+                    return;
+                }
+                throw new Error('Failed to fetch properties');
+            }
+            const properties = await response.json();
+            renderProperties(properties);
+        } catch (error) {
+            console.error(error);
+            if (dom.grid) {
+                dom.grid.innerHTML = `
+                   <div class="col-span-1 md:col-span-2 lg:col-span-3 text-center py-12 text-red-500">
+                        <p>Error loading properties. Please try again later.</p>
+                   </div>
+                `;
+            }
+        }
+    }
+
+    window.toggleFavorite = async (id, btnElement) => {
+        try {
+            const csrftoken = getCookie('csrftoken');
+            const response = await fetch(`/api/v1/buyer/favorites/${id}/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrftoken
+                }
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                const heartIcon = document.getElementById(`heart-icon-${id}`);
+
+                if (data.is_favorite) {
+                    favorites.push(id);
+                    if (heartIcon) {
+                        heartIcon.classList.remove('text-white');
+                        heartIcon.classList.add('fill-red-500', 'text-red-500');
+                    }
+                } else {
+                    favorites = favorites.filter(fid => fid !== id);
+                    if (heartIcon) {
+                        heartIcon.classList.remove('fill-red-500', 'text-red-500');
+                        heartIcon.classList.add('text-white');
+                    }
+                }
+            } else {
+                console.error("Failed to toggle favorite");
+            }
+        } catch (e) {
+            console.error(e);
+        }
+    };
 
     // --- LOGIC ---
 
@@ -265,40 +287,10 @@
         }).format(price);
     }
 
-    function getFilteredProperties() {
-        return mockProperties.filter(p => {
-            // Keyword match
-            const keywordMatch = !currentFilters.keywords ||
-                p.title.toLowerCase().includes(currentFilters.keywords.toLowerCase()) ||
-                p.features.some(f => f.toLowerCase().includes(currentFilters.keywords.toLowerCase()));
+    // --- CAROUSEL STATE ---
+    let carouselState = {}; // Stores current index for each property ID: { 1: 0, 2: 1 }
 
-            // Location match
-            const locationMatch = !currentFilters.location ||
-                p.location.toLowerCase().includes(currentFilters.location.toLowerCase());
-
-            // Type match
-            const typeMatch = !currentFilters.type || p.type === currentFilters.type;
-
-            // Price match
-            const priceMatch = p.price >= currentFilters.priceMin && p.price <= currentFilters.priceMax;
-
-            // Beds/Baths match
-            const bedsMatch = p.bedrooms >= currentFilters.beds;
-            const bathsMatch = p.bathrooms >= currentFilters.baths;
-
-            return keywordMatch && locationMatch && typeMatch && priceMatch && bedsMatch && bathsMatch;
-        }).sort((a, b) => {
-            switch (currentFilters.sort) {
-                case "price-asc": return a.price - b.price;
-                case "price-desc": return b.price - a.price;
-                case "newest": return new Date(b.dateAdded) - new Date(a.dateAdded);
-                default: return 0; // relevance (id order)
-            }
-        });
-    }
-
-    function renderProperties() {
-        const properties = getFilteredProperties();
+    function renderProperties(properties) {
         if (dom.resultsCount) dom.resultsCount.textContent = properties.length;
         if (dom.grid) dom.grid.innerHTML = "";
 
@@ -320,21 +312,54 @@
 
         properties.forEach(p => {
             const isFav = favorites.includes(p.id);
+            // Default images handling
+            let images = p.images || [];
+            if (images.length === 0) {
+                if (p.image) images = [p.image];
+                else images = ["https://placehold.co/600x400?text=No+Image"];
+            }
+
+            // Initialize state if new
+            if (carouselState[p.id] === undefined) {
+                carouselState[p.id] = 0;
+            }
+            // Ensure index is valid
+            if (carouselState[p.id] >= images.length) carouselState[p.id] = 0;
+
+            const currentImg = images[carouselState[p.id]];
+            const hasMultiple = images.length > 1;
+
             const card = document.createElement('div');
             card.className = "bg-[var(--card)] rounded-lg border border-[var(--border)] overflow-hidden hover:shadow-lg transition-shadow group";
             card.innerHTML = `
                     <div class="relative">
-                        <div class="aspect-video bg-gray-700 relative overflow-hidden">
-                            <img src="${p.image}" alt="${p.title}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105">
-                            <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-60"></div>
+                        <div class="aspect-video bg-gray-700 relative overflow-hidden group/image">
+                            <img src="${currentImg}" alt="${p.title}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" id="img-${p.id}">
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-60 pointer-events-none"></div>
                             
                             <button onclick="toggleFavorite(${p.id})" class="absolute top-2 right-2 p-2 rounded-full hover:bg-white/20 transition-colors z-10">
-                                <i data-lucide="heart" class="w-5 h-5 ${isFav ? 'fill-red-500 text-red-500' : 'text-white'} transition-colors"></i>
+                                <i id="heart-icon-${p.id}" data-lucide="heart" class="w-5 h-5 ${isFav ? 'fill-red-500 text-red-500' : 'text-white'} transition-colors"></i>
                             </button>
+
+                            ${hasMultiple ? `
+                                <button onclick="prevImage(${p.id}, ${images.length})" 
+                                    class="absolute left-2 top-1/2 -translate-y-1/2 p-1.5 rounded-full bg-black/50 text-white hover:bg-black/70 transition-opacity opacity-0 group-hover/image:opacity-100 z-10"
+                                    title="Previous Image">
+                                    <i data-lucide="chevron-left" class="w-5 h-5"></i>
+                                </button>
+                                <button onclick="nextImage(${p.id}, ${images.length})" 
+                                    class="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 rounded-full bg-black/50 text-white hover:bg-black/70 transition-opacity opacity-0 group-hover/image:opacity-100 z-10"
+                                    title="Next Image">
+                                    <i data-lucide="chevron-right" class="w-5 h-5"></i>
+                                </button>
+                                <div class="absolute bottom-2 right-2 px-2 py-0.5 bg-black/60 rounded text-[10px] text-white font-medium pointer-events-none z-10">
+                                    <span id="counter-${p.id}">${carouselState[p.id] + 1}</span>/${images.length}
+                                </div>
+                            ` : ''}
                         </div>
-                        <div class="absolute bottom-2 left-2">
+                        <div class="absolute bottom-2 left-2 pointer-events-none z-10">
                             <span class="px-2 py-1 bg-[var(--accent)] text-[var(--bg)] text-xs font-bold rounded capitalize shadow-md">
-                                ${p.type}
+                                ${p.type || 'Property'}
                             </span>
                         </div>
                     </div>
@@ -354,7 +379,7 @@
 
                         <div class="flex items-center justify-between border-t border-[var(--border)] pt-3 mt-2">
                             <span class="text-xl font-bold text-[var(--accent)]">
-                                ${formatPrice(p.price)}
+                                ${formatPrice(p.price || 0)}
                             </span>
                         </div>
                         
@@ -365,11 +390,11 @@
                         </div>
 
                         <div class="flex flex-wrap gap-1 pt-1">
-                            ${p.features.slice(0, 3).map(f => `
+                            ${p.features && p.features.length > 0 ? p.features.slice(0, 3).map(f => `
                                 <span class="px-2 py-1 bg-[var(--muted)]/20 text-[var(--muted-foreground)] text-xs rounded border border-[var(--border)]">
                                     ${f}
                                 </span>
-                            `).join('')}
+                            `).join('') : '<span class="text-xs text-[var(--muted-foreground)]">No features listed</span>'}
                         </div>
 
                         <div class="flex space-x-2 pt-2">
@@ -382,6 +407,10 @@
                         </div>
                     </div>
                 `;
+
+            window.propertyData = window.propertyData || {};
+            window.propertyData[p.id] = images;
+
             dom.grid.appendChild(card);
         });
         if (window.lucide) lucide.createIcons();
@@ -389,25 +418,43 @@
 
     // --- ACTIONS ---
 
-    window.toggleFavorite = (id) => {
-        if (favorites.includes(id)) {
-            favorites = favorites.filter(favId => favId !== id);
-        } else {
-            favorites.push(id);
-        }
-        renderProperties(); // Re-render to update icon
+    window.nextImage = (id, total) => {
+        if (!carouselState[id]) carouselState[id] = 0;
+        carouselState[id] = (carouselState[id] + 1) % total;
+        updateCardImage(id);
     };
+
+    window.prevImage = (id, total) => {
+        if (!carouselState[id]) carouselState[id] = 0;
+        carouselState[id] = (carouselState[id] - 1 + total) % total;
+        updateCardImage(id);
+    };
+
+    function updateCardImage(id) {
+        const imgEl = document.getElementById(`img-${id}`);
+        const counterEl = document.getElementById(`counter-${id}`);
+        const images = window.propertyData[id];
+
+        if (imgEl && images) {
+            imgEl.src = images[carouselState[id]];
+        }
+        if (counterEl) {
+            counterEl.textContent = carouselState[id] + 1;
+        }
+    }
 
     function updateFilters() {
         // Price parsing
-        let min = 0, max = Infinity;
+        let min = "", max = "";
         if (dom.inputPrice && dom.inputPrice.value) {
             if (dom.inputPrice.value.includes('+')) {
                 min = parseInt(dom.inputPrice.value.replace('+', ''));
             } else {
                 const parts = dom.inputPrice.value.split('-');
-                min = parseInt(parts[0]);
-                max = parseInt(parts[1]);
+                if (parts.length === 2) {
+                    min = parseInt(parts[0]);
+                    max = parseInt(parts[1]);
+                }
             }
         }
 
@@ -416,13 +463,13 @@
             location: dom.inputLocation ? dom.inputLocation.value : "",
             type: dom.inputType ? dom.inputType.value : "",
             priceMin: min,
-            priceMax: max,
-            beds: dom.inputBeds ? (parseInt(dom.inputBeds.value) || 0) : 0,
-            baths: dom.inputBaths ? (parseInt(dom.inputBaths.value) || 0) : 0,
+            priceMax: max === "" ? Infinity : max,
+            beds: dom.inputBeds ? (parseInt(dom.inputBeds.value) || "") : "",
+            baths: dom.inputBaths ? (parseInt(dom.inputBaths.value) || "") : "",
             sort: dom.inputSort ? dom.inputSort.value : "relevant"
         };
 
-        renderProperties();
+        fetchProperties();
     }
 
     function clearFilters() {
@@ -438,8 +485,6 @@
 
     // --- EVENT LISTENERS ---
     function setupEventListeners() {
-        // Sidebar Toggle REMOVED - managed by buyer_base.html
-
         // Filter UI Toggle
         if (dom.btnToggleFilters) {
             dom.btnToggleFilters.addEventListener('click', () => {
