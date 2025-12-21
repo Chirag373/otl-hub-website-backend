@@ -2,6 +2,8 @@ from django.views.generic import TemplateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 import json
 from django.core.serializers.json import DjangoJSONEncoder
+from core.mixins import BuyerRequiredMixin, SellerRequiredMixin, RealtorRequiredMixin, PartnerRequiredMixin
+from api.v1.serializer import SellerProfileSerializer
 
 class IndexView(TemplateView):
     template_name = "index.html"
@@ -15,26 +17,26 @@ class LoginView(TemplateView):
 class SignupView(TemplateView):
     template_name = "signup.html"
 
-class BuyerDashboardView(LoginRequiredMixin, TemplateView):
+class BuyerDashboardView(BuyerRequiredMixin, TemplateView):
     template_name = "buyer-dashboard.html"
 
-class BuyerPropertySearchView(LoginRequiredMixin, TemplateView):
+class BuyerPropertySearchView(BuyerRequiredMixin, TemplateView):
     template_name = "buyer-property-search.html"
 
 class PropertyDetailView(TemplateView):
     template_name = "property-detail.html"
 
-class BuyerFavoritesView(LoginRequiredMixin, TemplateView):
+class BuyerFavoritesView(BuyerRequiredMixin, TemplateView):
     template_name = "buyer-favorites.html"
 
-class BuyerSettingsView(LoginRequiredMixin, TemplateView):
+class BuyerSettingsView(BuyerRequiredMixin, TemplateView):
     template_name = "buyer-settings.html"
 
-class SellerDashboardView(LoginRequiredMixin, TemplateView):
+class SellerDashboardView(SellerRequiredMixin, TemplateView):
     template_name = "seller-dashboard.html"
     extra_context = {'active_page': 'dashboard'}
 
-class SellerPropertyView(LoginRequiredMixin, TemplateView):
+class SellerPropertyView(SellerRequiredMixin, TemplateView):
     template_name = "seller-property.html"
     extra_context = {'active_page': 'properties'}
 
@@ -44,8 +46,6 @@ class SellerPropertyView(LoginRequiredMixin, TemplateView):
             context['seller_profile'] = self.request.user.seller_profile
             
             try:
-                # Import here to avoid potential circular imports during app startup
-                from api.v1.serializer import SellerProfileSerializer
                 serializer = SellerProfileSerializer(self.request.user.seller_profile)
                 context['seller_profile_json'] = json.dumps(serializer.data, cls=DjangoJSONEncoder)
             except Exception as e:
@@ -54,23 +54,27 @@ class SellerPropertyView(LoginRequiredMixin, TemplateView):
             
         return context
 
-class SellerSettingsView(LoginRequiredMixin, TemplateView):
+class SellerSettingsView(SellerRequiredMixin, TemplateView):
     template_name = "seller-settings.html"
     extra_context = {'active_page': 'settings'}
 
-class RealtorDashboardView(LoginRequiredMixin, TemplateView):
+class RealtorDashboardView(RealtorRequiredMixin, TemplateView):
     template_name = "realtor-dashboard.html"
     extra_context = {'active_page': 'dashboard'}
 
-class RealtorSettingsView(LoginRequiredMixin, TemplateView):
+class RealtorSettingsView(RealtorRequiredMixin, TemplateView):
     template_name = "realtor-settings.html"
     extra_context = {'active_page': 'settings'}
 
-class PartnerDashboardView(LoginRequiredMixin, TemplateView):
+class RealtorClientsView(RealtorRequiredMixin, TemplateView):
+    template_name = "realtor-clients.html"
+    extra_context = {'active_page': 'clients'}
+
+class PartnerDashboardView(PartnerRequiredMixin, TemplateView):
     template_name = "partner-dashboard.html"
     extra_context = {'active_page': 'dashboard'}
 
-class PartnerSettingsView(LoginRequiredMixin, TemplateView):
+class PartnerSettingsView(PartnerRequiredMixin, TemplateView):
     template_name = "partner-settings.html"
     extra_context = {'active_page': 'settings'}
 

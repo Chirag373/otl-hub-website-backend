@@ -22,7 +22,7 @@ from django.conf.urls.static import static
 from core.views import (
     IndexView, AboutView, LoginView, SignupView,
     BuyerDashboardView, SellerDashboardView, SellerSettingsView, SellerPropertyView,
-    RealtorDashboardView, RealtorSettingsView, PartnerDashboardView, PartnerSettingsView,
+    RealtorDashboardView, RealtorSettingsView, RealtorClientsView, PartnerDashboardView, PartnerSettingsView,
     PartnersView, BuyerPropertySearchView, BuyerFavoritesView, BuyerSettingsView,
     TermsOfServiceView, PrivacyPolicyView, PropertyDetailView
 )
@@ -54,6 +54,7 @@ urlpatterns = [
     path("seller/property", SellerPropertyView.as_view(), name="seller_property"),
     path("seller/settings", SellerSettingsView.as_view(), name="seller_settings"),
     path("realtor/dashboard", RealtorDashboardView.as_view(), name="realtor_dashboard"),
+    path("realtor/clients", RealtorClientsView.as_view(), name="realtor_clients"),
     path("realtor/settings", RealtorSettingsView.as_view(), name="realtor_settings"),
     path("partner/dashboard", PartnerDashboardView.as_view(), name="partner_dashboard"),
     path("partner/settings", PartnerSettingsView.as_view(), name="partner_settings"),

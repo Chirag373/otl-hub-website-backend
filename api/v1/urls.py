@@ -1,7 +1,11 @@
 from django.urls import path
 from api.v1.auth import SignupView, VerifyOTPView
 from api.v1.auth import LoginView
-from api.v1.views import BuyerProfileView, RealtorProfileView, SellerProfileView, PartnerProfileView, PartnerListView, PropertyImageDeleteView, PropertySearchView, BuyerFavoritesView, BuyerFavoriteToggleView
+from api.v1.views import (
+    BuyerProfileView, RealtorProfileView, SellerProfileView, PartnerProfileView, PartnerListView, 
+    PropertyImageDeleteView, PropertySearchView, BuyerFavoritesView, BuyerFavoriteToggleView,
+    ChangePasswordView, DeleteAccountView, UpdateNotificationSettingsView
+)
 from api.v1.payment import CreateStripeCheckoutSessionView
 from rest_framework_simplejwt.views import TokenRefreshView, TokenBlacklistView
 
@@ -21,4 +25,7 @@ urlpatterns = [
     path("buyer/favorites/<int:property_id>/", BuyerFavoriteToggleView.as_view(), name="buyer-favorite-toggle"),
     path("create-checkout-session/", CreateStripeCheckoutSessionView.as_view(), name="create-checkout-session"),
     path("partners/", PartnerListView.as_view(), name="partner-list"),
+    path("user/change-password/", ChangePasswordView.as_view(), name="change-password"),
+    path("user/delete-account/", DeleteAccountView.as_view(), name="delete-account"),
+    path("user/settings/", UpdateNotificationSettingsView.as_view(), name="update-settings"),
 ]

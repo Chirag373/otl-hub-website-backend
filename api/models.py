@@ -104,7 +104,7 @@ class RealtorProfile(models.Model):
     )
 
     # Subscription details
-    subscription_active = models.BooleanField(default=False)
+    is_active_subscription = models.BooleanField(default=False)
     subscription_start_date = models.DateTimeField(null=True, blank=True)
 
     created_at = models.DateTimeField(auto_now_add=True)

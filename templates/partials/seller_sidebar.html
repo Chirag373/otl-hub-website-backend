@@ -8,11 +8,13 @@
     <div class="flex items-center space-x-3">
         <div class="avatar placeholder">
             <div class="bg-[var(--accent)] text-[var(--bg)] rounded-full w-10">
-                <span id="sidebar-avatar-initials" class="text-sm font-semibold">{{ request.user.first_name|first }}{{ request.user.last_name|first }}</span>
+                <span id="sidebar-avatar-initials" class="text-sm font-semibold">{{ request.user.first_name|first }}{{
+                    request.user.last_name|first }}</span>
             </div>
         </div>
         <div class="flex-1 min-w-0">
-            <p id="sidebar-user-name" class="text-sm font-medium text-[var(--foreground)] truncate">{{ request.user.first_name }} {{ request.user.last_name }}</p>
+            <p id="sidebar-user-name" class="text-sm font-medium text-[var(--foreground)] truncate">{{
+                request.user.first_name }} {{ request.user.last_name }}</p>
             <p class="text-xs text-[var(--muted-foreground)] truncate capitalize">Seller</p>
         </div>
     </div>
@@ -27,10 +29,7 @@
         class="flex items-center w-full px-4 py-2 text-sm font-medium rounded-md {% if active_page == 'properties' %}bg-[var(--accent)] text-[var(--bg)]{% else %}text-[var(--foreground)] hover:bg-[var(--accent)] hover:text-black transition-colors{% endif %}">
         <i data-lucide="building" class="mr-3 h-4 w-4"></i> My Property
     </a>
-    <a href="#"
-        class="flex items-center w-full px-4 py-2 text-sm font-medium rounded-md {% if active_page == 'messages' %}bg-[var(--accent)] text-[var(--bg)]{% else %}text-[var(--foreground)] hover:bg-[var(--accent)] hover:text-black transition-colors{% endif %}">
-        <i data-lucide="message-square" class="mr-3 h-4 w-4"></i> Messages
-    </a>
+
     <a href="{% url 'seller_settings' %}"
         class="flex items-center w-full px-4 py-2 text-sm font-medium rounded-md {% if active_page == 'settings' %}bg-[var(--accent)] text-[var(--bg)]{% else %}text-[var(--foreground)] hover:bg-[var(--accent)] hover:text-black transition-colors{% endif %}">
         <i data-lucide="settings" class="mr-3 h-4 w-4"></i> Settings

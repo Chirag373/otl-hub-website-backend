@@ -1,0 +1,413 @@
+{% extends 'realtor_base.html' %}
+
+{% block title %}Client Management | OTL Platform{% endblock %}
+
+{% block content %}
+<div class="space-y-2">
+    <h1 class="text-3xl font-bold text-[var(--foreground)]">Client Management</h1>
+    <p class="text-[var(--muted-foreground)]">Track and manage your clients' property transactions</p>
+</div>
+
+<div id="clients-container" class="space-y-6">
+    <!-- Content rendered by JS -->
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // --- DATA MODELS ---
+    const mockClients = [
+        {
+            id: 1,
+            name: "Sarah Johnson",
+            email: "sarah@email.com",
+            phone: "(555) 123-4567",
+            properties: [
+                {
+                    listingId: "PROP-001",
+                    address: "123 Main St, Springfield, IL 62701",
+                    contactedSeller: true,
+                    putInOffer: true,
+                    offerDate: "2024-03-10",
+                    sellerAcceptedOffer: true,
+                    acceptedDate: "2024-03-15",
+                    sellerRejectedOffer: false,
+                    rejectedDate: "",
+                    propertyClosed: false,
+                    closingDate: "",
+                    closingComment: "",
+                },
+            ],
+        },
+        {
+            id: 2,
+            name: "Michael Chen",
+            email: "michael@email.com",
+            phone: "(555) 987-6543",
+            properties: [
+                {
+                    listingId: "PROP-002",
+                    address: "456 Oak Avenue, Downtown, IL 62702",
+                    contactedSeller: true,
+                    putInOffer: true,
+                    offerDate: "2024-03-05",
+                    sellerAcceptedOffer: false,
+                    acceptedDate: "",
+                    sellerRejectedOffer: true,
+                    rejectedDate: "2024-03-08",
+                    propertyClosed: false,
+                    closingDate: "",
+                    closingComment: "Buyer financing fell through",
+                },
+                {
+                    listingId: "PROP-003",
+                    address: "789 Pine Road, Suburb Valley, IL 62703",
+                    contactedSeller: true,
+                    putInOffer: false,
+                    offerDate: "",
+                    sellerAcceptedOffer: false,
+                    acceptedDate: "",
+                    sellerRejectedOffer: false,
+                    rejectedDate: "",
+                    propertyClosed: false,
+                    closingDate: "",
+                    closingComment: "",
+                },
+            ],
+        },
+        {
+            id: 3,
+            name: "Emily Davis",
+            email: "emily@email.com",
+            phone: "(555) 456-7890",
+            properties: [],
+        },
+    ];
+
+    // --- STATE ---
+    let clients = JSON.parse(JSON.stringify(mockClients)); // Deep copy
+    let editingClientId = null;
+    let tempClientData = null;
+
+    // --- DOM ELEMENTS ---
+    const container = document.getElementById('clients-container');
+
+    // Grid/Sidebar elements are handled by base template logic, but we need container reference
+
+    // --- INITIALIZATION ---
+    function init() {
+        if (window.lucide) lucide.createIcons();
+        renderClients();
+    }
+
+    // --- RENDER LOGIC ---
+    function renderClients() {
+        container.innerHTML = '';
+
+        clients.forEach(client => {
+            const isEditing = editingClientId === client.id;
+            const card = document.createElement('div');
+            card.className = "bg-[var(--card)] rounded-lg border border-[var(--border)] p-6";
+
+            if (isEditing) {
+                card.innerHTML = renderEditMode(tempClientData);
+            } else {
+                card.innerHTML = renderViewMode(client);
+            }
+
+            container.appendChild(card);
+        });
+
+        if (window.lucide) lucide.createIcons();
+        bindEvents();
+    }
+
+    function renderViewMode(client) {
+        let propertiesHtml = '';
+
+        if (client.properties.length > 0) {
+            propertiesHtml = `<div class="space-y-4">
+                <h4 class="text-md font-semibold text-[var(--foreground)]">Properties (${client.properties.length})</h4>
+                ${client.properties.map((prop, idx) => `
+                    <div class="border border-[var(--border)] rounded-lg p-4">
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="flex items-center space-x-2">
+                                <span class="text-sm font-medium text-[var(--foreground)]">Property ${idx + 1}</span>
+                                <span class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded font-medium">${prop.listingId}</span>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                            <div class="flex items-start space-x-2">
+                                <i data-lucide="map-pin" class="h-4 w-4 text-[var(--muted-foreground)] mt-0.5"></i>
+                                <span class="text-sm text-[var(--foreground)]">${prop.address}</span>
+                            </div>
+
+                            <div class="flex items-center space-x-2">
+                                ${prop.contactedSeller
+                    ? `<i data-lucide="check-circle" class="h-4 w-4 text-green-500"></i>`
+                    : `<i data-lucide="x-circle" class="h-4 w-4 text-red-500"></i>`}
+                                <span class="text-sm text-[var(--foreground)]">Contacted: ${prop.contactedSeller ? "Yes" : "No"}</span>
+                            </div>
+
+                            <div class="flex items-center space-x-2">
+                                ${prop.putInOffer
+                    ? `<i data-lucide="check-circle" class="h-4 w-4 text-green-500"></i>`
+                    : `<i data-lucide="x-circle" class="h-4 w-4 text-red-500"></i>`}
+                                <span class="text-sm text-[var(--foreground)]">Offer: ${prop.putInOffer ? "Yes" : "No"}</span>
+                            </div>
+
+                            ${prop.putInOffer && prop.offerDate ? `
+                                <div class="flex items-center space-x-2">
+                                    <i data-lucide="calendar" class="h-4 w-4 text-[var(--muted-foreground)]"></i>
+                                    <span class="text-sm text-[var(--foreground)]">Offer Date: ${prop.offerDate}</span>
+                                </div>
+                            ` : ''}
+
+                            ${prop.sellerAcceptedOffer ? `
+                                <div class="flex items-center space-x-2">
+                                    <i data-lucide="check-circle" class="h-4 w-4 text-green-500"></i>
+                                    <span class="text-sm text-[var(--foreground)]">Accepted: ${prop.acceptedDate}</span>
+                                </div>
+                            ` : ''}
+
+                            ${prop.sellerRejectedOffer ? `
+                                <div class="flex items-center space-x-2">
+                                    <i data-lucide="x-circle" class="h-4 w-4 text-red-500"></i>
+                                    <span class="text-sm text-[var(--foreground)]">Rejected: ${prop.rejectedDate}</span>
+                                </div>
+                            ` : ''}
+
+                            ${prop.propertyClosed ? `
+                                <div class="flex items-center space-x-2">
+                                    <i data-lucide="check-circle" class="h-4 w-4 text-green-500"></i>
+                                    <span class="text-sm text-[var(--foreground)]">Closed: ${prop.closingDate}</span>
+                                </div>
+                            ` : ''}
+
+                            ${prop.closingComment ? `
+                                <div class="flex items-start space-x-2 md:col-span-2 lg:col-span-3">
+                                    <i data-lucide="file-text" class="h-4 w-4 text-[var(--muted-foreground)] mt-0.5"></i>
+                                    <span class="text-sm text-[var(--foreground)]">Comment: ${prop.closingComment}</span>
+                                </div>
+                            ` : ''}
+                        </div>
+                    </div>
+                `).join('')}
+            </div>`;
+        } else {
+            propertiesHtml = `<div class="text-center py-8"><p class="text-[var(--muted-foreground)]">No properties associated with this client yet.</p></div>`;
+        }
+
+        return `
+            <div class="space-y-6">
+                <div class="flex items-start justify-between">
+                    <div class="space-y-2">
+                        <h3 class="text-lg font-semibold text-[var(--foreground)]">${client.name}</h3>
+                        <div class="text-sm text-[var(--muted-foreground)]">
+                            <p>${client.email}</p>
+                            <p>${client.phone}</p>
+                        </div>
+                    </div>
+                    <button class="btn-edit flex items-center px-3 py-2 text-sm border border-[var(--border)] rounded-md hover:bg-[var(--muted)] text-[var(--foreground)] transition-colors" data-id="${client.id}">
+                        <i data-lucide="edit" class="mr-2 h-4 w-4"></i> Edit
+                    </button>
+                </div>
+                ${propertiesHtml}
+            </div>
+        `;
+    }
+
+    function renderEditMode(client) {
+        return `
+            <div class="space-y-6">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-lg font-semibold text-[var(--foreground)]">Edit Client Information</h3>
+                    <div class="flex space-x-2">
+                        <button class="btn-cancel flex items-center px-3 py-2 text-sm border border-[var(--border)] rounded-md text-[var(--foreground)] hover:bg-[var(--muted)]">
+                            <i data-lucide="x" class="mr-2 h-4 w-4"></i> Cancel
+                        </button>
+                        <button class="btn-save flex items-center px-3 py-2 text-sm bg-[var(--accent)] text-[var(--bg)] rounded-md hover:bg-[var(--accent-hover)] font-medium">
+                            <i data-lucide="save" class="mr-2 h-4 w-4"></i> Save Changes
+                        </button>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="space-y-2">
+                        <label class="text-sm font-medium text-[var(--foreground)]">Client Name</label>
+                        <input type="text" value="${client.name}" disabled class="w-full px-3 py-2 bg-[var(--muted)]/30 border border-[var(--border)] rounded-md text-[var(--foreground)] opacity-70">
+                    </div>
+                </div>
+
+                <div class="space-y-4">
+                    <h4 class="text-md font-semibold text-[var(--foreground)]">Properties</h4>
+                    ${client.properties.map((prop, idx) => `
+                        <div class="border border-[var(--border)] rounded-lg p-4 space-y-4">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center space-x-2">
+                                    <span class="text-sm font-medium text-[var(--foreground)]">Property ${idx + 1}</span>
+                                    <span class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">${prop.listingId}</span>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div class="space-y-2">
+                                    <label class="text-sm font-medium text-[var(--foreground)]">Property Address</label>
+                                    <input type="text" value="${prop.address}" class="prop-input w-full px-3 py-2 bg-[var(--input)] border border-[var(--border)] rounded-md text-[var(--foreground)] focus:border-[var(--accent)] outline-none" data-idx="${idx}" data-field="address">
+                                </div>
+
+                                <div class="space-y-2">
+                                    <label class="text-sm font-medium text-[var(--foreground)]">Contacted Seller?</label>
+                                    <select class="prop-input w-full px-3 py-2 bg-[var(--input)] border border-[var(--border)] rounded-md text-[var(--foreground)] focus:border-[var(--accent)] outline-none" data-idx="${idx}" data-field="contactedSeller">
+                                        <option value="false" ${!prop.contactedSeller ? 'selected' : ''}>No</option>
+                                        <option value="true" ${prop.contactedSeller ? 'selected' : ''}>Yes</option>
+                                    </select>
+                                </div>
+
+                                <div class="space-y-2">
+                                    <label class="text-sm font-medium text-[var(--foreground)]">Put In Offer?</label>
+                                    <select class="prop-input w-full px-3 py-2 bg-[var(--input)] border border-[var(--border)] rounded-md text-[var(--foreground)] focus:border-[var(--accent)] outline-none" data-idx="${idx}" data-field="putInOffer">
+                                        <option value="false" ${!prop.putInOffer ? 'selected' : ''}>No</option>
+                                        <option value="true" ${prop.putInOffer ? 'selected' : ''}>Yes</option>
+                                    </select>
+                                </div>
+
+                                ${prop.putInOffer ? `
+                                    <div class="space-y-2">
+                                        <label class="text-sm font-medium text-[var(--foreground)]">Offer Date</label>
+                                        <input type="date" value="${prop.offerDate}" class="prop-input w-full px-3 py-2 bg-[var(--input)] border border-[var(--border)] rounded-md text-[var(--foreground)] focus:border-[var(--accent)] outline-none" data-idx="${idx}" data-field="offerDate">
+                                    </div>
+                                    <div class="space-y-2">
+                                        <label class="text-sm font-medium text-[var(--foreground)]">Seller Accepted Offer?</label>
+                                        <select class="prop-input w-full px-3 py-2 bg-[var(--input)] border border-[var(--border)] rounded-md text-[var(--foreground)] focus:border-[var(--accent)] outline-none" data-idx="${idx}" data-field="sellerAcceptedOffer">
+                                            <option value="false" ${!prop.sellerAcceptedOffer ? 'selected' : ''}>No</option>
+                                            <option value="true" ${prop.sellerAcceptedOffer ? 'selected' : ''}>Yes</option>
+                                        </select>
+                                    </div>
+                                ` : ''}
+
+                                ${prop.sellerAcceptedOffer ? `
+                                    <div class="space-y-2">
+                                        <label class="text-sm font-medium text-[var(--foreground)]">Accepted Date</label>
+                                        <input type="date" value="${prop.acceptedDate}" class="prop-input w-full px-3 py-2 bg-[var(--input)] border border-[var(--border)] rounded-md text-[var(--foreground)] focus:border-[var(--accent)] outline-none" data-idx="${idx}" data-field="acceptedDate">
+                                    </div>
+                                    <div class="space-y-2">
+                                        <label class="text-sm font-medium text-[var(--foreground)]">Property Closed?</label>
+                                        <select class="prop-input w-full px-3 py-2 bg-[var(--input)] border border-[var(--border)] rounded-md text-[var(--foreground)] focus:border-[var(--accent)] outline-none" data-idx="${idx}" data-field="propertyClosed">
+                                            <option value="false" ${!prop.propertyClosed ? 'selected' : ''}>No</option>
+                                            <option value="true" ${prop.propertyClosed ? 'selected' : ''}>Yes</option>
+                                        </select>
+                                    </div>
+                                ` : ''}
+
+                                ${prop.putInOffer && !prop.sellerAcceptedOffer ? `
+                                    <div class="space-y-2">
+                                        <label class="text-sm font-medium text-[var(--foreground)]">Seller Rejected Offer?</label>
+                                        <select class="prop-input w-full px-3 py-2 bg-[var(--input)] border border-[var(--border)] rounded-md text-[var(--foreground)] focus:border-[var(--accent)] outline-none" data-idx="${idx}" data-field="sellerRejectedOffer">
+                                            <option value="false" ${!prop.sellerRejectedOffer ? 'selected' : ''}>No</option>
+                                            <option value="true" ${prop.sellerRejectedOffer ? 'selected' : ''}>Yes</option>
+                                        </select>
+                                    </div>
+                                ` : ''}
+
+                                ${prop.sellerRejectedOffer ? `
+                                    <div class="space-y-2">
+                                        <label class="text-sm font-medium text-[var(--foreground)]">Rejected Date</label>
+                                        <input type="date" value="${prop.rejectedDate}" class="prop-input w-full px-3 py-2 bg-[var(--input)] border border-[var(--border)] rounded-md text-[var(--foreground)] focus:border-[var(--accent)] outline-none" data-idx="${idx}" data-field="rejectedDate">
+                                    </div>
+                                ` : ''}
+
+                                ${prop.propertyClosed ? `
+                                    <div class="space-y-2">
+                                        <label class="text-sm font-medium text-[var(--foreground)]">Closing Date</label>
+                                        <input type="date" value="${prop.closingDate}" class="prop-input w-full px-3 py-2 bg-[var(--input)] border border-[var(--border)] rounded-md text-[var(--foreground)] focus:border-[var(--accent)] outline-none" data-idx="${idx}" data-field="closingDate">
+                                    </div>
+                                ` : ''}
+
+                                ${prop.sellerAcceptedOffer && !prop.propertyClosed ? `
+                                    <div class="space-y-2 md:col-span-2">
+                                        <label class="text-sm font-medium text-[var(--foreground)]">Closing Comment</label>
+                                        <textarea rows="2" class="prop-input w-full px-3 py-2 bg-[var(--input)] border border-[var(--border)] rounded-md text-[var(--foreground)] focus:border-[var(--accent)] outline-none resize-none" placeholder="e.g., Buyer financing fell through, Seller cancels..." data-idx="${idx}" data-field="closingComment">${prop.closingComment}</textarea>
+                                    </div>
+                                ` : ''}
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        `;
+    }
+
+    // --- ACTIONS ---
+    function handleEdit(id) {
+        editingClientId = id;
+        tempClientData = JSON.parse(JSON.stringify(clients.find(c => c.id === id)));
+        renderClients();
+    }
+
+    function handleCancel() {
+        editingClientId = null;
+        tempClientData = null;
+        renderClients();
+    }
+
+    function handleSave() {
+        if (tempClientData) {
+            const idx = clients.findIndex(c => c.id === tempClientData.id);
+            if (idx !== -1) {
+                clients[idx] = tempClientData;
+            }
+        }
+        editingClientId = null;
+        tempClientData = null;
+        renderClients();
+    }
+
+    function handlePropertyUpdate(idx, field, value) {
+        // Convert 'true'/'false' strings to booleans for select fields
+        if (value === 'true') value = true;
+        if (value === 'false') value = false;
+
+        tempClientData.properties[idx][field] = value;
+
+        // Re-render to show/hide conditional fields (like dates)
+        renderClients();
+    }
+
+    // --- EVENT LISTENERS ---
+    function bindEvents() {
+        // Edit Buttons
+        document.querySelectorAll('.btn-edit').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const id = parseInt(e.currentTarget.getAttribute('data-id'));
+                handleEdit(id);
+            });
+        });
+
+        // Cancel Buttons
+        document.querySelectorAll('.btn-cancel').forEach(btn => {
+            btn.addEventListener('click', handleCancel);
+        });
+
+        // Save Buttons
+        document.querySelectorAll('.btn-save').forEach(btn => {
+            btn.addEventListener('click', handleSave);
+        });
+
+        // Property Inputs
+        document.querySelectorAll('.prop-input').forEach(input => {
+            input.addEventListener('change', (e) => {
+                const idx = parseInt(e.target.getAttribute('data-idx'));
+                const field = e.target.getAttribute('data-field');
+                const value = e.target.value;
+                handlePropertyUpdate(idx, field, value);
+            });
+        });
+    }
+
+    // Run
+    // Wait for DOM content loaded if necessary, but script is at bottom
+    document.addEventListener('DOMContentLoaded', init);
+</script>
+{% endblock %}

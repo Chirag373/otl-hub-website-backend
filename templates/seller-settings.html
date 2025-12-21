@@ -86,23 +86,23 @@
     <div class="p-6 space-y-4">
         <div class="space-y-2">
             <label class="text-sm font-medium text-[var(--foreground)]">Current Password</label>
-            <input type="password"
+            <input type="password" id="current-password"
                 class="w-full px-3 py-2 bg-[var(--input)] border border-[var(--border)] rounded-md text-[var(--foreground)] focus:outline-none focus:border-[var(--accent)]">
         </div>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div class="space-y-2">
                 <label class="text-sm font-medium text-[var(--foreground)]">New Password</label>
-                <input type="password"
+                <input type="password" id="new-password"
                     class="w-full px-3 py-2 bg-[var(--input)] border border-[var(--border)] rounded-md text-[var(--foreground)] focus:outline-none focus:border-[var(--accent)]">
             </div>
             <div class="space-y-2">
                 <label class="text-sm font-medium text-[var(--foreground)]">Confirm New Password</label>
-                <input type="password"
+                <input type="password" id="confirm-password"
                     class="w-full px-3 py-2 bg-[var(--input)] border border-[var(--border)] rounded-md text-[var(--foreground)] focus:outline-none focus:border-[var(--accent)]">
             </div>
         </div>
         <div class="pt-4">
-            <button
+            <button id="update-password-btn"
                 class="px-4 py-2 bg-[var(--accent)] text-[var(--bg)] rounded-md hover:bg-[var(--accent-hover)] transition-colors font-medium">
                 Update Password
             </button>
@@ -133,26 +133,5 @@
 {% endblock %}
 
 {% block scripts %}
-<script>
-    // --- INITIALIZATION ---
-    function init() {
-        // Lucide created by Base
-        setupEventListeners();
-    }
-
-    // --- ACTIONS ---
-    function confirmDelete() {
-        if (confirm("Are you sure you want to delete your account? This action cannot be undone.")) {
-            alert("Account deletion request submitted.");
-        }
-    }
-
-    // --- EVENT LISTENERS ---
-    function setupEventListeners() {
-        // Sidebar toggle managed by seller_base.html
-    }
-
-    // Run
-    init();
-</script>
+{% include 'partials/settings_script.html' %}
 {% endblock %}

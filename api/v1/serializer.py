@@ -223,6 +223,7 @@ class SignupSerializer(serializers.ModelSerializer):
                 license_number=license_number,
                 company_brokerage=company_brokerage,
                 years_of_experience=years_of_experience,
+                is_active_subscription=False,
             )
         elif role == User.UserRole.SELLER:
             SellerProfile.objects.create(

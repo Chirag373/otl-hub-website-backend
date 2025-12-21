@@ -1,0 +1,234 @@
+<script>
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                // Does this cookie string begin with the name we want?
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    async function apiCall(url, method, data) {
+        const headers = {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCookie('csrftoken')
+        };
+        try {
+            const response = await fetch(url, {
+                method: method,
+                headers: headers,
+                body: JSON.stringify(data)
+            });
+            return response;
+        } catch (error) {
+            console.error("API Call Error:", error);
+            alert("An error occurred. Please try again.");
+            throw error;
+        }
+    }
+
+    // --- ACTIONS ---
+
+    // --- ACTIONS ---
+    function confirmDelete() {
+        const modal = document.getElementById('delete-account-modal');
+        if (modal) {
+            modal.classList.remove('hidden');
+        } else {
+            // Fallback if modal not present
+            if (confirm("Are you sure you want to delete your account? This action cannot be undone.")) {
+                performDelete();
+            }
+        }
+    }
+
+    function closeModal() {
+        const modal = document.getElementById('delete-account-modal');
+        if (modal) {
+            modal.classList.add('hidden');
+        }
+    }
+
+    function performDelete() {
+        apiCall("/api/v1/user/delete-account/", "DELETE", {})
+            .then(response => {
+                if (response.ok) {
+                    // Show success toast instead of alert
+                    Toastify({
+                        text: "Account deleted successfully. Redirecting...",
+                        duration: 3000,
+                        backgroundColor: "#22c55e",
+                    }).showToast();
+
+                    setTimeout(() => {
+                        window.location.href = "/";
+                    }, 1500);
+                } else {
+                    Toastify({
+                        text: "Failed to delete account.",
+                        duration: 3000,
+                        backgroundColor: "#dc2626",
+                    }).showToast();
+                    closeModal();
+                }
+            });
+    }
+
+    function updatePassword() {
+        const currentPassword = document.getElementById('current-password').value;
+        const newPassword = document.getElementById('new-password').value;
+        const confirmPassword = document.getElementById('confirm-password').value;
+
+        if (!currentPassword || !newPassword || !confirmPassword) {
+            Toastify({
+                text: "Please fill in all password fields.",
+                duration: 3000,
+                gravity: "top",
+                position: "right",
+                backgroundColor: "#dc2626",
+            }).showToast();
+            return;
+        }
+
+        if (newPassword !== confirmPassword) {
+            Toastify({
+                text: "New passwords do not match.",
+                duration: 3000,
+                gravity: "top",
+                position: "right",
+                backgroundColor: "#dc2626",
+            }).showToast();
+            return;
+        }
+
+        apiCall("/api/v1/user/change-password/", "POST", {
+            current_password: currentPassword,
+            new_password: newPassword
+        }).then(async response => {
+            const data = await response.json();
+            if (response.ok) {
+                Toastify({
+                    text: data.message || "Password updated successfully.",
+                    duration: 3000,
+                    gravity: "top",
+                    position: "right",
+                    backgroundColor: "#22c55e",
+                }).showToast();
+                // Clear fields
+                document.getElementById('current-password').value = '';
+                document.getElementById('new-password').value = '';
+                document.getElementById('confirm-password').value = '';
+            } else {
+                Toastify({
+                    text: data.error || "Failed to update password.",
+                    duration: 3000,
+                    gravity: "top",
+                    position: "right",
+                    backgroundColor: "#dc2626",
+                }).showToast();
+            }
+        });
+    }
+
+    function toggleSetting(id, isChecked) {
+        // Send update to server - mocked
+        apiCall("/api/v1/user/settings/", "POST", {
+            setting_id: id,
+            enabled: isChecked
+        }).then(async response => {
+            if (response.ok) {
+                Toastify({
+                    text: "Settings saved.",
+                    duration: 2000,
+                    gravity: "bottom",
+                    position: "right",
+                    backgroundColor: "#3b82f6",
+                }).showToast();
+            }
+        });
+    }
+
+    // --- EVENT LISTENERS ---
+    function setupEventListeners() {
+        // Password Update
+        const pwdBtn = document.getElementById('update-password-btn');
+        if (pwdBtn) {
+            pwdBtn.addEventListener('click', updatePassword);
+        }
+
+        // Toggles
+        document.querySelectorAll('.toggle-checkbox').forEach(toggle => {
+            toggle.addEventListener('change', (e) => {
+                toggleSetting(e.target.id, e.target.checked);
+            });
+        });
+    }
+
+    // --- INITIALIZATION ---
+    function init() {
+        if (window.lucide) lucide.createIcons();
+        setupEventListeners();
+    }
+
+
+    // Run
+    // Wait for DOM
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+    } else {
+        init();
+    }
+</script>
+
+<!-- Delete Account Modal -->
+<div id="delete-account-modal" class="hidden fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title"
+    role="dialog" aria-modal="true">
+    <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+        <!-- Background overlay -->
+        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
+
+        <!-- This element is to trick the browser into centering the modal contents. -->
+        <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+
+        <!-- Modal panel -->
+        <div
+            class="inline-block align-bottom bg-[var(--card)] rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full border border-[var(--border)]">
+            <div class="bg-[var(--card)] px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                <div class="sm:flex sm:items-start">
+                    <div
+                        class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
+                        <i data-lucide="alert-triangle" class="h-6 w-6 text-red-600"></i>
+                    </div>
+                    <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+                        <h3 class="text-lg leading-6 font-medium text-[var(--foreground)]" id="modal-title">
+                            Delete Account
+                        </h3>
+                        <div class="mt-2">
+                            <p class="text-sm text-[var(--muted-foreground)]">
+                                Are you sure you want to delete your account? All of your data will be permanently
+                                removed. This action cannot be undone.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-[var(--card)] px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse border-t border-[var(--border)]">
+                <button type="button" onclick="performDelete()"
+                    class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:ml-3 sm:w-auto sm:text-sm">
+                    Delete
+                </button>
+                <button type="button" onclick="closeModal()"
+                    class="mt-3 w-full inline-flex justify-center rounded-md border border-[var(--border)] shadow-sm px-4 py-2 bg-[var(--input)] text-base font-medium text-[var(--foreground)] hover:bg-[var(--muted)] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[var(--accent)] sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
+                    Cancel
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

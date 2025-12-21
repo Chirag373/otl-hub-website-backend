@@ -29,10 +29,7 @@
         class="flex items-center w-full px-4 py-2 text-sm font-medium rounded-md {% if active_page == 'favorites' %}bg-[var(--accent)] text-[var(--bg)]{% else %}text-[var(--foreground)] hover:bg-[var(--accent)] hover:text-black transition-colors{% endif %}">
         <i data-lucide="heart" class="mr-3 h-4 w-4"></i> Favorites
     </a>
-    <a href="#"
-        class="flex items-center w-full px-4 py-2 text-sm font-medium rounded-md {% if active_page == 'messages' %}bg-[var(--accent)] text-[var(--bg)]{% else %}text-[var(--foreground)] hover:bg-[var(--accent)] hover:text-black transition-colors{% endif %}">
-        <i data-lucide="message-square" class="mr-3 h-4 w-4"></i> Messages
-    </a>
+
     <a href="{% url 'buyer_settings' %}"
         class="flex items-center w-full px-4 py-2 text-sm font-medium rounded-md {% if active_page == 'settings' %}bg-[var(--accent)] text-[var(--bg)]{% else %}text-[var(--foreground)] hover:bg-[var(--accent)] hover:text-black transition-colors{% endif %}">
         <i data-lucide="settings" class="mr-3 h-4 w-4"></i> Settings

@@ -48,10 +48,10 @@ class RealtorProfileAdmin(admin.ModelAdmin):
         "license_number",
         "company_brokerage",
         "years_of_experience",
-        "subscription_active",
+        "is_active_subscription",
         "created_at",
     )
-    list_filter = ("years_of_experience", "subscription_active", "created_at")
+    list_filter = ("years_of_experience", "is_active_subscription", "created_at")
     search_fields = (
         "user__email",
         "user__first_name",
@@ -69,7 +69,7 @@ class RealtorProfileAdmin(admin.ModelAdmin):
         ),
         (
             "Subscription",
-            {"fields": ("subscription_active", "subscription_start_date")},
+            {"fields": ("is_active_subscription", "subscription_start_date")},
         ),
         ("Timestamps", {"fields": ("created_at", "updated_at")}),
     )
