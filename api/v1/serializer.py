@@ -6,7 +6,7 @@ from django.contrib.auth import authenticate
 from django.contrib.auth.password_validation import validate_password
 from django.utils.translation import gettext_lazy as _
 from api.models import RealtorProfile
-from core.models import Subscription
+
 from django.utils import timezone
 from datetime import timedelta
 import secrets
@@ -202,7 +202,6 @@ class SignupSerializer(serializers.ModelSerializer):
         
         # Ensure we pass the required fields
         user = User.objects.create_user(
-            username=email,
             email=email,
             password=password,
             role=role,
@@ -223,7 +222,7 @@ class SignupSerializer(serializers.ModelSerializer):
                 license_number=license_number,
                 company_brokerage=company_brokerage,
                 years_of_experience=years_of_experience,
-                is_active_subscription=False,
+
             )
         elif role == User.UserRole.SELLER:
             SellerProfile.objects.create(
@@ -293,34 +292,7 @@ class AgentSerializer(serializers.ModelSerializer):
         return f"{obj.user.first_name} {obj.user.last_name}"
 
 
-class SubscriptionSerializer(serializers.ModelSerializer):
-    """Serializer for membership subscription information"""
 
-    member_since = serializers.DateTimeField(
-        source="start_date", read_only=True, format="%B %Y"
-    )
-    expiration_date = serializers.DateTimeField(
-        source="end_date", read_only=True, format="%B %Y"
-    )
-    fee_paid = serializers.DecimalField(
-        source="amount", max_digits=10, decimal_places=2, read_only=True
-    )
-    property_access = serializers.SerializerMethodField()
-
-    class Meta:
-        model = Subscription
-        fields = ["member_since", "expiration_date", "fee_paid", "property_access"]
-
-    def get_property_access(self, obj):
-        # Map subscription type to access level
-        access_map = {
-            "BUYER_BASIC": "Basic Access",
-            "BUYER_PRO": "Premium Access",
-            "REALTOR_PROFESSIONAL": "Professional Access",
-            "SELLER_LISTING": "Listing Access",
-            "PARTNER_BUSINESS": "Business Access",
-        }
-        return access_map.get(obj.subscription_type, "Basic Access")
 
 
 class BuyerProfileSerializer(serializers.ModelSerializer):
@@ -339,9 +311,9 @@ class BuyerProfileSerializer(serializers.ModelSerializer):
     )
     budget_range = serializers.SerializerMethodField()
 
-    # Nested serializers for agent and subscription
+    # Nested serializers for agent
     agent = serializers.SerializerMethodField()
-    subscription = serializers.SerializerMethodField()
+
 
     class Meta:
         model = BuyerProfile
@@ -355,7 +327,7 @@ class BuyerProfileSerializer(serializers.ModelSerializer):
             "location",
             "budget_range",
             "agent",
-            "subscription",
+
         ]
 
     def get_agent(self, obj):
@@ -380,21 +352,7 @@ class BuyerProfileSerializer(serializers.ModelSerializer):
                     return choice_display
         return obj.budget_range  # Return raw value if no match found
 
-    def get_subscription(self, obj):
-        """Get active subscription information"""
-        try:
-            # Get the most recent completed subscription for the user
-            subscription = (
-                Subscription.objects.filter(user=obj.user, payment_status="COMPLETED")
-                .order_by("-start_date")
-                .first()
-            )
 
-            if subscription:
-                return SubscriptionSerializer(subscription).data
-            return None
-        except Subscription.DoesNotExist:
-            return None
 
     def update(self, instance, validated_data):
         # Handle nested user data
@@ -440,8 +398,8 @@ class RealtorProfileSerializer(serializers.ModelSerializer):
     )
     description = serializers.CharField(required=False, allow_blank=True)
 
-    # Nested serializer for subscription
-    subscription = serializers.SerializerMethodField()
+    # Nested serializer for agent
+
 
     class Meta:
         model = RealtorProfile
@@ -457,7 +415,7 @@ class RealtorProfileSerializer(serializers.ModelSerializer):
             "experience",
             "years_of_experience",
             "description",
-            "subscription",
+
         ]
 
     def get_experience(self, obj):
@@ -468,20 +426,7 @@ class RealtorProfileSerializer(serializers.ModelSerializer):
                     return choice_display
         return obj.years_of_experience
 
-    def get_subscription(self, obj):
-        """Get active subscription information"""
-        try:
-            subscription = (
-                Subscription.objects.filter(user=obj.user, payment_status="COMPLETED")
-                .order_by("-start_date")
-                .first()
-            )
 
-            if subscription:
-                return SubscriptionSerializer(subscription).data
-            return None
-        except Subscription.DoesNotExist:
-            return None
 
     def update(self, instance, validated_data):
         print(f"DEBUG: validated_data keys: {validated_data.keys()}")
@@ -572,8 +517,8 @@ class SellerProfileSerializer(serializers.ModelSerializer):
     
     leaseback_required = serializers.BooleanField(required=False)
 
-    # Nested serializer for subscription
-    subscription = serializers.SerializerMethodField()
+    # Nested serializer for properties
+
     
     has_active_listing = serializers.BooleanField(required=False)
 
@@ -610,7 +555,7 @@ class SellerProfileSerializer(serializers.ModelSerializer):
             "selling_type",
             "selling_type_input",
             "leaseback_required",
-            "subscription",
+
             "has_active_listing",
         ]
 
@@ -683,20 +628,7 @@ class PropertySearchSerializer(serializers.ModelSerializer):
                     return choice_display
         return obj.selling_type
 
-    def get_subscription(self, obj):
-        """Get active subscription information"""
-        try:
-            subscription = (
-                Subscription.objects.filter(user=obj.user, payment_status="COMPLETED")
-                .order_by("-start_date")
-                .first()
-            )
 
-            if subscription:
-                return SubscriptionSerializer(subscription).data
-            return None
-        except Subscription.DoesNotExist:
-            return None
 
     def update(self, instance, validated_data):
         print(f"DEBUG: validated_data keys: {validated_data.keys()}")
@@ -787,8 +719,8 @@ class PartnerProfileSerializer(serializers.ModelSerializer):
     
     partnership_type_display = serializers.CharField(source='get_partnership_type_display', read_only=True)
 
-    # Nested serializer for subscription
-    subscription = serializers.SerializerMethodField()
+    # Nested serializer for partnership type
+
 
     class Meta:
         model = PartnerProfile
@@ -805,23 +737,10 @@ class PartnerProfileSerializer(serializers.ModelSerializer):
             "service_areas",
             "website_url",
             "business_license_number",
-            "subscription",
+
         ]
 
-    def get_subscription(self, obj):
-        """Get active subscription information"""
-        try:
-            subscription = (
-                Subscription.objects.filter(user=obj.user, payment_status="COMPLETED")
-                .order_by("-start_date")
-                .first()
-            )
 
-            if subscription:
-                return SubscriptionSerializer(subscription).data
-            return None
-        except Subscription.DoesNotExist:
-            return None
 
     def update(self, instance, validated_data):
         user_data = validated_data.pop("user", {})

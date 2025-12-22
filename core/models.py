@@ -1,7 +1,39 @@
-from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.utils.translation import gettext_lazy as _
+
+
+class CustomUserManager(BaseUserManager):
+    """
+    Custom user model manager where email is the unique identifiers
+    for authentication instead of usernames.
+    """
+    def create_user(self, email, password, **extra_fields):
+        """
+        Create and save a User with the given email and password.
+        """
+        if not email:
+            raise ValueError(_('The Email must be set'))
+        email = self.normalize_email(email)
+        user = self.model(email=email, **extra_fields)
+        user.set_password(password)
+        user.save()
+        return user
+
+    def create_superuser(self, email, password, **extra_fields):
+        """
+        Create and save a SuperUser with the given email and password.
+        """
+        extra_fields.setdefault('is_staff', True)
+        extra_fields.setdefault('is_superuser', True)
+        extra_fields.setdefault('is_active', True)
+
+        if extra_fields.get('is_staff') is not True:
+            raise ValueError(_('Superuser must have is_staff=True.'))
+        if extra_fields.get('is_superuser') is not True:
+            raise ValueError(_('Superuser must have is_superuser=True.'))
+        return self.create_user(email, password, **extra_fields)
 
 
 class User(AbstractUser):
@@ -40,62 +72,16 @@ class User(AbstractUser):
             models.Index(fields=["email", "role"]),
         ]
 
+    objects = CustomUserManager()
+
     def __str__(self):
         return f"{self.email} ({self.get_role_display()})"
 
 
-class Subscription(models.Model):
-    """Track subscription payments and details"""
 
-    class SubscriptionType(models.TextChoices):
-        BUYER_BASIC = "BUYER_BASIC", _("Buyer Basic Plan")
-        BUYER_PRO = "BUYER_PRO", _("Buyer Pro Plan")
-        REALTOR_PROFESSIONAL = "REALTOR_PROFESSIONAL", _("Realtor Professional")
-        SELLER_LISTING = "SELLER_LISTING", _("Seller Property Listing")
-        PARTNER_BUSINESS = "PARTNER_BUSINESS", _("Partner Business Subscription")
 
-    class PaymentStatus(models.TextChoices):
-        PENDING = "PENDING", _("Pending")
-        COMPLETED = "COMPLETED", _("Completed")
-        FAILED = "FAILED", _("Failed")
-        REFUNDED = "REFUNDED", _("Refunded")
 
-    user = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name="subscriptions"
-    )
-    subscription_type = models.CharField(
-        max_length=50, choices=SubscriptionType.choices
-    )
-    amount = models.DecimalField(
-        max_digits=10, decimal_places=2, validators=[MinValueValidator(0)]
-    )
-    setup_fee = models.DecimalField(
-        max_digits=10, decimal_places=2, default=0, validators=[MinValueValidator(0)]
-    )
-    payment_status = models.CharField(
-        max_length=20, choices=PaymentStatus.choices, default=PaymentStatus.PENDING
-    )
-    transaction_id = models.CharField(
-        max_length=255, blank=True, help_text=_("Payment gateway transaction ID")
-    )
 
-    # Subscription period
-    start_date = models.DateTimeField()
-    end_date = models.DateTimeField()
-
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-    class Meta:
-        db_table = "subscriptions"
-        ordering = ["-created_at"]
-        indexes = [
-            models.Index(fields=["user", "subscription_type"]),
-            models.Index(fields=["payment_status"]),
-        ]
-
-    def __str__(self):
-        return f"{self.user.email} - {self.get_subscription_type_display()}"
 
 
 class PendingSignup(models.Model):

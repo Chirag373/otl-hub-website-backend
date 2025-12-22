@@ -174,48 +174,7 @@
     </div>
 </div>
 
-<div class="card bg-[var(--card)] border border-[var(--border)] shadow-xl">
-    <div class="card-body p-6">
-        <h3 class="text-lg font-semibold text-[var(--foreground)] mb-4">Partnership Status</h3>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div class="space-y-4">
-                <div class="form-control w-full">
-                    <label class="label">
-                        <span class="label-text text-[var(--foreground)] font-medium">Partner Since</span>
-                    </label>
-                    <div
-                        class="flex items-center space-x-2 px-3 py-3 bg-[var(--muted)]/30 rounded-lg border border-[var(--border)]">
-                        <i data-lucide="calendar" class="h-4 w-4 text-[var(--muted-foreground)]"></i>
-                        <span id="status-since" class="text-[var(--foreground)] text-sm">--</span>
-                    </div>
-                </div>
-                <div class="form-control w-full">
-                    <label class="label">
-                        <span class="label-text text-[var(--foreground)] font-medium">Renewal Date</span>
-                    </label>
-                    <input type="text" id="status-renewal" disabled
-                        class="input input-bordered w-full bg-[var(--muted)]/30 border-[var(--border)] text-[var(--foreground)] opacity-70">
-                </div>
-            </div>
-            <div class="space-y-4">
-                <div class="form-control w-full">
-                    <label class="label">
-                        <span class="label-text text-[var(--foreground)] font-medium">Partnership Fee</span>
-                    </label>
-                    <input type="text" id="status-fee" disabled
-                        class="input input-bordered w-full bg-[var(--muted)]/30 border-[var(--border)] text-[var(--foreground)] font-semibold opacity-70">
-                </div>
-            </div>
-        </div>
-
-        <div class="mt-6 alert bg-[var(--accent)]/10 border-[var(--accent)]/20 text-[var(--accent)] text-sm">
-            <i data-lucide="info" class="h-4 w-4"></i>
-            <span><strong>Your partnership</strong> provides access to our client referral network, marketing tools, and
-                business development resources.</span>
-        </div>
-    </div>
-</div>
 {% endblock %}
 
 {% block scripts %}
@@ -249,10 +208,7 @@
         inputExperience: document.getElementById('input-experience'),
         inputBio: document.getElementById('input-bio'),
 
-        // Status
-        statusSince: document.getElementById('status-since'),
-        statusRenewal: document.getElementById('status-renewal'),
-        statusFee: document.getElementById('status-fee'),
+
 
         // Actions
         btnEdit: document.getElementById('btn-edit-profile'),
@@ -314,15 +270,7 @@
                 // Missing fields
                 experience: "",
                 bio: "",
-                membership: data.subscription ? {
-                    level: data.subscription.property_access, // Reuse property access or similar
-                    feePaid: data.subscription.fee_paid ? `$${data.subscription.fee_paid}` : "$0.00",
-                    expirationDate: data.subscription.expiration_date
-                } : {
-                    level: "Inactive",
-                    feePaid: "$0.00",
-                    expirationDate: "--"
-                }
+
             };
 
             populateData();
@@ -419,10 +367,7 @@
         if (dom.inputExperience) dom.inputExperience.value = profile.experience || "";
         if (dom.inputBio) dom.inputBio.value = profile.bio || "";
 
-        // Status
-        if (dom.statusSince) dom.statusSince.textContent = profile.joinDate;
-        if (dom.statusRenewal && profile.membership) dom.statusRenewal.value = profile.membership.expirationDate;
-        if (dom.statusFee && profile.membership) dom.statusFee.value = profile.membership.feePaid;
+
     }
 
     // --- EVENT LISTENERS ---

@@ -10,10 +10,10 @@ class BuyerProfileAdmin(admin.ModelAdmin):
         "user",
         "preferred_location",
         "budget_range",
-        "subscription_plan",
+
         "created_at",
     )
-    list_filter = ("subscription_plan", "created_at")
+    list_filter = ("created_at",)
     search_fields = (
         "user__email",
         "user__first_name",
@@ -25,16 +25,7 @@ class BuyerProfileAdmin(admin.ModelAdmin):
     fieldsets = (
         ("User Information", {"fields": ("user",)}),
         ("Preferences", {"fields": ("preferred_location", "budget_range")}),
-        (
-            "Subscription",
-            {
-                "fields": (
-                    "subscription_plan",
-                    "subscription_start_date",
-                    "subscription_end_date",
-                )
-            },
-        ),
+
         ("Timestamps", {"fields": ("created_at", "updated_at")}),
     )
 
@@ -48,10 +39,10 @@ class RealtorProfileAdmin(admin.ModelAdmin):
         "license_number",
         "company_brokerage",
         "years_of_experience",
-        "is_active_subscription",
+
         "created_at",
     )
-    list_filter = ("years_of_experience", "is_active_subscription", "created_at")
+    list_filter = ("years_of_experience", "created_at")
     search_fields = (
         "user__email",
         "user__first_name",
@@ -67,10 +58,7 @@ class RealtorProfileAdmin(admin.ModelAdmin):
             "Professional Details",
             {"fields": ("license_number", "company_brokerage", "years_of_experience")},
         ),
-        (
-            "Subscription",
-            {"fields": ("is_active_subscription", "subscription_start_date")},
-        ),
+
         ("Timestamps", {"fields": ("created_at", "updated_at")}),
     )
 
@@ -115,10 +103,10 @@ class PartnerProfileAdmin(admin.ModelAdmin):
         "user",
         "company_name",
         "partnership_type",
-        "is_active_subscription",
+
         "created_at",
     )
-    list_filter = ("partnership_type", "is_active_subscription", "created_at")
+    list_filter = ("partnership_type", "created_at")
     search_fields = ("user__email", "company_name", "service_areas")
     readonly_fields = ("created_at", "updated_at")
 
@@ -128,9 +116,6 @@ class PartnerProfileAdmin(admin.ModelAdmin):
             "Business Details",
             {"fields": ("company_name", "partnership_type", "service_areas")},
         ),
-        (
-            "Subscription",
-            {"fields": ("is_active_subscription", "subscription_start_date")},
-        ),
+
         ("Timestamps", {"fields": ("created_at", "updated_at")}),
     )

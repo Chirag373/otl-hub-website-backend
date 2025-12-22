@@ -89,6 +89,22 @@
     const messageContainer = document.getElementById('message-container');
     const messageText = document.getElementById('message-text');
 
+    // Helper to get cookies
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
     if (loginForm) {
         loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -98,7 +114,7 @@
             submitBtn.innerHTML = '<span class="loading loading-spinner loading-sm"></span> Signing in...';
             submitBtn.classList.add('opacity-70');
             messageContainer.classList.add('hidden');
-            
+
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
 
@@ -107,6 +123,7 @@
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
+                        'X-CSRFToken': getCookie('csrftoken')
                     },
                     body: JSON.stringify({ email, password })
                 });
@@ -122,7 +139,7 @@
                     // Reset button
                     submitBtn.innerHTML = 'Success!';
                     submitBtn.classList.remove('opacity-70');
-                    
+
                     // Redirect based on role
                     const role = data.user.role;
                     let redirectUrl = "{% url 'buyer_dashboard' %}"; // Default

@@ -34,6 +34,23 @@
         }
     }
 
+    function togglePasswordVisibility(inputId, toggleBtn) {
+        const input = document.getElementById(inputId);
+
+        if (input.type === 'password') {
+            input.type = 'text';
+            toggleBtn.innerHTML = '<i data-lucide="eye-off" class="h-5 w-5"></i>';
+        } else {
+            input.type = 'password';
+            toggleBtn.innerHTML = '<i data-lucide="eye" class="h-5 w-5"></i>';
+        }
+        if (window.lucide) {
+            lucide.createIcons({
+                root: toggleBtn
+            });
+        }
+    }
+
     // --- ACTIONS ---
 
     // --- ACTIONS ---

@@ -221,7 +221,6 @@ class PartnerListView(ListAPIView):
     serializer_class = PartnerProfileSerializer
     queryset = PartnerProfile.objects.all().select_related('user')
     
-    # Enable filtering and ordering
     filter_backends = [DjangoFilterBackend, OrderingFilter]
     filterset_class = PartnerFilter
     ordering_fields = ['company_name', 'created_at']

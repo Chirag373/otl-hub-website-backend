@@ -68,26 +68,44 @@
 <!-- Password Section -->
 <div class="bg-[var(--card)] rounded-lg border border-[var(--border)] overflow-hidden">
     <div class="px-6 py-4 border-b border-[var(--border)]">
-        <h2 class="text-lg font-semibold text-[var(--foreground)]">Password & Security</h2>
+        <h2 class="text-lg font-semibold text-[var(--foreground)]">Password and Security</h2>
         <p class="text-sm text-[var(--muted-foreground)]">Update your password to keep your account secure</p>
     </div>
 
     <div class="p-6 space-y-4">
         <div class="space-y-2">
             <label class="text-sm font-medium text-[var(--foreground)]">Current Password</label>
-            <input type="password" id="current-password"
-                class="w-full px-3 py-2 bg-[var(--input)] border border-[var(--border)] rounded-md text-[var(--foreground)] focus:outline-none focus:border-[var(--accent)]">
+            <div class="relative">
+                <input type="password" id="current-password" autocomplete="current-password"
+                    class="w-full px-3 py-2 bg-[var(--input)] border border-[var(--border)] rounded-md text-[var(--foreground)] focus:outline-none focus:border-[var(--accent)] pr-10">
+                <button type="button" onclick="togglePasswordVisibility('current-password', this)"
+                    class="absolute inset-y-0 right-0 flex items-center pr-3 text-[var(--muted-foreground)] hover:text-[var(--foreground)]">
+                    <i data-lucide="eye" class="h-5 w-5"></i>
+                </button>
+            </div>
         </div>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div class="space-y-2">
                 <label class="text-sm font-medium text-[var(--foreground)]">New Password</label>
-                <input type="password" id="new-password"
-                    class="w-full px-3 py-2 bg-[var(--input)] border border-[var(--border)] rounded-md text-[var(--foreground)] focus:outline-none focus:border-[var(--accent)]">
+                <div class="relative">
+                    <input type="password" id="new-password" autocomplete="new-password"
+                        class="w-full px-3 py-2 bg-[var(--input)] border border-[var(--border)] rounded-md text-[var(--foreground)] focus:outline-none focus:border-[var(--accent)] pr-10">
+                    <button type="button" onclick="togglePasswordVisibility('new-password', this)"
+                        class="absolute inset-y-0 right-0 flex items-center pr-3 text-[var(--muted-foreground)] hover:text-[var(--foreground)]">
+                        <i data-lucide="eye" class="h-5 w-5"></i>
+                    </button>
+                </div>
             </div>
             <div class="space-y-2">
                 <label class="text-sm font-medium text-[var(--foreground)]">Confirm New Password</label>
-                <input type="password" id="confirm-password"
-                    class="w-full px-3 py-2 bg-[var(--input)] border border-[var(--border)] rounded-md text-[var(--foreground)] focus:outline-none focus:border-[var(--accent)]">
+                <div class="relative">
+                    <input type="password" id="confirm-password" autocomplete="new-password"
+                        class="w-full px-3 py-2 bg-[var(--input)] border border-[var(--border)] rounded-md text-[var(--foreground)] focus:outline-none focus:border-[var(--accent)] pr-10">
+                    <button type="button" onclick="togglePasswordVisibility('confirm-password', this)"
+                        class="absolute inset-y-0 right-0 flex items-center pr-3 text-[var(--muted-foreground)] hover:text-[var(--foreground)]">
+                        <i data-lucide="eye" class="h-5 w-5"></i>
+                    </button>
+                </div>
             </div>
         </div>
         <div class="pt-4">

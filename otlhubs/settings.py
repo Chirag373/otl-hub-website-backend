@@ -208,6 +208,4 @@ EMAIL_HOST_PASSWORD = "SignupOTLGroup2025@!"
 DEFAULT_FROM_EMAIL = "OTL Platform <info.signup@otlhub.net>"
 
 
-# Stripe Configuration
-STRIPE_PUBLIC_KEY = os.environ.get("STRIPE_PUBLIC_KEY", "pk_test_51STGPd9jMV2vESb6DI5Zjyxj0Tuw87eV3e5n56RmQqTQmOklxQwQW3WskUXYlkqfY8MbJQs3W2NGwHrHA4JlmdAq00khr3mOUI")
-STRIPE_SECRET_KEY = os.environ.get("STRIPE_SECRET_KEY", "dummy_secret_for_dev")
+

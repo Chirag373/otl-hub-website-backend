@@ -130,55 +130,7 @@
     </div>
 </div>
 
-<div class="card bg-[var(--card)] border border-[var(--border)] shadow-xl">
-    <div class="card-body p-6">
-        <h3 class="text-lg font-semibold text-[var(--foreground)] mb-4">Membership Subscription</h3>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div class="space-y-4">
-                <div class="form-control w-full">
-                    <label class="label">
-                        <span class="label-text text-[var(--foreground)] font-medium">Member Since</span>
-                    </label>
-                    <div
-                        class="flex items-center space-x-2 px-3 py-3 bg-[var(--muted)]/30 rounded-lg border border-[var(--border)]">
-                        <i data-lucide="calendar" class="h-4 w-4 text-[var(--muted-foreground)]"></i>
-                        <span id="sub-member-since" class="text-[var(--foreground)] text-sm">--</span>
-                    </div>
-                </div>
-                <div class="form-control w-full">
-                    <label class="label">
-                        <span class="label-text text-[var(--foreground)] font-medium">Expiration Date</span>
-                    </label>
-                    <input type="text" id="sub-expiration" disabled
-                        class="input input-bordered w-full bg-[var(--muted)]/30 border-[var(--border)] text-[var(--foreground)] opacity-70">
-                </div>
-            </div>
-            <div class="space-y-4">
-                <div class="form-control w-full">
-                    <label class="label">
-                        <span class="label-text text-[var(--foreground)] font-medium">Fee Paid</span>
-                    </label>
-                    <input type="text" id="sub-fee" disabled
-                        class="input input-bordered w-full bg-[var(--muted)]/30 border-[var(--border)] text-[var(--foreground)] font-semibold opacity-70">
-                </div>
-                <div class="form-control w-full">
-                    <label class="label">
-                        <span class="label-text text-[var(--foreground)] font-medium">Property Access</span>
-                    </label>
-                    <div
-                        class="flex items-center space-x-2 px-3 py-3 bg-[var(--muted)]/30 rounded-lg border border-[var(--border)]">
-                        <span id="sub-access" class="text-[var(--foreground)] font-semibold text-sm">--</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="mt-6 alert bg-blue-50/10 border-blue-500/30 text-blue-300 text-sm">
-            <i data-lucide="info" class="h-4 w-4"></i>
-            <span><strong>Your membership</strong> gives you access to client management tools and professional
-                networking features.</span>
-        </div>
-    </div>
-</div>
+
 {% endblock %}
 
 {% block scripts %}
@@ -205,11 +157,7 @@
         inputExperience: document.getElementById('input-experience'),
         inputBio: document.getElementById('input-bio'),
 
-        // Subscription
-        subMemberSince: document.getElementById('sub-member-since'),
-        subExpiration: document.getElementById('sub-expiration'),
-        subFee: document.getElementById('sub-fee'),
-        subAccess: document.getElementById('sub-access'),
+
 
         // Actions
         btnEdit: document.getElementById('btn-edit-profile'),
@@ -277,13 +225,7 @@
             dom.inputExperience.value = val;
         }
 
-        // Subscription
-        if (profile.subscription) {
-            if (dom.subMemberSince) dom.subMemberSince.textContent = profile.subscription.member_since;
-            if (dom.subExpiration) dom.subExpiration.value = profile.subscription.expiration_date;
-            if (dom.subFee) dom.subFee.value = `$${profile.subscription.fee_paid}`;
-            if (dom.subAccess) dom.subAccess.textContent = profile.subscription.property_access;
-        }
+
     }
 
     // --- EVENT LISTENERS ---

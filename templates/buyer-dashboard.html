@@ -38,18 +38,7 @@
         </div>
     </div>
 
-    <div class="card bg-[var(--card)] border border-[var(--border)] shadow-sm">
-        <div class="card-body p-6 flex-row items-center space-x-4">
-            <div class="p-3 bg-purple-100/10 rounded-lg text-purple-400">
-                <i data-lucide="calendar" class="h-6 w-6"></i>
-            </div>
-            <div>
-                <p class="text-sm text-[var(--muted-foreground)]">Time Remaining</p>
-                <p id="stat-days-left" class="text-2xl font-bold text-[var(--foreground)]">0d</p>
-                <p class="text-xs text-[var(--muted-foreground)]">Access plan validity</p>
-            </div>
-        </div>
-    </div>
+
 </div>
 
 <div id="access-counter-container" class="card bg-[var(--card)] border border-[var(--border)] p-6 shadow-sm">
@@ -192,55 +181,7 @@
     </div>
 </div>
 
-<div class="card bg-[var(--card)] border border-[var(--border)] shadow-xl">
-    <div class="card-body p-6">
-        <h3 class="text-lg font-semibold text-[var(--foreground)] mb-4">Membership Subscription</h3>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div class="space-y-4">
-                <div class="form-control w-full">
-                    <label class="label">
-                        <span class="label-text text-[var(--foreground)] font-medium">Member Since</span>
-                    </label>
-                    <div
-                        class="flex items-center space-x-2 px-3 py-3 bg-[var(--muted)]/30 rounded-lg border border-[var(--border)]">
-                        <i data-lucide="calendar" class="h-4 w-4 text-[var(--muted-foreground)]"></i>
-                        <span id="sub-member-since" class="text-[var(--foreground)] text-sm">--</span>
-                    </div>
-                </div>
-                <div class="form-control w-full">
-                    <label class="label">
-                        <span class="label-text text-[var(--foreground)] font-medium">Expiration Date</span>
-                    </label>
-                    <input type="text" id="sub-expiration" disabled
-                        class="input input-bordered w-full bg-[var(--muted)]/30 border-[var(--border)] text-[var(--foreground)] opacity-70">
-                </div>
-            </div>
-            <div class="space-y-4">
-                <div class="form-control w-full">
-                    <label class="label">
-                        <span class="label-text text-[var(--foreground)] font-medium">Fee Paid</span>
-                    </label>
-                    <input type="text" id="sub-fee" disabled
-                        class="input input-bordered w-full bg-[var(--muted)]/30 border-[var(--border)] text-[var(--foreground)] font-semibold opacity-70">
-                </div>
-                <div class="form-control w-full">
-                    <label class="label">
-                        <span class="label-text text-[var(--foreground)] font-medium">Property Access</span>
-                    </label>
-                    <div
-                        class="flex items-center space-x-2 px-3 py-3 bg-[var(--muted)]/30 rounded-lg border border-[var(--border)]">
-                        <i data-lucide="eye" class="h-4 w-4 text-[var(--muted-foreground)]"></i>
-                        <span id="sub-access-level" class="text-[var(--foreground)] font-semibold text-sm">--</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="mt-6 alert bg-blue-50/10 border-blue-500/30 text-blue-300 text-sm">
-            <i data-lucide="info" class="h-4 w-4"></i>
-            <span><strong>Your membership</strong> gives you access to premium features and priority support.</span>
-        </div>
-    </div>
-</div>
+
 
 <div class="card bg-[var(--card)] border border-[var(--border)] shadow-xl">
     <div class="card-body p-6">
@@ -268,7 +209,7 @@
         location: "",
         member_since: "",
         agent: null,
-        subscription: null
+
     };
 
     // Usage Stats (Mock - since API doesn't provide these yet, we might need a separate call or default them)
@@ -284,7 +225,7 @@
         // Stats
         statViewsCount: document.getElementById('stat-views-count'),
         statViewsRemaining: document.getElementById('stat-views-remaining'),
-        statDaysLeft: document.getElementById('stat-days-left'),
+
         accessCounterContainer: document.getElementById('access-counter-container'),
 
         // Profile View
@@ -316,11 +257,7 @@
         agentInputEmail: document.getElementById('agent-input-email'),
         agentInputBrokerage: document.getElementById('agent-input-brokerage'),
 
-        // Subscription
-        subMemberSince: document.getElementById('sub-member-since'),
-        subExpiration: document.getElementById('sub-expiration'),
-        subFee: document.getElementById('sub-fee'),
-        subAccess: document.getElementById('sub-access-level')
+
     };
 
     // --- INITIALIZATION ---
@@ -353,7 +290,7 @@
                 location: data.location || "",
                 member_since: data.member_since || "",
                 agent: data.agent, // API returns {name, phone, email, brokerage_company} or null
-                subscription: data.subscription // API returns {member_since, expiration_date, fee_paid, property_access} or null
+
             };
 
             populateData();
@@ -474,13 +411,7 @@
         if (dom.inputPhone) dom.inputPhone.value = profile.phone_number;
         if (dom.inputLocation) dom.inputLocation.value = profile.location;
 
-        // Subscription
-        if (profile.subscription) {
-            if (dom.subMemberSince) dom.subMemberSince.textContent = profile.subscription.member_since;
-            if (dom.subExpiration) dom.subExpiration.value = profile.subscription.expiration_date;
-            if (dom.subFee) dom.subFee.value = `$${profile.subscription.fee_paid}`;
-            if (dom.subAccess) dom.subAccess.textContent = profile.subscription.property_access;
-        }
+
 
         // Agent Inputs (for edit mode)
         if (profile.agent) {

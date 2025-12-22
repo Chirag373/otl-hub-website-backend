@@ -128,7 +128,7 @@
 
                         <button type="submit" id="submit-btn"
                             class="btn btn-block font-heading text-base bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-[var(--bg)] border-none rounded transition-all font-semibold cursor-pointer">
-                            Verify & Create Account
+                            Verify and Create Account
                         </button>
 
                         <div class="text-center text-sm text-[var(--muted-foreground)]">
@@ -344,21 +344,9 @@
             </div>
         `;
 
-        // Setup Fee Notice
-        const setupFee = type === 'partner' ? '$199' : '$99';
-        let noticeText = '';
-
-        if (type === 'buyer') {
-            noticeText = `<span class="font-bold text-[var(--foreground)]">$99</span> one-time account setup fee + property access fee + monthly subscription`;
-        } else if (type === 'realtor' || type === 'partner') {
-            noticeText = `<span class="font-bold text-[var(--foreground)]">${setupFee}</span> one-time setup fee + subscription (no property access fees)`;
-        } else if (type === 'seller') {
-            noticeText = `<span class="font-bold text-[var(--foreground)]">$99</span> one-time setup fee + <span class="font-bold text-[var(--foreground)]">$199</span> listing fee (no monthly subscriptions)`;
-        }
-
         html += `
             <div class="mb-6 p-3 bg-[var(--muted)]/30 rounded-lg border border-[var(--border)] text-center">
-                <p class="text-xs sm:text-sm text-[var(--muted-foreground)]">${noticeText}</p>
+                <p class="text-xs sm:text-sm text-[var(--muted-foreground)]">Create your account to get started.</p>
             </div>
         `;
 
@@ -390,60 +378,14 @@
     }
 
     function renderBuyerPlans() {
-        const isBasic = selectedBuyerPlan === 'basic';
-        const isPro = selectedBuyerPlan === 'pro';
-
-        // Styles
-        const basicCardClass = isBasic
-            ? "bg-gradient-to-br from-[var(--accent)]/20 to-[var(--accent)]/10 border-[var(--accent)] shadow-lg scale-105"
-            : "bg-[var(--muted)]/30 border-[var(--border)] hover:border-[var(--accent)]/30 hover:scale-105";
-
-        const proCardClass = isPro
-            ? "bg-gradient-to-br from-[var(--accent)]/20 to-[var(--accent)]/10 border-[var(--accent)] shadow-lg scale-105"
-            : "bg-[var(--muted)]/30 border-[var(--border)] hover:border-[var(--accent)]/30 hover:scale-105";
-
-        const basicCheck = isBasic
-            ? `<div class="absolute -top-2 -right-2 bg-green-500 text-white rounded-full p-1"><i data-lucide="check" class="w-4 h-4"></i></div>`
-            : '';
-
-        const proCheck = isPro
-            ? `<div class="absolute -top-2 -right-2 bg-green-500 text-white rounded-full p-1"><i data-lucide="check" class="w-4 h-4"></i></div>`
-            : '';
-
-        const pricingText = isPro
-            ? '<span class="font-semibold text-[var(--accent)]">Selected:</span> Pro - $50 + $99 setup fee'
-            : '<span class="font-semibold text-[var(--accent)]">Selected:</span> Basic - $25 + $99 setup fee';
-
         return `
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6 mt-2">
-                <button type="button" onclick="selectBuyerPlan('basic')" class="relative text-center p-4 rounded-lg border-2 transition-all cursor-pointer ${basicCardClass}">
-                    ${basicCheck}
-                    <div class="font-bold text-[var(--foreground)] text-lg mb-1">Basic</div>
-                    <div class="text-sm text-[var(--muted-foreground)] mb-2">1 Property Access</div>
-                    <div class="space-y-1">
-                        <div class="text-lg font-bold text-[var(--accent)]">$25</div>
-                        <div class="text-sm font-medium text-[var(--accent)]">3 months validity</div>
+            <div class="mb-6 mt-2">
+                <div class="bg-gradient-to-br from-[var(--accent)]/20 to-[var(--accent)]/10 rounded-lg border-2 border-[var(--accent)] p-6 text-center shadow-lg">
+                    <div class="mb-4">
+                        <div class="text-xl sm:text-2xl font-bold text-[var(--foreground)] mb-2">Standard Access</div>
+                        <div class="text-sm font-medium text-[var(--accent)]">Free Account</div>
                     </div>
-                </button>
-
-                <button type="button" onclick="selectBuyerPlan('pro')" class="relative mt-4 sm:mt-0 text-center p-4 rounded-lg border-2 transition-all cursor-pointer ${proCardClass}">
-                    ${proCheck}
-                    <div class="absolute -top-4 left-1/2 transform -translate-x-1/2 z-10 w-max">
-                        <div class="badge bg-[var(--accent)] border-none text-white px-3 py-1 text-xs font-bold shadow-lg">RECOMMENDED</div>
-                    </div>
-                    <div class="font-bold text-[var(--foreground)] text-lg mb-1">Pro</div>
-                    <div class="text-sm text-[var(--muted-foreground)] mb-2">3 Properties Access</div>
-                    <div class="space-y-1">
-                        <div class="text-lg font-bold text-[var(--accent)]">$50</div>
-                        <div class="text-sm font-medium text-[var(--accent)]">6 months validity</div>
-                    </div>
-                </button>
-            </div>
-            
-            <div class="mb-6 p-3 bg-[var(--accent)]/10 rounded-lg border border-[var(--accent)]/20 text-center">
-                <p class="text-sm text-[var(--foreground)]">
-                    ${pricingText}
-                </p>
+                </div>
             </div>
         `;
     }
@@ -457,20 +399,17 @@
         let planName, sub, fee, desc;
 
         if (type === 'realtor') {
-            planName = "Professional Subscription";
+            planName = "Professional Account";
             sub = "Unlimited access";
-            fee = `<div class="text-lg font-bold text-[var(--accent)]">$99<span class="text-sm"> + $49/mo</span></div>`;
-            desc = "one-time access + monthly subscription";
+            fee = `<div class="text-lg font-bold text-[var(--accent)]">Free</div>`;
         } else if (type === 'seller') {
-            planName = "Property Listing Plan";
+            planName = "Property Listing Account";
             sub = "List your property";
-            fee = `<div class="text-3xl font-bold text-[var(--accent)]">$298</div>`;
-            desc = "one-time fees (no monthly subscriptions)";
+            fee = `<div class="text-3xl font-bold text-[var(--accent)]">Free</div>`;
         } else { // partner
-            planName = "Business Partner Subscription";
+            planName = "Business Partner Account";
             sub = "Full platform access";
-            fee = `<div class="text-lg font-bold text-[var(--accent)]">$299<span class="text-sm"> + $99/mo</span></div>`;
-            desc = "one-time access + monthly subscription";
+            fee = `<div class="text-lg font-bold text-[var(--accent)]">Free</div>`;
         }
 
         return `
@@ -491,10 +430,10 @@
 
     function renderFeaturesList(type) {
         const featuresMap = {
-            buyer: ["Access to detailed property info", "Virtual tours & media", "Direct seller communication", "Saved favorites & alerts", "Market analysis tools", "Priority support"],
+            buyer: ["Access to detailed property info", "Virtual tours and media", "Direct seller communication", "Saved favorites and alerts", "Market analysis tools", "Priority support"],
             realtor: ["Professional realtor dashboard", "Advanced property search", "Client CRM", "Lead generation tools", "Market analysis reports", "Commission tools"],
-            seller: ["Professional listing creation", "High-quality photo uploads", "Virtual tour creation", "Market analysis & pricing", "Direct buyer connection", "Marketing exposure"],
-            partner: ["Partner dashboard & analytics", "Lead generation tools", "Client referral system", "Service booking", "Business profile page", "Marketing tools"]
+            seller: ["Professional listing creation", "High-quality photo uploads", "Virtual tour creation", "Market analysis and pricing", "Direct buyer connection", "Marketing exposure"],
+            partner: ["Partner dashboard and analytics", "Lead generation tools", "Client referral system", "Service booking", "Business profile page", "Marketing tools"]
         };
 
         const features = featuresMap[type] || [];
@@ -825,7 +764,7 @@
                 document.getElementById('otp_modal').close();
 
                 Toastify({
-                    text: "Email verified! Initiating payment...",
+                    text: "Email verified! Redirecting to login...",
                     duration: 3000,
                     close: true,
                     gravity: "bottom",
@@ -837,42 +776,9 @@
                 }).showToast();
 
                 // Call Stripe Checkout
-                try {
-                    const accessToken = data.access_token;
-                    const checkoutResponse = await fetch('/api/v1/create-checkout-session/', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRFToken': getCookie('csrftoken'),
-                            'Authorization': `Bearer ${accessToken}`
-                        },
-                        body: JSON.stringify({
-                            plan_name: selectedBuyerPlan // Use selected plan
-                        })
-                    });
-
-                    const checkoutData = await checkoutResponse.json();
-
-                    if (checkoutResponse.ok && checkoutData.url) {
-                        window.location.href = checkoutData.url;
-                    } else {
-                        throw new Error(checkoutData.error || "Failed to initiate payment");
-                    }
-                } catch (paymentError) {
-                    console.error("Payment Error:", paymentError);
-                    Toastify({
-                        text: "Payment initialization failed. Please login to complete payment.",
-                        duration: 5000,
-                        close: true,
-                        gravity: "bottom",
-                        position: "right",
-                        style: { background: "var(--destructive)" }
-                    }).showToast();
-
-                    setTimeout(() => {
-                        window.location.href = "{% url 'login' %}";
-                    }, 2000);
-                }
+                setTimeout(() => {
+                    window.location.href = "{% url 'login' %}";
+                }, 1000);
 
             } else {
                 errorDiv.textContent = data.error || "Verification failed. Please try again.";

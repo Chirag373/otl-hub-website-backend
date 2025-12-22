@@ -5,27 +5,32 @@
 {% block content %}
 <!-- Add Property Modal -->
 <div id="add-property-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
-    <div class="absolute inset-0 bg-black/70 backdrop-blur-sm transition-opacity" onclick="closeAddPropertyModal()"></div>
-    <div class="relative bg-[var(--card)] rounded-xl border border-[var(--border)] w-full max-w-4xl shadow-2xl flex flex-col max-h-[90vh]">
-        <div class="p-6 border-b border-[var(--border)] flex justify-between items-center sticky top-0 bg-[var(--card)] z-10 shrink-0">
+    <div class="absolute inset-0 bg-black/70 backdrop-blur-sm transition-opacity" onclick="closeAddPropertyModal()">
+    </div>
+    <div
+        class="relative bg-[var(--card)] rounded-xl border border-[var(--border)] w-full max-w-4xl shadow-2xl flex flex-col max-h-[90vh]">
+        <div
+            class="p-6 border-b border-[var(--border)] flex justify-between items-center sticky top-0 bg-[var(--card)] z-10 shrink-0">
             <div>
                 <h2 class="text-xl font-bold text-[var(--foreground)]">List Your Property</h2>
                 <p class="text-sm text-[var(--muted-foreground)]">Step <span id="wizard-step-num">1</span> of 4</p>
             </div>
-            <button onclick="closeAddPropertyModal()" class="p-2 hover:bg-[var(--muted)] rounded-full transition-colors text-[var(--foreground)]">
+            <button onclick="closeAddPropertyModal()"
+                class="p-2 hover:bg-[var(--muted)] rounded-full transition-colors text-[var(--foreground)]">
                 <i data-lucide="x" class="w-5 h-5"></i>
             </button>
         </div>
-        
+
         <div class="p-6 space-y-6 overflow-y-auto flex-1 custom-scrollbar">
             <form id="add-property-form">
                 <!-- Step 1: Location & Type -->
                 <div id="step-1" class="wizard-step space-y-4">
-                    <h3 class="text-lg font-semibold text-[var(--foreground)] mb-4">Location & Type</h3>
+                    <h3 class="text-lg font-semibold text-[var(--foreground)] mb-4">Location and Type</h3>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div class="space-y-2">
                             <label class="text-sm font-medium text-[var(--foreground)]">Property Type</label>
-                            <select name="property_type" class="w-full p-2 rounded-md bg-[var(--input)] border border-[var(--border)] text-[var(--foreground)] focus:ring-1 focus:ring-[var(--accent)] outline-none">
+                            <select name="property_type"
+                                class="w-full p-2 rounded-md bg-[var(--input)] border border-[var(--border)] text-[var(--foreground)] focus:ring-1 focus:ring-[var(--accent)] outline-none">
                                 <option value="SINGLE_FAMILY">Single Family</option>
                                 <option value="CONDO">Condo</option>
                                 <option value="TOWNHOME">Townhome</option>
@@ -34,19 +39,27 @@
                         </div>
                         <div class="space-y-2">
                             <label class="text-sm font-medium text-[var(--foreground)]">Street Address</label>
-                            <input type="text" name="street_address" class="w-full p-2 rounded-md bg-[var(--input)] border border-[var(--border)] text-[var(--foreground)] focus:ring-1 focus:ring-[var(--accent)] outline-none" required>
+                            <input type="text" name="street_address"
+                                class="w-full p-2 rounded-md bg-[var(--input)] border border-[var(--border)] text-[var(--foreground)] focus:ring-1 focus:ring-[var(--accent)] outline-none"
+                                required>
                         </div>
                         <div class="space-y-2">
                             <label class="text-sm font-medium text-[var(--foreground)]">City</label>
-                            <input type="text" name="city" class="w-full p-2 rounded-md bg-[var(--input)] border border-[var(--border)] text-[var(--foreground)] focus:ring-1 focus:ring-[var(--accent)] outline-none" required>
+                            <input type="text" name="city"
+                                class="w-full p-2 rounded-md bg-[var(--input)] border border-[var(--border)] text-[var(--foreground)] focus:ring-1 focus:ring-[var(--accent)] outline-none"
+                                required>
                         </div>
                         <div class="space-y-2">
                             <label class="text-sm font-medium text-[var(--foreground)]">State</label>
-                            <input type="text" name="state" class="w-full p-2 rounded-md bg-[var(--input)] border border-[var(--border)] text-[var(--foreground)] focus:ring-1 focus:ring-[var(--accent)] outline-none" required>
+                            <input type="text" name="state"
+                                class="w-full p-2 rounded-md bg-[var(--input)] border border-[var(--border)] text-[var(--foreground)] focus:ring-1 focus:ring-[var(--accent)] outline-none"
+                                required>
                         </div>
                         <div class="space-y-2">
                             <label class="text-sm font-medium text-[var(--foreground)]">Zip Code</label>
-                            <input type="text" name="zip_code" class="w-full p-2 rounded-md bg-[var(--input)] border border-[var(--border)] text-[var(--foreground)] focus:ring-1 focus:ring-[var(--accent)] outline-none" required>
+                            <input type="text" name="zip_code"
+                                class="w-full p-2 rounded-md bg-[var(--input)] border border-[var(--border)] text-[var(--foreground)] focus:ring-1 focus:ring-[var(--accent)] outline-none"
+                                required>
                         </div>
                     </div>
                 </div>
@@ -57,27 +70,33 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div class="space-y-2">
                             <label class="text-sm font-medium text-[var(--foreground)]">Bedrooms</label>
-                            <input type="number" name="bedrooms" class="w-full p-2 rounded-md bg-[var(--input)] border border-[var(--border)] text-[var(--foreground)] focus:ring-1 focus:ring-[var(--accent)] outline-none">
+                            <input type="number" name="bedrooms"
+                                class="w-full p-2 rounded-md bg-[var(--input)] border border-[var(--border)] text-[var(--foreground)] focus:ring-1 focus:ring-[var(--accent)] outline-none">
                         </div>
                         <div class="space-y-2">
                             <label class="text-sm font-medium text-[var(--foreground)]">Bathrooms</label>
-                            <input type="number" step="0.5" name="bathrooms" class="w-full p-2 rounded-md bg-[var(--input)] border border-[var(--border)] text-[var(--foreground)] focus:ring-1 focus:ring-[var(--accent)] outline-none">
+                            <input type="number" step="0.5" name="bathrooms"
+                                class="w-full p-2 rounded-md bg-[var(--input)] border border-[var(--border)] text-[var(--foreground)] focus:ring-1 focus:ring-[var(--accent)] outline-none">
                         </div>
                         <div class="space-y-2">
                             <label class="text-sm font-medium text-[var(--foreground)]">Square Feet</label>
-                            <input type="number" name="sqft" class="w-full p-2 rounded-md bg-[var(--input)] border border-[var(--border)] text-[var(--foreground)] focus:ring-1 focus:ring-[var(--accent)] outline-none">
+                            <input type="number" name="sqft"
+                                class="w-full p-2 rounded-md bg-[var(--input)] border border-[var(--border)] text-[var(--foreground)] focus:ring-1 focus:ring-[var(--accent)] outline-none">
                         </div>
                         <div class="space-y-2">
                             <label class="text-sm font-medium text-[var(--foreground)]">Garage Spaces</label>
-                            <input type="number" name="garage_spaces" class="w-full p-2 rounded-md bg-[var(--input)] border border-[var(--border)] text-[var(--foreground)] focus:ring-1 focus:ring-[var(--accent)] outline-none">
+                            <input type="number" name="garage_spaces"
+                                class="w-full p-2 rounded-md bg-[var(--input)] border border-[var(--border)] text-[var(--foreground)] focus:ring-1 focus:ring-[var(--accent)] outline-none">
                         </div>
                         <div class="md:col-span-2 space-y-2">
                             <label class="text-sm font-medium text-[var(--foreground)]">Listing Price ($)</label>
-                            <input type="number" name="estimated_value" class="w-full p-2 rounded-md bg-[var(--input)] border border-[var(--border)] text-[var(--foreground)] focus:ring-1 focus:ring-[var(--accent)] outline-none">
+                            <input type="number" name="estimated_value"
+                                class="w-full p-2 rounded-md bg-[var(--input)] border border-[var(--border)] text-[var(--foreground)] focus:ring-1 focus:ring-[var(--accent)] outline-none">
                         </div>
                         <div class="md:col-span-2 space-y-2">
                             <label class="text-sm font-medium text-[var(--foreground)]">Description</label>
-                            <textarea name="property_description" rows="3" class="w-full p-2 rounded-md bg-[var(--input)] border border-[var(--border)] text-[var(--foreground)] focus:ring-1 focus:ring-[var(--accent)] outline-none"></textarea>
+                            <textarea name="property_description" rows="3"
+                                class="w-full p-2 rounded-md bg-[var(--input)] border border-[var(--border)] text-[var(--foreground)] focus:ring-1 focus:ring-[var(--accent)] outline-none"></textarea>
                         </div>
                     </div>
                 </div>
@@ -88,7 +107,8 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div class="space-y-2">
                             <label class="text-sm font-medium text-[var(--foreground)]">Flooring</label>
-                            <select name="feature_flooring" class="w-full p-2 rounded-md bg-[var(--input)] border border-[var(--border)] text-[var(--foreground)] outline-none">
+                            <select name="feature_flooring"
+                                class="w-full p-2 rounded-md bg-[var(--input)] border border-[var(--border)] text-[var(--foreground)] outline-none">
                                 <option value="">Select...</option>
                                 <option value="Hardwood">Hardwood</option>
                                 <option value="Carpet">Carpet</option>
@@ -98,7 +118,8 @@
                         </div>
                         <div class="space-y-2">
                             <label class="text-sm font-medium text-[var(--foreground)]">Kitchen Countertop</label>
-                            <select name="feature_countertop" class="w-full p-2 rounded-md bg-[var(--input)] border border-[var(--border)] text-[var(--foreground)] outline-none">
+                            <select name="feature_countertop"
+                                class="w-full p-2 rounded-md bg-[var(--input)] border border-[var(--border)] text-[var(--foreground)] outline-none">
                                 <option value="">Select...</option>
                                 <option value="Granite">Granite</option>
                                 <option value="Wood">Wood</option>
@@ -106,7 +127,8 @@
                         </div>
                         <div class="space-y-2">
                             <label class="text-sm font-medium text-[var(--foreground)]">Foundation</label>
-                            <select name="feature_foundation" class="w-full p-2 rounded-md bg-[var(--input)] border border-[var(--border)] text-[var(--foreground)] outline-none">
+                            <select name="feature_foundation"
+                                class="w-full p-2 rounded-md bg-[var(--input)] border border-[var(--border)] text-[var(--foreground)] outline-none">
                                 <option value="">Select...</option>
                                 <option value="Slab">Slab</option>
                                 <option value="Pier & Beam">Pier & Beam</option>
@@ -115,7 +137,8 @@
                         </div>
                         <div class="space-y-2">
                             <label class="text-sm font-medium text-[var(--foreground)]">Cooling</label>
-                            <select name="feature_cooling" class="w-full p-2 rounded-md bg-[var(--input)] border border-[var(--border)] text-[var(--foreground)] outline-none">
+                            <select name="feature_cooling"
+                                class="w-full p-2 rounded-md bg-[var(--input)] border border-[var(--border)] text-[var(--foreground)] outline-none">
                                 <option value="">Select...</option>
                                 <option value="Central">Central</option>
                                 <option value="Window Units">Window Units</option>
@@ -124,7 +147,8 @@
                         </div>
                         <div class="space-y-2">
                             <label class="text-sm font-medium text-[var(--foreground)]">Heating</label>
-                            <select name="feature_heating" class="w-full p-2 rounded-md bg-[var(--input)] border border-[var(--border)] text-[var(--foreground)] outline-none">
+                            <select name="feature_heating"
+                                class="w-full p-2 rounded-md bg-[var(--input)] border border-[var(--border)] text-[var(--foreground)] outline-none">
                                 <option value="">Select...</option>
                                 <option value="Gas">Gas</option>
                                 <option value="Electric">Electric</option>
@@ -132,8 +156,9 @@
                             </select>
                         </div>
                         <div class="space-y-2 pt-6">
-                             <label class="flex items-center space-x-2 cursor-pointer text-[var(--foreground)]">
-                                <input type="checkbox" name="feature_fireplace" class="rounded border-[var(--border)] text-[var(--accent)] focus:ring-[var(--accent)]">
+                            <label class="flex items-center space-x-2 cursor-pointer text-[var(--foreground)]">
+                                <input type="checkbox" name="feature_fireplace"
+                                    class="rounded border-[var(--border)] text-[var(--accent)] focus:ring-[var(--accent)]">
                                 <span>Has Fireplace</span>
                             </label>
                         </div>
@@ -141,19 +166,23 @@
                             <label class="text-sm font-medium text-[var(--foreground)]">Community Amenities</label>
                             <div class="grid grid-cols-2 gap-2">
                                 <label class="flex items-center space-x-2">
-                                    <input type="checkbox" name="feature_amenities" value="Golf course community" class="rounded border-[var(--border)] text-[var(--accent)]">
+                                    <input type="checkbox" name="feature_amenities" value="Golf course community"
+                                        class="rounded border-[var(--border)] text-[var(--accent)]">
                                     <span class="text-sm text-[var(--foreground)]">Golf course community</span>
                                 </label>
                                 <label class="flex items-center space-x-2">
-                                    <input type="checkbox" name="feature_amenities" value="Swimming pool" class="rounded border-[var(--border)] text-[var(--accent)]">
+                                    <input type="checkbox" name="feature_amenities" value="Swimming pool"
+                                        class="rounded border-[var(--border)] text-[var(--accent)]">
                                     <span class="text-sm text-[var(--foreground)]">Swimming pool</span>
                                 </label>
                                 <label class="flex items-center space-x-2">
-                                    <input type="checkbox" name="feature_amenities" value="Study room" class="rounded border-[var(--border)] text-[var(--accent)]">
+                                    <input type="checkbox" name="feature_amenities" value="Study room"
+                                        class="rounded border-[var(--border)] text-[var(--accent)]">
                                     <span class="text-sm text-[var(--foreground)]">Study room</span>
                                 </label>
                                 <label class="flex items-center space-x-2">
-                                    <input type="checkbox" name="feature_amenities" value="Shed" class="rounded border-[var(--border)] text-[var(--accent)]">
+                                    <input type="checkbox" name="feature_amenities" value="Shed"
+                                        class="rounded border-[var(--border)] text-[var(--accent)]">
                                     <span class="text-sm text-[var(--foreground)]">Shed</span>
                                 </label>
                             </div>
@@ -162,23 +191,28 @@
                             <label class="text-sm font-medium text-[var(--foreground)]">Appliances</label>
                             <div class="grid grid-cols-2 gap-2">
                                 <label class="flex items-center space-x-2">
-                                    <input type="checkbox" name="feature_appliances" value="Dishwasher" class="rounded border-[var(--border)] text-[var(--accent)]">
+                                    <input type="checkbox" name="feature_appliances" value="Dishwasher"
+                                        class="rounded border-[var(--border)] text-[var(--accent)]">
                                     <span class="text-sm text-[var(--foreground)]">Dishwasher</span>
                                 </label>
                                 <label class="flex items-center space-x-2">
-                                    <input type="checkbox" name="feature_appliances" value="Gas cooktop" class="rounded border-[var(--border)] text-[var(--accent)]">
+                                    <input type="checkbox" name="feature_appliances" value="Gas cooktop"
+                                        class="rounded border-[var(--border)] text-[var(--accent)]">
                                     <span class="text-sm text-[var(--foreground)]">Gas cooktop</span>
                                 </label>
                                 <label class="flex items-center space-x-2">
-                                    <input type="checkbox" name="feature_appliances" value="Disposal" class="rounded border-[var(--border)] text-[var(--accent)]">
+                                    <input type="checkbox" name="feature_appliances" value="Disposal"
+                                        class="rounded border-[var(--border)] text-[var(--accent)]">
                                     <span class="text-sm text-[var(--foreground)]">Disposal</span>
                                 </label>
                                 <label class="flex items-center space-x-2">
-                                    <input type="checkbox" name="feature_appliances" value="Electric cooktop" class="rounded border-[var(--border)] text-[var(--accent)]">
+                                    <input type="checkbox" name="feature_appliances" value="Electric cooktop"
+                                        class="rounded border-[var(--border)] text-[var(--accent)]">
                                     <span class="text-sm text-[var(--foreground)]">Electric cooktop</span>
                                 </label>
                                 <label class="flex items-center space-x-2">
-                                    <input type="checkbox" name="feature_appliances" value="Built-in oven" class="rounded border-[var(--border)] text-[var(--accent)]">
+                                    <input type="checkbox" name="feature_appliances" value="Built-in oven"
+                                        class="rounded border-[var(--border)] text-[var(--accent)]">
                                     <span class="text-sm text-[var(--foreground)]">Built-in oven</span>
                                 </label>
                             </div>
@@ -189,11 +223,13 @@
                 <!-- Step 4: Images -->
                 <div id="step-4" class="wizard-step hidden space-y-4">
                     <h3 class="text-lg font-semibold text-[var(--foreground)] mb-4">Property Images (Max 6)</h3>
-                    <div class="border-2 border-dashed border-[var(--border)] rounded-lg p-8 text-center hover:bg-[var(--muted)]/20 transition-colors cursor-pointer" onclick="document.getElementById('img-upload').click()">
+                    <div class="border-2 border-dashed border-[var(--border)] rounded-lg p-8 text-center hover:bg-[var(--muted)]/20 transition-colors cursor-pointer"
+                        onclick="document.getElementById('img-upload').click()">
                         <i data-lucide="image-plus" class="w-12 h-12 mx-auto mb-2 text-[var(--muted-foreground)]"></i>
                         <p class="text-[var(--muted-foreground)]">Click to upload images</p>
                         <p class="text-xs text-[var(--muted-foreground)] mt-1">(JPG, PNG only. Max 5MB each)</p>
-                        <input type="file" id="img-upload" multiple accept="image/*" class="hidden" onchange="handleImagePreview(this)">
+                        <input type="file" id="img-upload" multiple accept="image/*" class="hidden"
+                            onchange="handleImagePreview(this)">
                     </div>
                     <div id="image-preview-grid" class="grid grid-cols-3 md:grid-cols-4 gap-4 mt-4">
                         <!-- Previews go here -->
@@ -203,11 +239,16 @@
             </form>
         </div>
 
-        <div class="p-6 border-t border-[var(--border)] flex justify-between bg-[var(--card)] sticky bottom-0 z-10 shrink-0">
-            <button id="btn-prev" onclick="changeStep(-1)" class="px-4 py-2 border border-[var(--border)] rounded-md hover:bg-[var(--muted)] text-[var(--foreground)] hidden">Previous</button>
+        <div
+            class="p-6 border-t border-[var(--border)] flex justify-between bg-[var(--card)] sticky bottom-0 z-10 shrink-0">
+            <button id="btn-prev" onclick="changeStep(-1)"
+                class="px-4 py-2 border border-[var(--border)] rounded-md hover:bg-[var(--muted)] text-[var(--foreground)] hidden">Previous</button>
             <div class="flex-1"></div>
-            <button id="btn-next" onclick="changeStep(1)" class="px-6 py-2 bg-[var(--accent)] text-[var(--bg)] font-semibold rounded-md hover:bg-[var(--accent-hover)] transition-colors">Next</button>
-            <button id="btn-submit" onclick="submitProperty()" class="hidden px-6 py-2 bg-[var(--accent)] text-[var(--bg)] font-semibold rounded-md hover:bg-[var(--accent-hover)] transition-colors">List Property</button>
+            <button id="btn-next" onclick="changeStep(1)"
+                class="px-6 py-2 bg-[var(--accent)] text-[var(--bg)] font-semibold rounded-md hover:bg-[var(--accent-hover)] transition-colors">Next</button>
+            <button id="btn-submit" onclick="submitProperty()"
+                class="hidden px-6 py-2 bg-[var(--accent)] text-[var(--bg)] font-semibold rounded-md hover:bg-[var(--accent-hover)] transition-colors">List
+                Property</button>
         </div>
     </div>
 </div>
@@ -261,11 +302,13 @@
 <div class="bg-[var(--card)] rounded-lg border border-[var(--border)] shadow-lg mt-6">
     <div class="p-6 pb-0">
         <div class="relative max-w-4xl mx-auto">
-            <div id="prop-hero-image" class="group aspect-video bg-gray-700 relative w-full rounded-xl overflow-hidden shadow-sm">
-                <div class="absolute inset-0 bg-gradient-to-br from-gray-700 to-gray-900 flex items-center justify-center">
+            <div id="prop-hero-image"
+                class="group aspect-video bg-gray-700 relative w-full rounded-xl overflow-hidden shadow-sm">
+                <div
+                    class="absolute inset-0 bg-gradient-to-br from-gray-700 to-gray-900 flex items-center justify-center">
                     <i data-lucide="home" class="w-16 h-16 text-gray-500"></i>
                 </div>
-                
+
                 <div class="absolute top-4 left-4 flex items-center space-x-2 z-10">
                     <div class="w-2 h-2 bg-green-500 rounded-full"></div>
                     <span class="px-3 py-1 text-sm font-medium rounded capitalize bg-green-100 text-green-800">
@@ -273,9 +316,10 @@
                     </span>
                 </div>
                 <div class="absolute top-4 right-4 z-10">
-            <button onclick="openEditPropertyModal(4)" class="p-2 bg-white/80 hover:bg-white rounded-md transition-colors text-black">
-                <i data-lucide="edit" class="h-4 w-4"></i>
-            </button>
+                    <button onclick="openEditPropertyModal(4)"
+                        class="p-2 bg-white/80 hover:bg-white rounded-md transition-colors text-black">
+                        <i data-lucide="edit" class="h-4 w-4"></i>
+                    </button>
                 </div>
             </div>
         </div>
@@ -327,14 +371,17 @@
                     <p class="text-sm text-[var(--muted-foreground)] mb-1">Your Realtor</p>
                     <p id="realtor-name" class="text-lg font-semibold text-[var(--foreground)]">Jennifer Martinez</p>
                     <p class="text-sm text-[var(--muted-foreground)] mt-1">
-                        <span id="realtor-phone">(555) 123-4567</span> • <span id="realtor-email">jennifer@premierrealty.com</span>
+                        <span id="realtor-phone">(555) 123-4567</span> • <span
+                            id="realtor-email">jennifer@premierrealty.com</span>
                     </p>
                 </div>
                 <div class="flex space-x-2">
-                    <button class="flex items-center px-3 py-2 text-sm border border-[var(--border)] rounded-md hover:bg-[var(--muted)] text-[var(--foreground)]">
+                    <button
+                        class="flex items-center px-3 py-2 text-sm border border-[var(--border)] rounded-md hover:bg-[var(--muted)] text-[var(--foreground)]">
                         <i data-lucide="phone" class="h-4 w-4 mr-2"></i> Call
                     </button>
-                    <button class="flex items-center px-3 py-2 text-sm border border-[var(--border)] rounded-md hover:bg-[var(--muted)] text-[var(--foreground)]">
+                    <button
+                        class="flex items-center px-3 py-2 text-sm border border-[var(--border)] rounded-md hover:bg-[var(--muted)] text-[var(--foreground)]">
                         <i data-lucide="message-square" class="h-4 w-4 mr-2"></i> Message
                     </button>
                 </div>
@@ -342,10 +389,12 @@
         </div>
 
         <div class="flex space-x-3">
-            <button onclick="openEditPropertyModal(1)" class="flex-1 flex items-center justify-center px-4 py-3 bg-[var(--accent)] text-[var(--bg)] font-semibold rounded-md hover:bg-[var(--accent-hover)] transition-colors">
+            <button onclick="openEditPropertyModal(1)"
+                class="flex-1 flex items-center justify-center px-4 py-3 bg-[var(--accent)] text-[var(--bg)] font-semibold rounded-md hover:bg-[var(--accent-hover)] transition-colors">
                 <i data-lucide="edit" class="h-4 w-4 mr-2"></i> Edit Listing
             </button>
-            <button class="flex-1 flex items-center justify-center px-4 py-3 bg-[var(--card)] text-[var(--foreground)] border border-[var(--border)] rounded-md hover:bg-[var(--muted)] transition-colors">
+            <button
+                class="flex-1 flex items-center justify-center px-4 py-3 bg-[var(--card)] text-[var(--foreground)] border border-[var(--border)] rounded-md hover:bg-[var(--muted)] transition-colors">
                 <i data-lucide="eye" class="h-4 w-4 mr-2"></i> Preview Listing
             </button>
         </div>
@@ -369,20 +418,23 @@
     </div>
 </div>
 {% else %}
-    <!-- Empty State -->
-    <div class="flex flex-col items-center justify-center min-h-[60vh] text-center space-y-6 animate-in fade-in duration-500">
-        <div class="p-6 bg-[var(--muted)]/30 rounded-full ring-1 ring-[var(--border)]">
-            <i data-lucide="home" class="w-16 h-16 text-[var(--muted-foreground)]"></i>
-        </div>
-        <div class="max-w-md space-y-2">
-            <h2 class="text-3xl font-bold text-[var(--foreground)]">Property Not Listed</h2>
-            <p class="text-[var(--muted-foreground)] text-lg">You haven't listed your property yet. Add your property details to get started with selling.</p>
-        </div>
-        <button onclick="openAddPropertyModal()" class="group flex items-center px-8 py-4 bg-[var(--accent)] text-[var(--bg)] font-bold text-lg rounded-lg hover:bg-[var(--accent-hover)] transition-all transform hover:scale-105 shadow-lg shadow-[var(--accent)]/20">
-            <i data-lucide="plus-circle" class="w-6 h-6 mr-2 transition-transform group-hover:rotate-90"></i>
-            List My Property
-        </button>
+<!-- Empty State -->
+<div
+    class="flex flex-col items-center justify-center min-h-[60vh] text-center space-y-6 animate-in fade-in duration-500">
+    <div class="p-6 bg-[var(--muted)]/30 rounded-full ring-1 ring-[var(--border)]">
+        <i data-lucide="home" class="w-16 h-16 text-[var(--muted-foreground)]"></i>
     </div>
+    <div class="max-w-md space-y-2">
+        <h2 class="text-3xl font-bold text-[var(--foreground)]">Property Not Listed</h2>
+        <p class="text-[var(--muted-foreground)] text-lg">You haven't listed your property yet. Add your property
+            details to get started with selling.</p>
+    </div>
+    <button onclick="openAddPropertyModal()"
+        class="group flex items-center px-8 py-4 bg-[var(--accent)] text-[var(--bg)] font-bold text-lg rounded-lg hover:bg-[var(--accent-hover)] transition-all transform hover:scale-105 shadow-lg shadow-[var(--accent)]/20">
+        <i data-lucide="plus-circle" class="w-6 h-6 mr-2 transition-transform group-hover:rotate-90"></i>
+        List My Property
+    </button>
+</div>
 {% endif %}
 
 {% endblock %}
@@ -390,8 +442,8 @@
 {% block scripts %}
 <script>
     // --- MOCKED DATA OR FROM BACKEND ---
-    const propertyData = {{ seller_profile_json|safe|default:"{}" }};
-    
+    const propertyData = JSON.parse('{{ seller_profile_json|escapejs|default:"{}" }}');
+
     // Default or existing data
     let property = {
         id: 1,
@@ -408,7 +460,7 @@
         listingDate: "2024-01-15",
         features: [],
         structuredFeatures: {
-            ...propertyData.property_features,
+            ...(propertyData.property_features || {}),
             propertyType: [propertyData.property_type],
         },
         images: propertyData.images || [],
@@ -425,55 +477,55 @@
     function openEditPropertyModal(step = 1) {
         const form = document.getElementById('add-property-form');
         form.setAttribute('data-editing', 'true'); // Flag to prevent reset
-        
+
         // Populate Step 1
         // Note: Using propertyData which comes from backend serialization
         // We use propertyData.property_type_val (raw) for the select value if available, 
         // fallback to propertyData.property_type (display) might not match select options if they differ.
-        if(form.property_type) form.property_type.value = propertyData.property_type_val || propertyData.property_type || "";
-        if(form.street_address) form.street_address.value = propertyData.street_address || "";
-        if(form.city) form.city.value = propertyData.city || "";
-        if(form.state) form.state.value = propertyData.state || "";
-        if(form.zip_code) form.zip_code.value = propertyData.zip_code || "";
-        
+        if (form.property_type) form.property_type.value = propertyData.property_type_val || propertyData.property_type || "";
+        if (form.street_address) form.street_address.value = propertyData.street_address || "";
+        if (form.city) form.city.value = propertyData.city || "";
+        if (form.state) form.state.value = propertyData.state || "";
+        if (form.zip_code) form.zip_code.value = propertyData.zip_code || "";
+
         // Populate Step 2
-        if(form.bedrooms) form.bedrooms.value = propertyData.bedrooms || "";
-        if(form.bathrooms) form.bathrooms.value = propertyData.bathrooms || "";
-        if(form.sqft) form.sqft.value = propertyData.sqft || "";
-        if(form.garage_spaces) form.garage_spaces.value = propertyData.garage_spaces || "";
-        if(form.estimated_value) form.estimated_value.value = propertyData.estimated_value || "";
-        if(form.property_description) form.property_description.value = propertyData.property_description || "";
-        
+        if (form.bedrooms) form.bedrooms.value = propertyData.bedrooms || "";
+        if (form.bathrooms) form.bathrooms.value = propertyData.bathrooms || "";
+        if (form.sqft) form.sqft.value = propertyData.sqft || "";
+        if (form.garage_spaces) form.garage_spaces.value = propertyData.garage_spaces || "";
+        if (form.estimated_value) form.estimated_value.value = propertyData.estimated_value || "";
+        if (form.property_description) form.property_description.value = propertyData.property_description || "";
+
         // Populate Step 3 (Features)
         const feats = propertyData.property_features || {};
-        if(form.feature_flooring) form.feature_flooring.value = feats.flooring || "";
-        if(form.feature_countertop) form.feature_countertop.value = feats.kitchenCountertop || "";
-        if(form.feature_foundation) form.feature_foundation.value = feats.foundation || "";
-        if(form.feature_cooling) form.feature_cooling.value = feats.cooling || "";
-        if(form.feature_heating) form.feature_heating.value = feats.heating || "";
-        if(form.feature_fireplace) form.feature_fireplace.checked = feats.fireplace || false;
-        
+        if (form.feature_flooring) form.feature_flooring.value = feats.flooring || "";
+        if (form.feature_countertop) form.feature_countertop.value = feats.kitchenCountertop || "";
+        if (form.feature_foundation) form.feature_foundation.value = feats.foundation || "";
+        if (form.feature_cooling) form.feature_cooling.value = feats.cooling || "";
+        if (form.feature_heating) form.feature_heating.value = feats.heating || "";
+        if (form.feature_fireplace) form.feature_fireplace.checked = feats.fireplace || false;
+
         // Multi-checkboxes population
-        if(feats.communityAmenities) {
+        if (feats.communityAmenities) {
             const amenities = Array.isArray(feats.communityAmenities) ? feats.communityAmenities : [feats.communityAmenities];
             const checkboxes = document.getElementsByName('feature_amenities');
-            for(let cb of checkboxes) {
+            for (let cb of checkboxes) {
                 cb.checked = amenities.includes(cb.value);
             }
         }
-        if(feats.appliances) {
+        if (feats.appliances) {
             const appliances = Array.isArray(feats.appliances) ? feats.appliances : [feats.appliances];
             const checkboxes = document.getElementsByName('feature_appliances');
-            for(let cb of checkboxes) {
+            for (let cb of checkboxes) {
                 cb.checked = appliances.includes(cb.value);
             }
         }
-        
+
         // Reset Image Upload
         const grid = document.getElementById('image-preview-grid');
         grid.innerHTML = '';
         selectedImages = [];
-        
+
         // Populate Existing Images
         if (propertyData.images && propertyData.images.length > 0) {
             propertyData.images.forEach(img => {
@@ -488,13 +540,13 @@
                 grid.appendChild(div);
             });
         }
-        
-        if(window.lucide) lucide.createIcons();
-        
+
+        if (window.lucide) lucide.createIcons();
+
         // Update Modal Title & Button
         document.querySelector('#add-property-modal h2').textContent = "Edit Your Property";
         document.getElementById('btn-submit').textContent = "Update Listing";
-        
+
         openAddPropertyModal(false); // Don't reset
         currentStep = step;
         updateWizardUI();
@@ -508,9 +560,9 @@
             // Reset form if it's a fresh add
             const form = document.getElementById('add-property-form');
             if (!form.getAttribute('data-editing')) {
-                 form.reset();
-                 document.getElementById('image-preview-grid').innerHTML = '';
-                 selectedImages = [];
+                form.reset();
+                document.getElementById('image-preview-grid').innerHTML = '';
+                selectedImages = [];
             }
         }
     }
@@ -518,7 +570,7 @@
     function updateWizardUI() {
         // Update UI
         document.getElementById('wizard-step-num').textContent = currentStep;
-        
+
         // Toggle Steps
         document.querySelectorAll('.wizard-step').forEach((el, index) => {
             el.classList.toggle('hidden', index + 1 !== currentStep);
@@ -526,7 +578,7 @@
 
         // Toggle Buttons
         document.getElementById('btn-prev').classList.toggle('hidden', currentStep === 1);
-        
+
         if (currentStep === totalSteps) {
             document.getElementById('btn-next').classList.add('hidden');
             document.getElementById('btn-submit').classList.remove('hidden');
@@ -559,18 +611,18 @@
     function handleImagePreview(input) {
         const grid = document.getElementById('image-preview-grid');
         const error = document.getElementById('image-error');
-        
+
         if (input.files.length + selectedImages.length > 6) {
             error.textContent = "Maximum 6 images allowed";
             error.classList.remove('hidden');
             return;
         }
-        
+
         error.classList.add('hidden');
-        
+
         Array.from(input.files).forEach(file => {
             selectedImages.push(file);
-            
+
             const reader = new FileReader();
             reader.onload = (e) => {
                 const div = document.createElement('div');
@@ -582,7 +634,7 @@
                     </button>
                 `;
                 grid.appendChild(div);
-                if(window.lucide) lucide.createIcons();
+                if (window.lucide) lucide.createIcons();
             };
             reader.readAsDataURL(file);
         });
@@ -594,17 +646,17 @@
         // For simplicity in this demo, we'll just remove from DOM and clear array if needed or implement better tracking
         // But since user asked for "seeing previous images", we focused on that.
         // Ideally, we'd track index. For now, removing from DOM.
-        
+
         // If we want to strictly sync with selectedImages, we need to store index on the element.
         // Let's assume for now user won't remove new uploads in complex ways or we clear all if they re-upload.
         btn.closest('div').remove();
-        
+
         // Re-sync logic would go here (filtering selectedImages)
         // For now, let's just assume we need to re-validate count on submit
     }
 
     async function deleteExistingImage(imageId, btn) {
-        if(!confirm("Are you sure you want to delete this image?")) return;
+        if (!confirm("Are you sure you want to delete this image?")) return;
 
         try {
             const response = await fetch(`/api/v1/seller/property-image/${imageId}/`, {
@@ -633,7 +685,7 @@
     async function submitProperty() {
         const form = document.getElementById('add-property-form');
         const formData = new FormData(form);
-        
+
         // Add structured features
         const features = {
             flooring: formData.get('feature_flooring'),
@@ -647,10 +699,10 @@
         };
         formData.append('property_features', JSON.stringify(features));
         formData.append('has_active_listing', 'true');
-        
+
         // Add images
         selectedImages.forEach((file) => {
-            formData.append('upload_images', file); 
+            formData.append('upload_images', file);
         });
 
         try {
@@ -695,8 +747,8 @@
 
     // --- EXISTING DASHBOARD LOGIC ---
     // Note: I will only enable these if we have a listing
-    
-    {% if seller_profile.has_active_listing %}
+
+    // {% if seller_profile.has_active_listing %}
     // --- CONSTANTS & OPTIONS ---
     const PROPERTY_TYPE_OPTIONS = ["Single Family", "Condo", "Townhome", "Apartment unit"];
     const FLOORING_OPTIONS = ["Hardwood", "Carpet", "Tile", "Vinyl"];
@@ -706,10 +758,10 @@
     const HEATING_OPTIONS = ["Gas", "Electric"];
     const COOLING_OPTIONS = ["Central", "Electric"];
     const APPLIANCES_OPTIONS = ["Dishwasher", "Gas cooktop", "Disposal", "Electric cooktop", "Built-in oven"];
-    
+
     let isEditingFeatures = false;
     let editedFeatures = JSON.parse(JSON.stringify(property.structuredFeatures)); // Deep copy
-    
+
     const dom = {
         // Stats & Info
         statStatus: document.getElementById('stat-status'),
@@ -737,17 +789,17 @@
     function init() {
         if (window.lucide) lucide.createIcons();
         renderHeaderInfo();
-        renderFeaturesSection(); 
+        renderFeaturesSection();
         renderPropertyImages();
     }
 
     function renderHeaderInfo() {
-        if(!dom.propTitle) return; // Guard
-        
+        if (!dom.propTitle) return; // Guard
+
         dom.propTitle.textContent = property.title || "My Property";
         dom.propLocation.textContent = property.location;
         dom.propPrice.textContent = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0 }).format(property.price);
-        
+
         dom.propBeds.textContent = property.bedrooms;
         dom.propBaths.textContent = property.bathrooms;
         dom.propSqft.textContent = (property.sqft || 0).toLocaleString();
@@ -757,34 +809,34 @@
     function renderPropertyImages() {
         if (property.images && property.images.length > 0) {
             // Clear existing placeholder content except the absolute positioned controls
-            const controls = Array.from(dom.propHeroImage.children).filter(el => 
+            const controls = Array.from(dom.propHeroImage.children).filter(el =>
                 el.classList.contains('absolute') && !el.classList.contains('inset-0')
             );
-            
-            dom.propHeroImage.innerHTML = ''; 
-            
+
+            dom.propHeroImage.innerHTML = '';
+
             // Create scroll container
             const container = document.createElement('div');
             container.className = "flex overflow-x-auto snap-x snap-mandatory w-full h-full scrollbar-hide no-scrollbar scroll-smooth";
-            
+
             property.images.forEach(img => {
                 const wrapper = document.createElement('div');
                 wrapper.className = "flex-shrink-0 w-full h-full snap-center relative";
-                
+
                 const imageEl = document.createElement('img');
                 imageEl.src = img.image;
                 imageEl.className = "w-full h-full object-cover";
-                
+
                 wrapper.appendChild(imageEl);
                 container.appendChild(wrapper);
             });
-            
+
             dom.propHeroImage.appendChild(container);
-            
+
             // Add Scroll Buttons if multiple images
             if (property.images.length > 1) {
                 const btnClass = "absolute top-1/2 -translate-y-1/2 p-2 bg-black/50 hover:bg-black/70 text-white rounded-full transition-all duration-300 z-20 cursor-pointer opacity-0 group-hover:opacity-100";
-                
+
                 const prevBtn = document.createElement('button');
                 prevBtn.innerHTML = '<i data-lucide="chevron-left" class="w-6 h-6"></i>';
                 prevBtn.className = `${btnClass} left-4`;
@@ -792,7 +844,7 @@
                     e.preventDefault();
                     container.scrollBy({ left: -container.offsetWidth, behavior: 'smooth' });
                 };
-                
+
                 const nextBtn = document.createElement('button');
                 nextBtn.innerHTML = '<i data-lucide="chevron-right" class="w-6 h-6"></i>';
                 nextBtn.className = `${btnClass} right-4`;
@@ -800,11 +852,11 @@
                     e.preventDefault();
                     container.scrollBy({ left: container.offsetWidth, behavior: 'smooth' });
                 };
-                
+
                 dom.propHeroImage.appendChild(prevBtn);
                 dom.propHeroImage.appendChild(nextBtn);
             }
-            
+
             // Edit Button (Top Right)
             const editBtnContainer = document.createElement('div');
             editBtnContainer.className = "absolute top-4 right-4 z-10";
@@ -818,8 +870,8 @@
             // Re-append other controls (like status badge)
             const otherControls = controls.filter(c => !c.querySelector('button i[data-lucide="edit"]'));
             otherControls.forEach(c => dom.propHeroImage.appendChild(c));
-            
-            if(window.lucide) lucide.createIcons();
+
+            if (window.lucide) lucide.createIcons();
         }
     }
 
@@ -849,7 +901,7 @@
         } else {
             renderViewMode();
         }
-        
+
         // Re-bind listeners for dynamic buttons
         bindFeatureActionListeners();
         if (window.lucide) lucide.createIcons();
@@ -861,10 +913,10 @@
 
         const createSection = (title, items) => {
             if (!items || (Array.isArray(items) && items.length === 0)) return '';
-            const badges = Array.isArray(items) 
+            const badges = Array.isArray(items)
                 ? items.map(i => `<span class="px-3 py-1 bg-[var(--muted)]/30 text-[var(--foreground)] text-sm rounded-full">${i}</span>`).join('')
                 : `<span class="px-3 py-1 bg-[var(--muted)]/30 text-[var(--foreground)] text-sm rounded-full">${items}</span>`;
-            
+
             return `
                 <div>
                     <h3 class="text-lg font-semibold text-[var(--foreground)] mb-3">${title}</h3>
@@ -876,19 +928,19 @@
         html += createSection('Property Type', sf.propertyType);
         html += createSection('Flooring', sf.flooring);
         html += createSection('Kitchen Countertop', sf.kitchenCountertop);
-        html += createSection('Community & Amenities', sf.communityAmenities);
+        html += createSection('Community and Amenities', sf.communityAmenities);
         html += createSection('Foundation', sf.foundation);
 
         // Heating & Cooling Combined
         const hvacItems = [];
-        if(sf.fireplace) hvacItems.push('Fireplace');
-        if(sf.heating) hvacItems.push(`Heating: ${sf.heating}`);
-        if(sf.cooling) hvacItems.push(`Cooling: ${sf.cooling}`);
-        
-        if(hvacItems.length > 0) {
+        if (sf.fireplace) hvacItems.push('Fireplace');
+        if (sf.heating) hvacItems.push(`Heating: ${sf.heating}`);
+        if (sf.cooling) hvacItems.push(`Cooling: ${sf.cooling}`);
+
+        if (hvacItems.length > 0) {
             html += `
                 <div>
-                    <h3 class="text-lg font-semibold text-[var(--foreground)] mb-3">Heating & Cooling</h3>
+                    <h3 class="text-lg font-semibold text-[var(--foreground)] mb-3">Heating and Cooling</h3>
                     <div class="flex flex-wrap gap-2">
                         ${hvacItems.map(i => `<span class="px-3 py-1 bg-[var(--muted)]/30 text-[var(--foreground)] text-sm rounded-full">${i}</span>`).join('')}
                     </div>
@@ -939,17 +991,17 @@
         `;
 
         let html = '';
-        
+
         html += createCheckboxGroup('propType', 'Property Type', PROPERTY_TYPE_OPTIONS, editedFeatures.propertyType || []);
         html += `<div class="pt-4 border-t border-[var(--border)]">` + createSelect('input-flooring', 'Flooring', FLOORING_OPTIONS, editedFeatures.flooring) + `</div>`;
         html += `<div class="pt-4 border-t border-[var(--border)]">` + createSelect('input-counter', 'Kitchen Countertop', KITCHEN_COUNTERTOP_OPTIONS, editedFeatures.kitchenCountertop) + `</div>`;
-        html += `<div class="pt-4 border-t border-[var(--border)]">` + createCheckboxGroup('amenities', 'Community & Amenities', COMMUNITY_AMENITIES_OPTIONS, editedFeatures.communityAmenities || []) + `</div>`;
+        html += `<div class="pt-4 border-t border-[var(--border)]">` + createCheckboxGroup('amenities', 'Community and Amenities', COMMUNITY_AMENITIES_OPTIONS, editedFeatures.communityAmenities || []) + `</div>`;
         html += `<div class="pt-4 border-t border-[var(--border)]">` + createSelect('input-foundation', 'Foundation', FOUNDATION_OPTIONS, editedFeatures.foundation) + `</div>`;
-        
+
         // Heating & Cooling
         html += `
             <div class="pt-4 border-t border-[var(--border)]">
-                <h3 class="text-lg font-semibold text-[var(--foreground)] mb-4">Heating & Cooling</h3>
+                <h3 class="text-lg font-semibold text-[var(--foreground)] mb-4">Heating and Cooling</h3>
                 <div class="space-y-4">
                     ${createCheckbox('input-fireplace', 'Fireplace', editedFeatures.fireplace)}
                     ${createSelect('input-heating', 'Heating', HEATING_OPTIONS, editedFeatures.heating)}
@@ -992,14 +1044,14 @@
 
     async function saveFeatures() {
         // Harvest data from inputs
-        
+
         // 1. Single Selects
         editedFeatures.flooring = document.getElementById('input-flooring').value;
         editedFeatures.kitchenCountertop = document.getElementById('input-counter').value;
         editedFeatures.foundation = document.getElementById('input-foundation').value;
         editedFeatures.heating = document.getElementById('input-heating').value;
         editedFeatures.cooling = document.getElementById('input-cooling').value;
-        
+
         // 2. Single Checkboxes
         editedFeatures.fireplace = document.getElementById('input-fireplace').checked;
 
@@ -1014,7 +1066,7 @@
 
         // Save to main property object (Optimistic update)
         property.structuredFeatures = JSON.parse(JSON.stringify(editedFeatures));
-        
+
         // Backend Update
         const formData = new FormData();
         formData.append('property_features', JSON.stringify(editedFeatures));
@@ -1022,8 +1074,8 @@
         // but our UI allows multiple checkboxes. We'll just sync the first one if available or ignore for now
         // as property_type is a specific field in the model.
         if (editedFeatures.propertyType && editedFeatures.propertyType.length > 0) {
-             // Mapping readable values back to keys if necessary, strictly simplest case:
-             // formData.append('property_type', ...); 
+            // Mapping readable values back to keys if necessary, strictly simplest case:
+            // formData.append('property_type', ...); 
         }
 
         try {
@@ -1034,7 +1086,7 @@
                 },
                 body: formData
             });
-            
+
             if (!response.ok) {
                 console.error("Failed to save features");
                 // Revert optimistic update?
@@ -1042,15 +1094,15 @@
         } catch (e) {
             console.error(e);
         }
-        
+
         // Switch mode
         isEditingFeatures = false;
         renderFeaturesSection();
     }
-    
+
     // Run Init
     init();
-    {% endif %}
+    // {% endif %}
 
     if (window.lucide) lucide.createIcons();
 </script>
