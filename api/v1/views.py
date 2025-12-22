@@ -1,4 +1,5 @@
 from rest_framework.generics import RetrieveUpdateAPIView, DestroyAPIView, ListAPIView
+from rest_framework.views import APIView
 from django.db.models import Q
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from api.v1.serializer import (
@@ -13,6 +14,10 @@ from api.models import BuyerProfile, RealtorProfile, SellerProfile, PartnerProfi
 from rest_framework.response import Response
 from rest_framework import status
 from django.shortcuts import get_object_or_404
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework.filters import OrderingFilter
+from api.filters import PropertyFilter, PartnerFilter
+
 
 
 class BuyerProfileView(RetrieveUpdateAPIView):
@@ -124,61 +129,16 @@ class PropertySearchView(ListAPIView):
     """
     Public View (for Buyers) to search properties
     """
-    permission_classes = [AllowAny] # Or AllowAny if public
+    permission_classes = [AllowAny]
     serializer_class = PropertySearchSerializer
+    queryset = SellerProfile.objects.filter(has_active_listing=True).select_related('user').prefetch_related('images')
     
-    def get_queryset(self):
-        keywords = self.request.query_params.get('keywords')
-        location = self.request.query_params.get('location')
-        p_type = self.request.query_params.get('type')
-        price_min = self.request.query_params.get('price_min')
-        price_max = self.request.query_params.get('price_max')
-        beds = self.request.query_params.get('beds')
-        baths = self.request.query_params.get('baths')
-        sort = self.request.query_params.get('sort')
-
-
-        if keywords:
-            queryset = queryset.filter(
-                Q(property_description__icontains=keywords) | 
-                Q(city__icontains=keywords) |
-                Q(street_address__icontains=keywords)
-
-            )
-            
-        if location:
-            queryset = queryset.filter(
-                Q(city__icontains=location) |
-                Q(state__icontains=location) |
-                Q(zip_code__icontains=location)
-            )
-            
-        if p_type:
-            queryset = queryset.filter(property_type__iexact=p_type)
-            
-        if price_min:
-            queryset = queryset.filter(estimated_value__gte=price_min)
-            
-        if price_max and price_max != 'Infinity':
-            queryset = queryset.filter(estimated_value__lte=price_max)
-            
-        if beds:
-            queryset = queryset.filter(bedrooms__gte=beds)
-            
-        if baths:
-            queryset = queryset.filter(bathrooms__gte=baths)
-            
-
-        if sort:
-            if sort == 'price-asc':
-                queryset = queryset.order_by('estimated_value')
-            elif sort == 'price-desc':
-                queryset = queryset.order_by('-estimated_value')
-            elif sort == 'newest':
-                queryset = queryset.order_by('-created_at')
-
-            
-        return queryset
+    filter_backends = [DjangoFilterBackend, OrderingFilter]
+    
+    filterset_class = PropertyFilter
+    
+    ordering_fields = ['estimated_value', 'created_at']
+    ordering = ['-created_at'] 
 
 class BuyerFavoritesView(ListAPIView):
     """
@@ -187,13 +147,16 @@ class BuyerFavoritesView(ListAPIView):
     permission_classes = [IsAuthenticated, IsBuyer]
     serializer_class = PropertySearchSerializer
     
+    filter_backends = [DjangoFilterBackend, OrderingFilter]
+    filterset_class = PropertyFilter
+    ordering_fields = ['estimated_value', 'created_at']
+    ordering = ['-created_at']
+
     def get_queryset(self):
 
         buyer_profile = get_object_or_404(BuyerProfile, user=self.request.user)
         return buyer_profile.favorites.all().select_related('user').prefetch_related('images')
 
-
-from rest_framework.views import APIView
 
 class BuyerFavoriteToggleView(APIView):
     """
@@ -257,6 +220,12 @@ class PartnerListView(ListAPIView):
     permission_classes = [AllowAny]
     serializer_class = PartnerProfileSerializer
     queryset = PartnerProfile.objects.all().select_related('user')
+    
+    # Enable filtering and ordering
+    filter_backends = [DjangoFilterBackend, OrderingFilter]
+    filterset_class = PartnerFilter
+    ordering_fields = ['company_name', 'created_at']
+    ordering = ['-created_at']
 
 
 class ChangePasswordView(APIView):
