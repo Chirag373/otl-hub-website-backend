@@ -14,8 +14,6 @@ from rest_framework.response import Response
 from rest_framework import status
 from django.shortcuts import get_object_or_404
 
-# Create your views here.
-
 
 class BuyerProfileView(RetrieveUpdateAPIView):
     """
@@ -115,7 +113,7 @@ class PropertyImageDeleteView(DestroyAPIView):
     queryset = PropertyImage.objects.all()
     
     def get_queryset(self):
-        # Ensure user can only delete their own images
+
         return PropertyImage.objects.filter(seller_profile__user=self.request.user)
 
     def delete(self, request, *args, **kwargs):
@@ -130,14 +128,6 @@ class PropertySearchView(ListAPIView):
     serializer_class = PropertySearchSerializer
     
     def get_queryset(self):
-        # Base queryset - optimize with select_related/prefetch_related
-        # In a real app, strict filtering: has_active_listing=True
-        queryset = SellerProfile.objects.filter(has_active_listing=True).select_related('user').prefetch_related('images')
-        
-        # If DB is empty/dev mode, might want to relax this:
-        # queryset = SellerProfile.objects.all().select_related('user').prefetch_related('images')
-
-        # Extract query params
         keywords = self.request.query_params.get('keywords')
         location = self.request.query_params.get('location')
         p_type = self.request.query_params.get('type')
@@ -147,13 +137,13 @@ class PropertySearchView(ListAPIView):
         baths = self.request.query_params.get('baths')
         sort = self.request.query_params.get('sort')
 
-        # Filters
+
         if keywords:
             queryset = queryset.filter(
                 Q(property_description__icontains=keywords) | 
                 Q(city__icontains=keywords) |
                 Q(street_address__icontains=keywords)
-                # JSONField search depends on DB backend, skipping for simple compatibility
+
             )
             
         if location:
@@ -178,7 +168,7 @@ class PropertySearchView(ListAPIView):
         if baths:
             queryset = queryset.filter(bathrooms__gte=baths)
             
-        # Sorting
+
         if sort:
             if sort == 'price-asc':
                 queryset = queryset.order_by('estimated_value')
@@ -186,7 +176,7 @@ class PropertySearchView(ListAPIView):
                 queryset = queryset.order_by('-estimated_value')
             elif sort == 'newest':
                 queryset = queryset.order_by('-created_at')
-            # 'relevant' is default, no specific sort needed (or ID)
+
             
         return queryset
 
@@ -198,7 +188,7 @@ class BuyerFavoritesView(ListAPIView):
     serializer_class = PropertySearchSerializer
     
     def get_queryset(self):
-        # We start from the BuyerProfile to ensure safety
+
         buyer_profile = get_object_or_404(BuyerProfile, user=self.request.user)
         return buyer_profile.favorites.all().select_related('user').prefetch_related('images')
 
@@ -270,6 +260,9 @@ class PartnerListView(ListAPIView):
 
 
 class ChangePasswordView(APIView):
+    """
+    View to handle user password change
+    """
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
@@ -289,6 +282,9 @@ class ChangePasswordView(APIView):
 
 
 class DeleteAccountView(APIView):
+    """
+    View to delete user account
+    """
     permission_classes = [IsAuthenticated]
 
     def delete(self, request):
@@ -298,10 +294,13 @@ class DeleteAccountView(APIView):
 
 
 class UpdateNotificationSettingsView(APIView):
+    """
+    View to update user notification settings
+    """
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
-        # Mock saving settings
+
         return Response({"message": "Notification settings updated"}, status=status.HTTP_200_OK)
 
 

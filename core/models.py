@@ -6,6 +6,7 @@ from django.utils.translation import gettext_lazy as _
 
 class User(AbstractUser):
     """Extended User model with role-based authentication"""
+    username = None
 
     class UserRole(models.TextChoices):
         BUYER = "BUYER", _("Buyer")
