@@ -62,6 +62,9 @@ class User(AbstractUser):
     otp = models.CharField(max_length=8, blank=True, null=True)
     otp_created_at = models.DateTimeField(blank=True, null=True)
 
+    # Stripe
+    stripe_customer_id = models.CharField(max_length=100, blank=True, null=True)
+
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = ["first_name", "last_name"]
 
@@ -76,12 +79,6 @@ class User(AbstractUser):
 
     def __str__(self):
         return f"{self.email} ({self.get_role_display()})"
-
-
-
-
-
-
 
 
 class PendingSignup(models.Model):

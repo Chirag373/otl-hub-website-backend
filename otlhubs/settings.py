@@ -209,3 +209,7 @@ DEFAULT_FROM_EMAIL = "OTL Platform <info.signup@otlhub.net>"
 
 
 
+
+# Stripe Configuration
+STRIPE_PUBLIC_KEY = os.getenv('STRIPE_PUBLIC_KEY', '')
+STRIPE_SECRET_KEY = os.getenv('STRIPE_SECRET_KEY', '')

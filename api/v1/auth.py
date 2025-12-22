@@ -75,36 +75,28 @@ class VerifyOTPView(generics.GenericAPIView):
     throttle_scope = 'signup'
 
     def post(self, request):
-        with transaction.atomic():
-            serializer = self.get_serializer(data=request.data)
-            serializer.is_valid(raise_exception=True)
-            
-            pending_signup = serializer.validated_data['pending_signup']
-            signup_data = pending_signup.signup_data
-
-            # Create the actual user
-            signup_serializer = SignupSerializer(data=signup_data)
-            if signup_serializer.is_valid(raise_exception=True):
-                user = signup_serializer.save()
-                
-                user.is_active = True
-                user.save()
-                
-                # Cleanup
-                pending_signup.delete()
-
-        # Generate tokens
-        refresh = RefreshToken.for_user(user)
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
         
-        return Response(
-            {
-                "message": "Email verified and account created successfully",
-                "access_token": str(refresh.access_token),
-                "refresh_token": str(refresh),
-                "user": UserResponseSerializer(user).data
-            },
-            status=status.HTTP_201_CREATED
-        )
+        pending_signup = serializer.validated_data['pending_signup']
+        
+        # Initiate Stripe Checkout instead of creating user immediately
+        try:
+            from api.v1.payment import create_checkout_session
+            checkout_url = create_checkout_session(request, pending_signup)
+            
+            return Response(
+                {
+                    "message": "OTP Verified. Redirecting to payment.",
+                    "url": checkout_url
+                },
+                status=status.HTTP_200_OK
+            )
+        except Exception as e:
+            return Response(
+                {"error": "Failed to initiate payment: " + str(e)},
+                status=status.HTTP_400_BAD_REQUEST
+            )
 
 
 from django.contrib.auth import login

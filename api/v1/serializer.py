@@ -82,6 +82,7 @@ class SignupSerializer(serializers.ModelSerializer):
     service_areas = serializers.CharField(required=False, allow_blank=True)
     website_url = serializers.URLField(required=False, allow_blank=True)
     business_license_number = serializers.CharField(required=False, allow_blank=True)
+    selected_plan = serializers.CharField(required=False, allow_blank=True, write_only=True)
 
     class Meta:
         model = User
@@ -105,6 +106,7 @@ class SignupSerializer(serializers.ModelSerializer):
             "service_areas",
             "website_url",
             "business_license_number",
+            "selected_plan",
         ]
 
     def validate(self, data):
@@ -195,6 +197,7 @@ class SignupSerializer(serializers.ModelSerializer):
         service_areas = validated_data.pop("service_areas", None)
         website_url = validated_data.pop("website_url", None)
         business_license_number = validated_data.pop("business_license_number", None)
+        selected_plan = validated_data.pop("selected_plan", None)
 
         # Create user using the manager's create_user method which handles hashing
         # and email normalization

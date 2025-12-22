@@ -361,7 +361,7 @@
 
     function renderPricingPlan(type) {
         const config = planConfigs[type];
-        
+
         // Changed padding from p-6 to p-4 sm:p-6 for better mobile view
         let html = `<div class="card bg-[var(--card)] rounded-lg border border-[var(--border)] shadow-lg overflow-visible"><div class="card-body p-4 sm:p-6">`;
 
@@ -405,7 +405,7 @@
         const basic = config.plans.basic;
         const pro = config.plans.pro;
         const isBasic = selectedBuyerPlan === 'basic';
-        
+
         // Helper to generate card class
         const getCardClass = (isSelected, isRecommended) => {
             let classes = "cursor-pointer relative rounded-lg border-2 p-4 transition-all hover:border-[var(--accent)]/50 ";
@@ -471,7 +471,7 @@
 
     function renderSinglePlan(type, config) {
         let content = '';
-        
+
         if (type === 'seller') {
             content = `
                 <div class="text-center space-y-3">
@@ -516,7 +516,7 @@
                 </div>
             `;
         } else if (type === 'partner') {
-             content = `
+            content = `
                 <div class="text-center space-y-3">
                     <div class="flex justify-between items-center text-sm border-b border-[var(--border)] pb-2">
                          <span class="text-[var(--muted-foreground)]">Access Fee</span>
@@ -709,6 +709,7 @@
                 const budget = document.querySelector('select');
                 if (location) formData.preferred_location = location.value;
                 if (budget) formData.budget_range = budget.value;
+                formData.selected_plan = selectedBuyerPlan; // Send selected plan
             } else if (currentUserType === 'realtor') {
                 const license = document.querySelector('input[placeholder="Real estate license number"]');
                 const company = document.querySelector('input[placeholder="Company or brokerage name"]');
@@ -883,7 +884,7 @@
                 document.getElementById('otp_modal').close();
 
                 Toastify({
-                    text: "Email verified! Redirecting to login...",
+                    text: "Email verified! Redirecting to payment...",
                     duration: 3000,
                     close: true,
                     gravity: "bottom",
@@ -895,9 +896,16 @@
                 }).showToast();
 
                 // Call Stripe Checkout
-                setTimeout(() => {
-                    window.location.href = "{% url 'login' %}";
-                }, 1000);
+                if (data.url) {
+                    setTimeout(() => {
+                        window.location.href = data.url;
+                    }, 1000);
+                } else {
+                    // Fallback if no URL but successful (shouldn't happen with payment flow)
+                    setTimeout(() => {
+                        window.location.href = "{% url 'login' %}";
+                    }, 1000);
+                }
 
             } else {
                 errorDiv.textContent = data.error || "Verification failed. Please try again.";
