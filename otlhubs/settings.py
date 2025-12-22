@@ -12,6 +12,9 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 import os
 from pathlib import Path
 from datetime import timedelta
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -21,12 +24,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-&psk#)@5i*l7g$ek^_3-2lztr6v+5c&6g0l-w5)8zqj^@5j8g5"
+SECRET_KEY = os.getenv("SECRET_KEY", "django-insecure-&psk#)@5i*l7g$ek^_3-2lztr6v+5c&6g0l-w5)8zqj^@5j8g5")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv("DEBUG", "True") == "True"
 
-ALLOWED_HOSTS = ["testserver", "127.0.0.1", "localhost"]
+ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "testserver,127.0.0.1,localhost").split(",")
 
 
 # Application definition
@@ -86,8 +89,12 @@ WSGI_APPLICATION = "otlhubs.wsgi.application"
 
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": os.getenv("DB_NAME", "otlhub_db"),
+        "USER": os.getenv("DB_USER", "chirag"),
+        "PASSWORD": os.getenv("DB_PASSWORD", ""),
+        "HOST": os.getenv("DB_HOST", "localhost"),
+        "PORT": os.getenv("DB_PORT", "5432"),
     }
 }
 
@@ -199,13 +206,13 @@ CORS_ALLOW_ALL_ORIGINS = (
 )
 
 # Email Settings
-EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
-EMAIL_HOST = "smtp.ionos.com"
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
-EMAIL_HOST_USER = "info.signup@otlhub.net"
-EMAIL_HOST_PASSWORD = "SignupOTLGroup2025@!"
-DEFAULT_FROM_EMAIL = "OTL Platform <info.signup@otlhub.net>"
+EMAIL_BACKEND = os.getenv("EMAIL_BACKEND", "django.core.mail.backends.smtp.EmailBackend")
+EMAIL_HOST = os.getenv("EMAIL_HOST", "smtp.ionos.com")
+EMAIL_PORT = int(os.getenv("EMAIL_PORT", 587))
+EMAIL_USE_TLS = os.getenv("EMAIL_USE_TLS", "True") == "True"
+EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER", "info.signup@otlhub.net")
+EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD", "SignupOTLGroup2025@!")
+DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL", "OTL Platform <info.signup@otlhub.net>")
 
 
 
