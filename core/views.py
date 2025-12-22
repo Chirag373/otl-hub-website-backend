@@ -23,6 +23,9 @@ class BuyerDashboardView(BuyerRequiredMixin, TemplateView):
 class BuyerPropertySearchView(BuyerRequiredMixin, TemplateView):
     template_name = "buyer-property-search.html"
 
+class PublicPropertySearchView(TemplateView):
+    template_name = "public-property-search.html"
+
 class PropertyDetailView(TemplateView):
     template_name = "property-detail.html"
 

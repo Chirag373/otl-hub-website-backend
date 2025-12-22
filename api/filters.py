@@ -10,6 +10,7 @@ class PropertyFilter(django_filters.FilterSet):
     beds = django_filters.NumberFilter(field_name='bedrooms', lookup_expr='gte')
     baths = django_filters.NumberFilter(field_name='bathrooms', lookup_expr='gte')
     type = django_filters.CharFilter(field_name='property_type', lookup_expr='iexact')
+    zip_code = django_filters.CharFilter(field_name='zip_code', lookup_expr='icontains')
 
     class Meta:
         model = SellerProfile

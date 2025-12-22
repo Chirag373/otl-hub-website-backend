@@ -16,6 +16,7 @@ from rest_framework import status
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import OrderingFilter
+from rest_framework.pagination import LimitOffsetPagination
 from api.filters import PropertyFilter, PartnerFilter
 
 
@@ -131,6 +132,7 @@ class PropertySearchView(ListAPIView):
     """
     permission_classes = [AllowAny]
     serializer_class = PropertySearchSerializer
+    pagination_class = LimitOffsetPagination
     queryset = SellerProfile.objects.filter(has_active_listing=True).select_related('user').prefetch_related('images')
     
     filter_backends = [DjangoFilterBackend, OrderingFilter]

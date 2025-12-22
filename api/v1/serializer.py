@@ -573,13 +573,14 @@ class PropertySearchSerializer(serializers.ModelSerializer):
     type = serializers.CharField(source='property_type', read_only=True)
     features = serializers.JSONField(source='property_features', read_only=True)
     dateAdded = serializers.DateTimeField(source='created_at', read_only=True)
+    description = serializers.CharField(source='property_description', read_only=True)
     
     class Meta:
         model = SellerProfile
         fields = [
             'id', 'title', 'location', 'price', 
             'bedrooms', 'bathrooms', 'sqft', 
-            'image', 'images', 'type', 'features', 'dateAdded'
+            'image', 'images', 'type', 'features', 'dateAdded', 'description'
         ]
 
     def get_title(self, obj):

@@ -1,128 +1,128 @@
-{% extends 'buyer_base.html' %}
+{% extends 'base.html' %}
+{% load static %}
 
 {% block title %}Property Search | OTL Platform{% endblock %}
 
-{% block sidebar %}
-{% include 'partials/buyer_sidebar.html' with active_page='search' %}
-{% endblock %}
-
 {% block content %}
-<div class="space-y-2">
-    <h1 class="text-3xl font-bold text-[var(--foreground)]">Property Search</h1>
-    <p class="text-[var(--muted-foreground)]">Find your perfect property with advanced filters</p>
-</div>
+<div class="max-w-7xl mx-auto px-6 py-8 space-y-6">
+    <div class="space-y-2">
+        <h1 class="text-3xl font-bold text-[var(--foreground)]">Property Search</h1>
+        <p class="text-[var(--muted-foreground)]">Find your perfect property with advanced filters</p>
+    </div>
 
-<div class="bg-[var(--card)] rounded-lg border border-[var(--border)] p-6 space-y-6">
+    <div class="bg-[var(--card)] rounded-lg border border-[var(--border)] p-6 space-y-6">
 
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div class="space-y-2">
-            <label class="text-sm font-medium text-[var(--foreground)]">Keywords</label>
-            <input type="text" id="filter-keywords" placeholder="e.g., condo, downtown, pool"
-                class="w-full px-3 py-2 bg-[var(--input)] border border-[var(--border)] rounded-md text-[var(--foreground)] focus:outline-none focus:border-[var(--accent)]">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div class="space-y-2">
+                <label class="text-sm font-medium text-[var(--foreground)]">Keywords</label>
+                <input type="text" id="filter-keywords" placeholder="e.g., condo, downtown, pool"
+                    class="w-full px-3 py-2 bg-[var(--input)] border border-[var(--border)] rounded-md text-[var(--foreground)] focus:outline-none focus:border-[var(--accent)]">
+            </div>
+            <div class="space-y-2">
+                <label class="text-sm font-medium text-[var(--foreground)]">Location</label>
+                <input type="text" id="filter-location" placeholder="City, State or ZIP"
+                    class="w-full px-3 py-2 bg-[var(--input)] border border-[var(--border)] rounded-md text-[var(--foreground)] focus:outline-none focus:border-[var(--accent)]">
+            </div>
+            <div class="space-y-2">
+                <label class="text-sm font-medium text-[var(--foreground)]">Property Type</label>
+                <select id="filter-type"
+                    class="w-full px-3 py-2 bg-[var(--input)] border border-[var(--border)] rounded-md text-[var(--foreground)] focus:outline-none focus:border-[var(--accent)]">
+                    <option value="">Any Type</option>
+                    <option value="house">House</option>
+                    <option value="condo">Condo</option>
+                    <option value="townhouse">Townhouse</option>
+                    <option value="apartment">Apartment</option>
+                    <option value="land">Land</option>
+                </select>
+            </div>
+            <div class="flex items-end space-x-2">
+                <button id="btn-search"
+                    class="flex-1 flex items-center justify-center px-4 py-2 bg-[var(--accent)] text-[var(--bg)] rounded-md hover:bg-[var(--accent-hover)] transition-colors font-medium">
+                    <i data-lucide="search" class="mr-2 h-4 w-4"></i> Search
+                </button>
+                <button id="btn-toggle-filters"
+                    class="p-2 border border-[var(--border)] rounded-md text-[var(--foreground)] hover:bg-[var(--muted)] transition-colors"
+                    title="Advanced Filters">
+                    <i data-lucide="sliders-horizontal" class="h-5 w-5"></i>
+                </button>
+            </div>
         </div>
-        <div class="space-y-2">
-            <label class="text-sm font-medium text-[var(--foreground)]">Location</label>
-            <input type="text" id="filter-location" placeholder="City, State or ZIP"
-                class="w-full px-3 py-2 bg-[var(--input)] border border-[var(--border)] rounded-md text-[var(--foreground)] focus:outline-none focus:border-[var(--accent)]">
+
+        <div id="advanced-filters" class="hidden pt-4 border-t border-[var(--border)]">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-semibold text-[var(--foreground)]">Advanced Filters</h3>
+                <button id="btn-clear-filters"
+                    class="flex items-center px-3 py-1 text-sm border border-[var(--border)] rounded-md text-[var(--foreground)] hover:bg-[var(--muted)] transition-colors">
+                    <i data-lucide="x" class="mr-2 h-4 w-4"></i> Clear All
+                </button>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="space-y-2">
+                    <label class="text-sm font-medium text-[var(--foreground)]">Price Range</label>
+                    <select id="filter-price"
+                        class="w-full px-3 py-2 bg-[var(--input)] border border-[var(--border)] rounded-md text-[var(--foreground)] focus:outline-none focus:border-[var(--accent)]">
+                        <option value="">Any Price</option>
+                        <option value="0-200000">Under $200,000</option>
+                        <option value="200000-400000">$200,000 - $400,000</option>
+                        <option value="400000-600000">$400,000 - $600,000</option>
+                        <option value="600000-800000">$600,000 - $800,000</option>
+                        <option value="800000-1000000">$800,000 - $1,000,000</option>
+                        <option value="1000000+">$1,000,000+</option>
+                    </select>
+                </div>
+
+                <div class="space-y-2">
+                    <label class="text-sm font-medium text-[var(--foreground)]">Bedrooms</label>
+                    <select id="filter-beds"
+                        class="w-full px-3 py-2 bg-[var(--input)] border border-[var(--border)] rounded-md text-[var(--foreground)] focus:outline-none focus:border-[var(--accent)]">
+                        <option value="">Any</option>
+                        <option value="1">1+</option>
+                        <option value="2">2+</option>
+                        <option value="3">3+</option>
+                        <option value="4">4+</option>
+                        <option value="5">5+</option>
+                    </select>
+                </div>
+
+                <div class="space-y-2">
+                    <label class="text-sm font-medium text-[var(--foreground)]">Bathrooms</label>
+                    <select id="filter-baths"
+                        class="w-full px-3 py-2 bg-[var(--input)] border border-[var(--border)] rounded-md text-[var(--foreground)] focus:outline-none focus:border-[var(--accent)]">
+                        <option value="">Any</option>
+                        <option value="1">1+</option>
+                        <option value="2">2+</option>
+                        <option value="3">3+</option>
+                        <option value="4">4+</option>
+                    </select>
+                </div>
+            </div>
         </div>
-        <div class="space-y-2">
-            <label class="text-sm font-medium text-[var(--foreground)]">Property Type</label>
-            <select id="filter-type"
-                class="w-full px-3 py-2 bg-[var(--input)] border border-[var(--border)] rounded-md text-[var(--foreground)] focus:outline-none focus:border-[var(--accent)]">
-                <option value="">Any Type</option>
-                <option value="house">House</option>
-                <option value="condo">Condo</option>
-                <option value="townhouse">Townhouse</option>
-                <option value="apartment">Apartment</option>
-                <option value="land">Land</option>
+    </div>
+
+    <div class="flex items-center justify-between">
+        <h2 class="text-xl font-semibold text-[var(--foreground)]">
+            Search Results (<span id="results-count">0</span> properties)
+        </h2>
+        <div class="flex items-center space-x-2">
+            <span class="text-sm text-[var(--muted-foreground)] hidden sm:inline">Sort by:</span>
+            <select id="sort-order"
+                class="bg-[var(--input)] border border-[var(--border)] text-[var(--foreground)] rounded px-2 py-1 text-sm focus:outline-none">
+                <option value="relevant">Most Relevant</option>
+                <option value="price-asc">Price: Low to High</option>
+                <option value="price-desc">Price: High to Low</option>
+                <option value="newest">Newest First</option>
             </select>
         </div>
-        <div class="flex items-end space-x-2">
-            <button id="btn-search"
-                class="flex-1 flex items-center justify-center px-4 py-2 bg-[var(--accent)] text-[var(--bg)] rounded-md hover:bg-[var(--accent-hover)] transition-colors font-medium">
-                <i data-lucide="search" class="mr-2 h-4 w-4"></i> Search
-            </button>
-            <button id="btn-toggle-filters"
-                class="p-2 border border-[var(--border)] rounded-md text-[var(--foreground)] hover:bg-[var(--muted)] transition-colors"
-                title="Advanced Filters">
-                <i data-lucide="sliders-horizontal" class="h-5 w-5"></i>
-            </button>
-        </div>
     </div>
 
-    <div id="advanced-filters" class="hidden pt-4 border-t border-[var(--border)]">
-        <div class="flex items-center justify-between mb-4">
-            <h3 class="text-lg font-semibold text-[var(--foreground)]">Advanced Filters</h3>
-            <button id="btn-clear-filters"
-                class="flex items-center px-3 py-1 text-sm border border-[var(--border)] rounded-md text-[var(--foreground)] hover:bg-[var(--muted)] transition-colors">
-                <i data-lucide="x" class="mr-2 h-4 w-4"></i> Clear All
-            </button>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div class="space-y-2">
-                <label class="text-sm font-medium text-[var(--foreground)]">Price Range</label>
-                <select id="filter-price"
-                    class="w-full px-3 py-2 bg-[var(--input)] border border-[var(--border)] rounded-md text-[var(--foreground)] focus:outline-none focus:border-[var(--accent)]">
-                    <option value="">Any Price</option>
-                    <option value="0-200000">Under $200,000</option>
-                    <option value="200000-400000">$200,000 - $400,000</option>
-                    <option value="400000-600000">$400,000 - $600,000</option>
-                    <option value="600000-800000">$600,000 - $800,000</option>
-                    <option value="800000-1000000">$800,000 - $1,000,000</option>
-                    <option value="1000000+">$1,000,000+</option>
-                </select>
-            </div>
-
-            <div class="space-y-2">
-                <label class="text-sm font-medium text-[var(--foreground)]">Bedrooms</label>
-                <select id="filter-beds"
-                    class="w-full px-3 py-2 bg-[var(--input)] border border-[var(--border)] rounded-md text-[var(--foreground)] focus:outline-none focus:border-[var(--accent)]">
-                    <option value="">Any</option>
-                    <option value="1">1+</option>
-                    <option value="2">2+</option>
-                    <option value="3">3+</option>
-                    <option value="4">4+</option>
-                    <option value="5">5+</option>
-                </select>
-            </div>
-
-            <div class="space-y-2">
-                <label class="text-sm font-medium text-[var(--foreground)]">Bathrooms</label>
-                <select id="filter-baths"
-                    class="w-full px-3 py-2 bg-[var(--input)] border border-[var(--border)] rounded-md text-[var(--foreground)] focus:outline-none focus:border-[var(--accent)]">
-                    <option value="">Any</option>
-                    <option value="1">1+</option>
-                    <option value="2">2+</option>
-                    <option value="3">3+</option>
-                    <option value="4">4+</option>
-                </select>
-            </div>
-        </div>
+    <div id="property-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
     </div>
 </div>
-
-<div class="flex items-center justify-between">
-    <h2 class="text-xl font-semibold text-[var(--foreground)]">
-        Search Results (<span id="results-count">0</span> properties)
-    </h2>
-    <div class="flex items-center space-x-2">
-        <span class="text-sm text-[var(--muted-foreground)] hidden sm:inline">Sort by:</span>
-        <select id="sort-order"
-            class="bg-[var(--input)] border border-[var(--border)] text-[var(--foreground)] rounded px-2 py-1 text-sm focus:outline-none">
-            <option value="relevant">Most Relevant</option>
-            <option value="price-asc">Price: Low to High</option>
-            <option value="price-desc">Price: High to Low</option>
-            <option value="newest">Newest First</option>
-        </select>
-    </div>
-</div>
-
-<div id="property-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
 </div>
 {% endblock %}
 
-{% block scripts %}
+{% block extra_scripts %}
 <script>
     // --- STATE ---
     let favorites = []; // Array of favorite IDs

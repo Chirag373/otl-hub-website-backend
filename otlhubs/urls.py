@@ -24,7 +24,7 @@ from core.views import (
     BuyerDashboardView, SellerDashboardView, SellerSettingsView, SellerPropertyView,
     RealtorDashboardView, RealtorSettingsView, RealtorClientsView, PartnerDashboardView, PartnerSettingsView,
     PartnersView, BuyerPropertySearchView, BuyerFavoritesView, BuyerSettingsView,
-    TermsOfServiceView, PrivacyPolicyView, PropertyDetailView
+    TermsOfServiceView, PrivacyPolicyView, PropertyDetailView, PublicPropertySearchView
 )
 
 from django.contrib.auth.views import LogoutView
@@ -41,6 +41,7 @@ urlpatterns = [
     path("login", LoginView.as_view(), name="login"),
     path("logout", LogoutView.as_view(next_page='index'), name="logout"),
     path("signup", SignupView.as_view(), name="signup"),
+    path("property-search", PublicPropertySearchView.as_view(), name="public_property_search"),
     path("property/detail", PropertyDetailView.as_view(), name="property_detail"),
     path("terms-of-service", TermsOfServiceView.as_view(), name="terms_of_service"),
     path("privacy-policy", PrivacyPolicyView.as_view(), name="privacy_policy"),

@@ -60,7 +60,7 @@
 <section id="search"
     class="bg-[var(--card)] py-12 px-0 border-t border-[var(--border)] border-b border-[var(--border)]">
     <div class="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8">
-        <form class="space-y-6" action="/buyer/property-search/" method="GET">
+        <form id="search-form" class="space-y-6" onsubmit="event.preventDefault(); handleSearch(event);">
             <div class="w-full max-w-screen-2xl grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
                 <div class="form-control w-full">
                     <label class="label font-heading text-lg text-[var(--muted-foreground)] mb-1">
@@ -145,11 +145,11 @@
             </div>
         </div>
 
-        <div class="text-center mt-12">
-            <a href="/buyer/property-search"
+        <div id="load-more-container" class="text-center mt-12 hidden">
+            <button id="load-more-btn" onclick="loadMore()"
                 class="btn btn-lg btn-outline font-heading text-base px-8 py-3 bg-transparent hover:bg-[var(--accent)]/10 text-[var(--accent)] border border-[var(--accent)] hover:border-[var(--accent-hover)] rounded-lg shadow-lg font-semibold cursor-pointer transition-colors h-auto">
-                View All Properties
-            </a>
+                Load More
+            </button>
         </div>
     </div>
 </section>
@@ -173,48 +173,143 @@
         });
     }
 
-    // Fetch Latest Properties
-    async function fetchLatestProperties() {
-        const grid = document.getElementById('property-grid');
+    // --- STATE ---
+    let searchState = {
+        offset: 0,
+        limit: 6,
+        itemsToLoad: 6,
+        filters: {}
+    };
+
+    const dom = {
+        grid: document.getElementById('property-grid'),
+        sectionTitle: document.querySelector('#property-grid').previousElementSibling,
+        loadMoreContainer: document.getElementById('load-more-container'),
+        loadMoreBtn: document.getElementById('load-more-btn')
+    };
+
+    // Handle Search
+    async function handleSearch(event) {
+        if (event) event.preventDefault();
+
+        const form = document.getElementById('search-form');
+        const formData = new FormData(form);
+
+        // Update state filters
+        searchState.filters = {
+            location: formData.get('location'),
+            zip_code: formData.get('zip_code'),
+            type: formData.get('type'),
+            beds: formData.get('beds'),
+            baths: formData.get('baths'),
+        };
+
+        // Update Title
+        if (dom.sectionTitle) dom.sectionTitle.textContent = "Search Results";
+
+        // Scroll to results
+        if (dom.grid && dom.grid.parentElement) {
+            dom.grid.parentElement.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        fetchProperties(true);
+    }
+
+    // Load More Wrapper
+    function loadMore() {
+        console.log("Loading more...");
+        fetchProperties(false);
+    }
+    // Expose
+    window.loadMore = loadMore;
+
+    // Core Fetch Function
+    async function fetchProperties(reset = false) {
+        if (reset) {
+            searchState.offset = 0;
+            if (dom.grid) {
+                // Initial loader
+                dom.grid.innerHTML = `
+                    <div class="col-span-full text-center py-12" id="initial-loader">
+                        <span class="loading loading-spinner loading-lg text-[var(--accent)]"></span>
+                    </div>
+                `;
+            }
+            if (dom.loadMoreContainer) dom.loadMoreContainer.classList.add('hidden');
+        } else {
+            if (dom.loadMoreBtn) dom.loadMoreBtn.classList.add('loading');
+        }
+
+        const params = new URLSearchParams();
+
+        // Add filters
+        for (const [key, value] of Object.entries(searchState.filters)) {
+            if (value) params.append(key, value);
+        }
+
+        params.append('limit', searchState.itemsToLoad);
+        params.append('offset', searchState.offset);
+        params.append('sort', 'newest');
+
         try {
-            // Fetch newest 3 properties
-            const response = await fetch('/api/v1/buyer/property-search/?sort=newest&limit=3');
+            const response = await fetch(`/api/v1/buyer/property-search/?${params.toString()}`);
             if (!response.ok) throw new Error('Failed to fetch');
 
             const data = await response.json();
-            // Assuming API returns array or paginated object. 
-            // ListAPIView usually returns array if not paginated, or {count, results} if paginated.
-            // DRF default pagination is usually PageNumberPagination which returns { results: [...] }
 
             let properties = [];
-            if (Array.isArray(data)) {
-                properties = data;
-            } else if (data.results) {
+            let next = null;
+
+            if (data.results) {
                 properties = data.results;
+                next = data.next;
+            } else if (Array.isArray(data)) {
+                properties = data;
             }
 
-            // Limit to first 3 if API didn't
-            properties = properties.slice(0, 3);
+            const initialLoader = document.getElementById('initial-loader');
+            if (initialLoader) initialLoader.remove();
 
-            if (properties.length === 0) {
-                grid.innerHTML = `
+            if (reset && properties.length === 0) {
+                dom.grid.innerHTML = `
                     <div class="col-span-full text-center py-12">
-                        <p class="text-[var(--muted-foreground)] text-lg">No properties listed yet. Check back soon!</p>
+                        <p class="text-[var(--muted-foreground)] text-lg">No properties found.</p>
                     </div>
                 `;
                 return;
             }
 
-            grid.innerHTML = properties.map(property => createPropertyCard(property)).join('');
+            const cardsHtml = properties.map(property => createPropertyCard(property)).join('');
+
+            if (reset) {
+                dom.grid.innerHTML = cardsHtml;
+            } else {
+                dom.grid.insertAdjacentHTML('beforeend', cardsHtml);
+            }
+
+            searchState.offset += properties.length;
+
+            if (dom.loadMoreContainer) {
+                if (next) {
+                    dom.loadMoreContainer.classList.remove('hidden');
+                } else {
+                    dom.loadMoreContainer.classList.add('hidden');
+                }
+            }
+
             if (window.lucide) lucide.createIcons();
 
         } catch (error) {
-            console.error('Error loading properties:', error);
-            grid.innerHTML = `
-                <div class="col-span-full text-center py-12">
-                     <p class="text-red-400">Unable to load properties.</p>
-                </div>
-            `;
+            console.error('Error fetching properties:', error);
+            if (dom.grid && reset) {
+                dom.grid.innerHTML = `
+                    <div class="col-span-full text-center py-12">
+                         <p class="text-red-400">Unable to load properties.</p>
+                    </div>
+                `;
+            }
+        } finally {
+            if (dom.loadMoreBtn) dom.loadMoreBtn.classList.remove('loading');
         }
     }
 
@@ -319,9 +414,16 @@
                     </div>
 
                     <div class="mb-2">
-                        <div class="flex items-center gap-2 text-sm text-[var(--foreground)] font-medium mb-1 line-clamp-1">
-                            ${address}
-                        </div>
+                        <p class="text-[var(--foreground)] text-sm mb-2">
+                            ${(() => {
+                const desc = p.description || "No description available.";
+                const words = desc.split(/\s+/);
+                if (words.length > 25) {
+                    return words.slice(0, 25).join(" ") + " ...";
+                }
+                return desc;
+            })()}
+                        </p>
                         <div class="flex items-center gap-2 text-sm text-[var(--muted-foreground)]">
                             <i data-lucide="map-pin" class="w-3 h-3"></i>
                             <span>${cityState}</span>
@@ -340,6 +442,6 @@
     }
 
     // Run on load
-    document.addEventListener('DOMContentLoaded', fetchLatestProperties);
+    document.addEventListener('DOMContentLoaded', () => fetchProperties(true));
 </script>
 {% endblock %}
