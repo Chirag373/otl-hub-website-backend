@@ -330,31 +330,65 @@
 
     // --- PRICING RENDERERS ---
 
+    const planConfigs = {
+        buyer: {
+            setupFee: 99,
+            subtitle: "See what you'll pay for your buyer account",
+            plans: {
+                basic: { id: 'basic', name: 'Basic', price: 25, duration: '3 Months', access: '1 Property Access' },
+                pro: { id: 'pro', name: 'Pro', price: 50, duration: '6 Months', access: '3 Properties Access', recommended: true }
+            }
+        },
+        seller: {
+            setupFee: 99,
+            listingFee: 199,
+            total: 298,
+            subtitle: "See what you'll pay for your seller account"
+        },
+        realtor: {
+            setupFee: 99,
+            accessFee: 99,
+            monthly: 49,
+            subtitle: "See what you'll pay for your realtor account"
+        },
+        partner: {
+            setupFee: 199,
+            accessFee: 299,
+            monthly: 99,
+            subtitle: "See what you'll pay for your partner account"
+        }
+    };
+
     function renderPricingPlan(type) {
+        const config = planConfigs[type];
+        
         // Changed padding from p-6 to p-4 sm:p-6 for better mobile view
         let html = `<div class="card bg-[var(--card)] rounded-lg border border-[var(--border)] shadow-lg overflow-visible"><div class="card-body p-4 sm:p-6">`;
 
         // Header
         html += `
             <div class="text-center mb-6">
-                <h3 class="font-heading text-2xl sm:text-3xl text-[var(--foreground)] mb-2 capitalize">${type} Plan</h3>
+                <h3 class="font-heading text-2xl sm:text-3xl text-[var(--foreground)] mb-2 capitalize">Pricing Plan</h3>
                 <p class="text-sm text-[var(--muted-foreground)]">
-                    ${getPlanSubtitle(type)}
+                    ${config.subtitle}
                 </p>
             </div>
         `;
 
+        // Setup Fee Notice
         html += `
             <div class="mb-6 p-3 bg-[var(--muted)]/30 rounded-lg border border-[var(--border)] text-center">
-                <p class="text-xs sm:text-sm text-[var(--muted-foreground)]">Create your account to get started.</p>
+                <p class="text-sm font-medium text-[var(--foreground)]">
+                    <span class="text-[var(--accent)] font-bold">Note:</span> One-time setup fee of $${config.setupFee} applies
+                </p>
             </div>
         `;
 
         // Plans Grid or Single Plan
         if (type === 'buyer') {
-            html += renderBuyerPlans();
+            html += renderBuyerPlans(config);
         } else {
-            html += renderSinglePlan(type);
+            html += renderSinglePlan(type, config);
         }
 
         // Features List
@@ -367,25 +401,65 @@
         lucide.createIcons();
     }
 
-    function getPlanSubtitle(type) {
-        const subtitles = {
-            buyer: "Access to premium property listings and tools",
-            realtor: "Professional tools for licensed real estate agents",
-            seller: "List and sell your property with maximum exposure",
-            partner: "Business partnership and service provider tools"
+    function renderBuyerPlans(config) {
+        const basic = config.plans.basic;
+        const pro = config.plans.pro;
+        const isBasic = selectedBuyerPlan === 'basic';
+        
+        // Helper to generate card class
+        const getCardClass = (isSelected, isRecommended) => {
+            let classes = "cursor-pointer relative rounded-lg border-2 p-4 transition-all hover:border-[var(--accent)]/50 ";
+            if (isSelected) {
+                classes += "border-[var(--accent)] bg-[var(--accent)]/5 ";
+            } else {
+                classes += "border-[var(--border)] bg-[var(--card)] ";
+            }
+            if (isRecommended && !isSelected) {
+                classes += "shadow-md "; // subtle boost for recommended
+            }
+            return classes;
         };
-        return subtitles[type];
-    }
 
-    function renderBuyerPlans() {
         return `
-            <div class="mb-6 mt-2">
-                <div class="bg-gradient-to-br from-[var(--accent)]/20 to-[var(--accent)]/10 rounded-lg border-2 border-[var(--accent)] p-6 text-center shadow-lg">
-                    <div class="mb-4">
-                        <div class="text-xl sm:text-2xl font-bold text-[var(--foreground)] mb-2">Standard Access</div>
-                        <div class="text-sm font-medium text-[var(--accent)]">Free Account</div>
+            <div class="grid grid-cols-2 gap-3 mb-6">
+                <!-- Basic Plan -->
+                <div onclick="selectBuyerPlan('basic')" class="${getCardClass(isBasic, false)}">
+                    <div class="text-center">
+                        <div class="font-heading text-lg text-[var(--foreground)] mb-1">${basic.name}</div>
+                        <div class="text-xl font-bold text-[var(--accent)] mb-1">$${basic.price}</div>
+                        <div class="text-xs text-[var(--muted-foreground)] font-medium">${basic.access}</div>
+                        <div class="text-xs text-[var(--muted-foreground)]">${basic.duration}</div>
                     </div>
+                    ${isBasic ? '<div class="absolute top-2 right-2 text-[var(--accent)]"><i data-lucide="check-circle" class="w-4 h-4"></i></div>' : ''}
                 </div>
+
+                <!-- Pro Plan -->
+                <div onclick="selectBuyerPlan('pro')" class="${getCardClass(!isBasic, true)}">
+                    ${!isBasic ? `
+                    <div class="absolute -top-3 left-1/2 transform -translate-x-1/2">
+                        <span class="bg-gradient-to-r from-[var(--accent)] to-[var(--accent-hover)] text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-sm">RECOMMENDED</span>
+                    </div>
+                    ` : ''}
+                    <div class="text-center ${!isBasic ? 'mt-1' : ''}">
+                        <div class="font-heading text-lg text-[var(--foreground)] mb-1">${pro.name}</div>
+                        <div class="text-xl font-bold text-[var(--accent)] mb-1">$${pro.price}</div>
+                        <div class="text-xs text-[var(--muted-foreground)] font-medium">${pro.access}</div>
+                        <div class="text-xs text-[var(--muted-foreground)]">${pro.duration}</div>
+                    </div>
+                     ${!isBasic ? '<div class="absolute top-2 right-2 text-[var(--accent)]"><i data-lucide="check-circle" class="w-4 h-4"></i></div>' : ''}
+                </div>
+            </div>
+
+            <!-- Selection Indicator -->
+            <div class="p-3 bg-[var(--accent)]/10 rounded-lg border border-[var(--accent)]/20 text-center mb-2">
+                <p class="text-sm text-[var(--foreground)]">
+                    Selected: <span class="font-bold">${isBasic ? basic.name : pro.name}</span> - 
+                    <span class="font-mono">$${isBasic ? basic.price : pro.price}</span> + 
+                    <span class="text-[var(--muted-foreground)] text-xs">$${config.setupFee} setup fee</span>
+                </p>
+                <p class="text-lg font-bold text-[var(--accent)] mt-1">
+                    Total: $${(isBasic ? basic.price : pro.price) + config.setupFee}
+                </p>
             </div>
         `;
     }
@@ -395,34 +469,79 @@
         renderPricingPlan('buyer'); // Re-render to update classes
     }
 
-    function renderSinglePlan(type) {
-        let planName, sub, fee, desc;
-
-        if (type === 'realtor') {
-            planName = "Professional Account";
-            sub = "Unlimited access";
-            fee = `<div class="text-lg font-bold text-[var(--accent)]">Free</div>`;
-        } else if (type === 'seller') {
-            planName = "Property Listing Account";
-            sub = "List your property";
-            fee = `<div class="text-3xl font-bold text-[var(--accent)]">Free</div>`;
-        } else { // partner
-            planName = "Business Partner Account";
-            sub = "Full platform access";
-            fee = `<div class="text-lg font-bold text-[var(--accent)]">Free</div>`;
+    function renderSinglePlan(type, config) {
+        let content = '';
+        
+        if (type === 'seller') {
+            content = `
+                <div class="text-center space-y-3">
+                    <div class="flex justify-between items-center text-sm border-b border-[var(--border)] pb-2">
+                        <span class="text-[var(--muted-foreground)]">Listing Fee</span>
+                        <span class="font-medium text-[var(--foreground)]">$${config.listingFee}</span>
+                    </div>
+                    <div class="flex justify-between items-center text-sm border-b border-[var(--border)] pb-2">
+                        <span class="text-[var(--muted-foreground)]">Setup Fee</span>
+                        <span class="font-medium text-[var(--foreground)]">$${config.setupFee}</span>
+                    </div>
+                    <div class="flex justify-between items-center pt-2">
+                        <span class="font-bold text-[var(--foreground)]">Total Due</span>
+                        <span class="text-3xl font-bold text-[var(--accent)]">$${config.total}</span>
+                    </div>
+                    <div class="mt-4 pt-2">
+                         <span class="inline-block px-3 py-1 bg-[var(--muted)]/50 rounded-full text-xs font-medium text-[var(--muted-foreground)]">
+                            No monthly subscription
+                        </span>
+                    </div>
+                </div>
+            `;
+        } else if (type === 'realtor') {
+            content = `
+                <div class="text-center space-y-3">
+                    <div class="flex justify-between items-center text-sm border-b border-[var(--border)] pb-2">
+                         <span class="text-[var(--muted-foreground)]">Access Fee</span>
+                        <span class="font-medium text-[var(--foreground)]">$${config.accessFee}</span>
+                    </div>
+                    <div class="flex justify-between items-center text-sm border-b border-[var(--border)] pb-2">
+                         <span class="text-[var(--muted-foreground)]">Setup Fee</span>
+                        <span class="font-medium text-[var(--foreground)]">$${config.setupFee}</span>
+                    </div>
+                     <div class="flex justify-between items-center pt-2">
+                        <span class="font-bold text-[var(--foreground)]">Initial Total</span>
+                        <span class="text-2xl font-bold text-[var(--foreground)]">$${config.accessFee + config.setupFee}</span>
+                    </div>
+                    <div class="mt-4 p-3 bg-[var(--accent)]/5 rounded-lg border border-[var(--accent)]/20">
+                         <p class="text-sm text-[var(--muted-foreground)]">Monthly Subscription</p>
+                         <p class="text-3xl font-bold text-[var(--accent)]">$${config.monthly}<span class="text-sm font-normal text-[var(--muted-foreground)]">/mo</span></p>
+                    </div>
+                </div>
+            `;
+        } else if (type === 'partner') {
+             content = `
+                <div class="text-center space-y-3">
+                    <div class="flex justify-between items-center text-sm border-b border-[var(--border)] pb-2">
+                         <span class="text-[var(--muted-foreground)]">Access Fee</span>
+                        <span class="font-medium text-[var(--foreground)]">$${config.accessFee}</span>
+                    </div>
+                    <div class="flex justify-between items-center text-sm border-b border-[var(--border)] pb-2">
+                         <span class="text-[var(--muted-foreground)]">Setup Fee</span>
+                        <span class="font-medium text-[var(--foreground)]">$${config.setupFee}</span>
+                    </div>
+                     <div class="flex justify-between items-center pt-2">
+                        <span class="font-bold text-[var(--foreground)]">Initial Total</span>
+                        <span class="text-2xl font-bold text-[var(--foreground)]">$${config.accessFee + config.setupFee}</span>
+                    </div>
+                    <div class="mt-4 p-3 bg-[var(--accent)]/5 rounded-lg border border-[var(--accent)]/20">
+                         <p class="text-sm text-[var(--muted-foreground)]">Monthly Subscription</p>
+                         <p class="text-3xl font-bold text-[var(--accent)]">$${config.monthly}<span class="text-sm font-normal text-[var(--muted-foreground)]">/mo</span></p>
+                    </div>
+                </div>
+            `;
         }
 
         return `
             <div class="mb-6 mt-2">
-                <div class="bg-gradient-to-br from-[var(--accent)]/20 to-[var(--accent)]/10 rounded-lg border-2 border-[var(--accent)] p-6 text-center shadow-lg">
-                    <div class="mb-4">
-                        <div class="text-xl sm:text-2xl font-bold text-[var(--foreground)] mb-2">${planName}</div>
-                        <div class="text-sm text-[var(--muted-foreground)] mb-2">${sub}</div>
-                        <div class="space-y-1">
-                            ${fee}
-                            <div class="text-xs text-[var(--muted-foreground)]">${desc}</div>
-                        </div>
-                    </div>
+                <div class="bg-gradient-to-br from-[var(--card)] to-[var(--muted)]/20 rounded-lg border border-[var(--border)] p-6 shadow-sm">
+                   ${content}
                 </div>
             </div>
         `;
