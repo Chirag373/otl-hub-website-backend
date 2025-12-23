@@ -140,7 +140,7 @@ class SellerProfile(models.Model):
 
     # Property Address Details
     address_number = models.CharField(
-        max_length=20, blank=True, help_text=_("Street number")
+        max_length=50, blank=True, help_text=_("Street number")
     )
     street_address = models.CharField(
         max_length=255, blank=True, help_text=_("Street name and type")

@@ -562,52 +562,6 @@ class SellerProfileSerializer(serializers.ModelSerializer):
             "has_active_listing",
         ]
 
-
-class PropertySearchSerializer(serializers.ModelSerializer):
-    """
-    Serializer for publicly searching properties (SellerProfiles)
-    """
-    id = serializers.IntegerField(read_only=True) # Use profile ID for consistency with favorites lookup
-    title = serializers.SerializerMethodField()
-    location = serializers.SerializerMethodField()
-    price = serializers.DecimalField(source='estimated_value', max_digits=12, decimal_places=2, read_only=True)
-    image = serializers.SerializerMethodField()
-    images = serializers.SerializerMethodField()
-    type = serializers.CharField(source='property_type', read_only=True)
-    features = serializers.JSONField(source='property_features', read_only=True)
-    dateAdded = serializers.DateTimeField(source='created_at', read_only=True)
-    description = serializers.CharField(source='property_description', read_only=True)
-    
-    class Meta:
-        model = SellerProfile
-        fields = [
-            'id', 'title', 'location', 'price', 
-            'bedrooms', 'bathrooms', 'sqft', 
-            'image', 'images', 'type', 'features', 'dateAdded', 'description'
-        ]
-
-    def get_title(self, obj):
-        if obj.street_address:
-            return obj.street_address
-        return f"Property in {obj.city}" if obj.city else "Unlisted Address"
-
-    def get_location(self, obj):
-        parts = [p for p in [obj.city, obj.state] if p]
-        return ", ".join(parts) if parts else "Location N/A"
-
-    def get_image(self, obj):
-        # optimistically get primary image, or first available
-        primary_img = obj.images.filter(is_primary=True).first()
-        if not primary_img:
-            primary_img = obj.images.first()
-        
-        if primary_img and primary_img.image:
-            return primary_img.image.url
-        return None # Frontend can show placeholder
-
-    def get_images(self, obj):
-        return [img.image.url for img in obj.images.all() if img.image]
-
     def get_property_type(self, obj):
         """Get formatted property type display"""
         if obj.property_type:
@@ -708,6 +662,54 @@ class PropertySearchSerializer(serializers.ModelSerializer):
                 PropertyImage.objects.create(seller_profile=instance, image=image)
 
         return instance
+
+
+class PropertySearchSerializer(serializers.ModelSerializer):
+    """
+    Serializer for publicly searching properties (SellerProfiles)
+    """
+    id = serializers.IntegerField(read_only=True) # Use profile ID for consistency with favorites lookup
+    title = serializers.SerializerMethodField()
+    location = serializers.SerializerMethodField()
+    price = serializers.DecimalField(source='estimated_value', max_digits=12, decimal_places=2, read_only=True)
+    image = serializers.SerializerMethodField()
+    images = serializers.SerializerMethodField()
+    type = serializers.CharField(source='property_type', read_only=True)
+    features = serializers.JSONField(source='property_features', read_only=True)
+    dateAdded = serializers.DateTimeField(source='created_at', read_only=True)
+    description = serializers.CharField(source='property_description', read_only=True)
+    
+    class Meta:
+        model = SellerProfile
+        fields = [
+            'id', 'title', 'location', 'price', 
+            'bedrooms', 'bathrooms', 'sqft', 
+            'image', 'images', 'type', 'features', 'dateAdded', 'description'
+        ]
+
+    def get_title(self, obj):
+        if obj.street_address:
+            return obj.street_address
+        return f"Property in {obj.city}" if obj.city else "Unlisted Address"
+
+    def get_location(self, obj):
+        parts = [p for p in [obj.city, obj.state] if p]
+        return ", ".join(parts) if parts else "Location N/A"
+
+    def get_image(self, obj):
+        # optimistically get primary image, or first available
+        primary_img = obj.images.filter(is_primary=True).first()
+        if not primary_img:
+            primary_img = obj.images.first()
+        
+        if primary_img and primary_img.image:
+            return primary_img.image.url
+        return None # Frontend can show placeholder
+
+    def get_images(self, obj):
+        return [img.image.url for img in obj.images.all() if img.image]
+
+
 
 
 class PartnerProfileSerializer(serializers.ModelSerializer):
