@@ -183,35 +183,7 @@
                     disabled>
             </div>
 
-            <div class="form-control w-full">
-                <label class="label">
-                    <span class="label-text text-[var(--foreground)] font-medium">Reason for Selling</span>
-                </label>
-                <select id="input-reason"
-                    class="select select-bordered w-full bg-[var(--input)] border-[var(--border)] text-[var(--foreground)] disabled:opacity-50 disabled:bg-[var(--input)] disabled:text-[var(--muted-foreground)] focus:outline-none focus:border-[var(--accent)]"
-                    disabled>
-                    <option value="FORECLOSURE">Foreclosure</option>
-                    <option value="RETIREMENT">Retirement</option>
-                    <option value="RELOCATION">Relocation</option>
-                    <option value="LEISURE">Leisure</option>
-                    <option value="INVESTMENT">Investment</option>
-                </select>
-            </div>
 
-            <div class="form-control w-full">
-                <label class="label">
-                    <span class="label-text text-[var(--foreground)] font-medium">Selling Type</span>
-                </label>
-                <select id="input-selling-type"
-                    class="select select-bordered w-full bg-[var(--input)] border-[var(--border)] text-[var(--foreground)] disabled:opacity-50 disabled:bg-[var(--input)] disabled:text-[var(--muted-foreground)] focus:outline-none focus:border-[var(--accent)]"
-                    disabled>
-                    <option value="WITH_REAL_ESTATE_AGENT">With Real Estate Agent</option>
-                    <option value="FOR_SALE_BY_OWNER">For Sale By Owner</option>
-                    <option value="SHORT_SALE">Short Sale</option>
-                    <option value="FORECLOSURE">Foreclosure</option>
-                    <option value="AUCTION">Auction</option>
-                </select>
-            </div>
 
             <div class="form-control w-full md:col-span-2">
                 <label class="label">
@@ -289,8 +261,7 @@
 
         inputPropType: document.getElementById('input-prop-type'),
         inputEstValue: document.getElementById('input-est-value'),
-        inputReason: document.getElementById('input-reason'),
-        inputSellingType: document.getElementById('input-selling-type'),
+
         inputDescription: document.getElementById('input-description'),
         inputLeaseback: document.getElementById('input-leaseback'),
 
@@ -378,15 +349,7 @@
             dom.inputPropType.value = propTypeMap[profile.property_type] || profile.property_type.toUpperCase().replace(/ /g, '_');
         }
 
-        // Reason Map
-        if (dom.inputReason && profile.reason_for_selling) {
-            dom.inputReason.value = profile.reason_for_selling.toUpperCase().replace(/ /g, '_');
-        }
 
-        // Selling Type Map
-        if (dom.inputSellingType && profile.selling_type) {
-            dom.inputSellingType.value = profile.selling_type.toUpperCase().replace(/ /g, '_');
-        }
 
 
     }
@@ -449,8 +412,7 @@
             county: dom.inputCounty.value,
             property_type: dom.inputPropType.value,
             estimated_value: dom.inputEstValue.value,
-            reason_for_selling: dom.inputReason.value,
-            selling_type: dom.inputSellingType.value,
+
             property_description: dom.inputDescription.value,
             leaseback_required: dom.inputLeaseback.checked
         };

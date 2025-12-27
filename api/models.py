@@ -115,21 +115,7 @@ class SellerProfile(models.Model):
         TOWNHOME = "TOWNHOME", _("Townhome")
         APARTMENT_UNIT = "APARTMENT_UNIT", _("Apartment unit")
 
-    class ReasonForSelling(models.TextChoices):
-        UPSIZING = "UPSIZING", _("Upsizing")
-        DOWNSIZING = "DOWNSIZING", _("Downsizing")
-        RELOCATION = "RELOCATION", _("Relocation")
-        FINANCIAL = "FINANCIAL", _("Financial Reasons")
-        DIVORCE = "DIVORCE", _("Divorce/Separation")
-        INHERITED = "INHERITED", _("Inherited Property")
-        INVESTMENT = "INVESTMENT", _("Investment Property Sale")
-        OTHER = "OTHER", _("Other")
 
-    class SellingType(models.TextChoices):
-        FOR_SALE_BY_OWNER = "FSBO", _("For Sale By Owner (FSBO)")
-        WITH_AGENT = "WITH_AGENT", _("With Real Estate Agent")
-        CASH_BUYER = "CASH_BUYER", _("Cash Buyer")
-        AUCTION = "AUCTION", _("Auction")
 
     user = models.OneToOneField(
         User,
@@ -178,19 +164,7 @@ class SellerProfile(models.Model):
     # Detailed Features (JSON)
     property_features = models.JSONField(default=dict, blank=True, help_text=_("Structured property features"))
 
-    # Selling Details
-    reason_for_selling = models.CharField(
-        max_length=50,
-        choices=ReasonForSelling.choices,
-        blank=True,
-        help_text=_("Reason for selling the property"),
-    )
-    selling_type = models.CharField(
-        max_length=50,
-        choices=SellingType.choices,
-        blank=True,
-        help_text=_("Type of sale"),
-    )
+
     leaseback_required = models.BooleanField(
         default=False, help_text=_("Whether seller requires leaseback arrangement")
     )

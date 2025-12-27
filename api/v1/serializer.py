@@ -507,16 +507,7 @@ class SellerProfileSerializer(serializers.ModelSerializer):
         required=False
     )
 
-    # Selling details
-    reason_for_selling = serializers.SerializerMethodField()
-    reason_for_selling_input = serializers.ChoiceField(
-        choices=SellerProfile.ReasonForSelling.choices, required=False, write_only=True, source='reason_for_selling'
-    )
-    
-    selling_type = serializers.SerializerMethodField()
-    selling_type_input = serializers.ChoiceField(
-        choices=SellerProfile.SellingType.choices, required=False, write_only=True, source='selling_type'
-    )
+
     
     leaseback_required = serializers.BooleanField(required=False)
 
@@ -553,10 +544,7 @@ class SellerProfileSerializer(serializers.ModelSerializer):
             "property_features",
             "images",
             "upload_images",
-            "reason_for_selling",
-            "reason_for_selling_input",
-            "selling_type",
-            "selling_type_input",
+
             "leaseback_required",
 
             "has_active_listing",
@@ -570,21 +558,7 @@ class SellerProfileSerializer(serializers.ModelSerializer):
                     return choice_display
         return obj.property_type
 
-    def get_reason_for_selling(self, obj):
-        """Get formatted reason for selling display"""
-        if obj.reason_for_selling:
-            for choice_value, choice_display in SellerProfile.ReasonForSelling.choices:
-                if choice_value == obj.reason_for_selling:
-                    return choice_display
-        return obj.reason_for_selling
 
-    def get_selling_type(self, obj):
-        """Get formatted selling type display"""
-        if obj.selling_type:
-            for choice_value, choice_display in SellerProfile.SellingType.choices:
-                if choice_value == obj.selling_type:
-                    return choice_display
-        return obj.selling_type
 
 
 
@@ -635,12 +609,7 @@ class SellerProfileSerializer(serializers.ModelSerializer):
                 pass # Keep as string or handle error
         instance.property_features = property_features
         
-        instance.reason_for_selling = validated_data.get(
-            "reason_for_selling", instance.reason_for_selling
-        )
-        instance.selling_type = validated_data.get(
-            "selling_type", instance.selling_type
-        )
+
         instance.leaseback_required = validated_data.get(
             "leaseback_required", instance.leaseback_required
         )
