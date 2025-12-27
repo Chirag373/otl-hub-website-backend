@@ -20,8 +20,17 @@
             </div>
             <div class="space-y-2">
                 <label class="text-sm font-medium text-[var(--foreground)]">Location</label>
-                <input type="text" id="filter-location" placeholder="City, State or ZIP"
-                    class="w-full px-3 py-2 bg-[var(--input)] border border-[var(--border)] rounded-md text-[var(--foreground)] focus:outline-none focus:border-[var(--accent)]">
+                <div class="flex gap-2" id="location-filters">
+                    <select id="filter-state"
+                        class="state-select w-1/2 px-3 py-2 bg-[var(--input)] border border-[var(--border)] rounded-md text-[var(--foreground)] focus:outline-none focus:border-[var(--accent)]">
+                        <option value="">State</option>
+                    </select>
+                    <select id="filter-city"
+                        class="city-select w-1/2 px-3 py-2 bg-[var(--input)] border border-[var(--border)] rounded-md text-[var(--foreground)] focus:outline-none focus:border-[var(--accent)]"
+                        disabled>
+                        <option value="">City</option>
+                    </select>
+                </div>
             </div>
             <div class="space-y-2">
                 <label class="text-sm font-medium text-[var(--foreground)]">Property Type</label>
@@ -124,6 +133,86 @@
 
 {% block extra_scripts %}
 <script>
+    // --- API CONFIG ---
+    const CSC_API_KEY = 'WnVWTGlEejlKbzMyOXd4c2VmdVQzZzFWTVJTb0xXWk1pNExvWVFzZQ==';
+    const CSC_BASE_URL = 'https://api.countrystatecity.in/v1';
+    let cachedStates = null;
+    let cachedCities = {};
+
+    async function fetchUSStates() {
+        if (cachedStates) return cachedStates;
+        try {
+            const res = await fetch(`${CSC_BASE_URL}/countries/US/states`, {
+                headers: { 'X-CSCAPI-KEY': CSC_API_KEY }
+            });
+            if (!res.ok) throw new Error('Failed to fetch states');
+            const data = await res.json();
+            data.sort((a, b) => a.name.localeCompare(b.name));
+            cachedStates = data;
+            return data;
+        } catch (e) {
+            console.error(e);
+            return [];
+        }
+    }
+
+    async function fetchCities(stateIso) {
+        if (cachedCities[stateIso]) return cachedCities[stateIso];
+        try {
+            const res = await fetch(`${CSC_BASE_URL}/countries/US/states/${stateIso}/cities`, {
+                headers: { 'X-CSCAPI-KEY': CSC_API_KEY }
+            });
+            if (!res.ok) throw new Error('Failed to fetch cities');
+            const data = await res.json();
+            data.sort((a, b) => a.name.localeCompare(b.name));
+            cachedCities[stateIso] = data;
+            return data;
+        } catch (e) {
+            console.error(e);
+            return [];
+        }
+    }
+
+    async function initLocationSelectors(container) {
+        const stateSels = container.querySelectorAll('.state-select');
+
+        if (stateSels.length === 0) return;
+
+        // Load States
+        const states = await fetchUSStates();
+        const stateOptions = '<option value="">Select State</option>' +
+            states.map(s => `<option value="${s.iso2}">${s.name}</option>`).join('');
+
+        stateSels.forEach(stateSel => {
+            stateSel.innerHTML = stateOptions;
+
+            // Find corresponding city select
+            const citySel = container.querySelector('.city-select');
+
+            if (!citySel) return;
+
+            stateSel.addEventListener('change', async () => {
+                const stateCode = stateSel.value;
+                citySel.disabled = true;
+                citySel.innerHTML = '<option value="">Loading...</option>';
+
+                if (stateCode) {
+                    const cities = await fetchCities(stateCode);
+                    if (cities.length === 0) {
+                        citySel.innerHTML = '<option value="">No cities found</option>';
+                    } else {
+                        citySel.innerHTML = '<option value="">Select City</option>' +
+                            cities.map(c => `<option value="${c.name}">${c.name}</option>`).join('');
+                        citySel.disabled = false;
+                    }
+                } else {
+                    citySel.innerHTML = '<option value="">Select City</option>';
+                    citySel.disabled = true;
+                }
+            });
+        });
+    }
+
     // --- STATE ---
     let favorites = []; // Array of favorite IDs
     let currentFilters = {
@@ -144,7 +233,8 @@
 
         // Filters
         inputKeywords: document.getElementById('filter-keywords'),
-        inputLocation: document.getElementById('filter-location'),
+        inputState: document.getElementById('filter-state'),
+        inputCity: document.getElementById('filter-city'),
         inputType: document.getElementById('filter-type'),
         inputPrice: document.getElementById('filter-price'),
         inputBeds: document.getElementById('filter-beds'),
@@ -183,6 +273,9 @@
         fetchFavoriteIds().finally(() => {
             updateFilters();
         });
+
+        // Initialize Location Dropdowns
+        initLocationSelectors(document.body);
 
         setupEventListeners();
     }
@@ -477,9 +570,17 @@
             }
         }
 
+        let loc = "";
+        if (dom.inputState && dom.inputCity) {
+            const s = dom.inputState.value;
+            const c = dom.inputCity.value;
+            if (s && c) loc = `${c}, ${s}`;
+            else if (s) loc = s;
+        }
+
         currentFilters = {
             keywords: dom.inputKeywords ? dom.inputKeywords.value : "",
-            location: dom.inputLocation ? dom.inputLocation.value : "",
+            location: loc,
             type: dom.inputType ? dom.inputType.value : "",
             priceMin: min,
             priceMax: max === "" ? Infinity : max,
@@ -493,7 +594,12 @@
 
     function clearFilters() {
         if (dom.inputKeywords) dom.inputKeywords.value = "";
-        if (dom.inputLocation) dom.inputLocation.value = "";
+        if (dom.inputState) dom.inputState.value = "";
+        if (dom.inputCity) {
+            dom.inputCity.value = "";
+            dom.inputCity.innerHTML = '<option value="">City</option>';
+            dom.inputCity.disabled = true;
+        }
         if (dom.inputType) dom.inputType.value = "";
         if (dom.inputPrice) dom.inputPrice.value = "";
         if (dom.inputBeds) dom.inputBeds.value = "";
@@ -527,7 +633,7 @@
         }
 
         // Enter key on inputs
-        [dom.inputKeywords, dom.inputLocation].forEach(input => {
+        [dom.inputKeywords].forEach(input => {
             if (input) {
                 input.addEventListener('keypress', (e) => {
                     if (e.key === 'Enter') updateFilters();

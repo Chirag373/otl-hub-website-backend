@@ -177,6 +177,87 @@
 </dialog>
 
 <script>
+    // --- API CONFIG ---
+    const CSC_API_KEY = 'WnVWTGlEejlKbzMyOXd4c2VmdVQzZzFWTVJTb0xXWk1pNExvWVFzZQ==';
+    const CSC_BASE_URL = 'https://api.countrystatecity.in/v1';
+    let cachedStates = null;
+    let cachedCities = {};
+
+    async function fetchUSStates() {
+        if (cachedStates) return cachedStates;
+        try {
+            const res = await fetch(`${CSC_BASE_URL}/countries/US/states`, {
+                headers: { 'X-CSCAPI-KEY': CSC_API_KEY }
+            });
+            if (!res.ok) throw new Error('Failed to fetch states');
+            const data = await res.json();
+            data.sort((a, b) => a.name.localeCompare(b.name));
+            cachedStates = data;
+            return data;
+        } catch (e) {
+            console.error(e);
+            return [];
+        }
+    }
+
+    async function fetchCities(stateIso) {
+        if (cachedCities[stateIso]) return cachedCities[stateIso];
+        try {
+            const res = await fetch(`${CSC_BASE_URL}/countries/US/states/${stateIso}/cities`, {
+                headers: { 'X-CSCAPI-KEY': CSC_API_KEY }
+            });
+            if (!res.ok) throw new Error('Failed to fetch cities');
+            const data = await res.json();
+            data.sort((a, b) => a.name.localeCompare(b.name));
+            cachedCities[stateIso] = data;
+            return data;
+        } catch (e) {
+            console.error(e);
+            return [];
+        }
+    }
+
+    async function initLocationSelectors(container) {
+        const stateSels = container.querySelectorAll('.state-select');
+
+        if (stateSels.length === 0) return;
+
+        // Load States for all selectors found
+        const states = await fetchUSStates();
+        const stateOptions = '<option value="">Select State</option>' +
+            states.map(s => `<option value="${s.iso2}">${s.name}</option>`).join('');
+
+        stateSels.forEach(stateSel => {
+            stateSel.innerHTML = stateOptions;
+
+            // Find corresponding city select
+            // We assume it's in the same dynamic container and uniquely identifiable relative to the state select or just by class if only one set exists
+            const citySel = container.querySelector('.city-select');
+
+            if (!citySel) return;
+
+            stateSel.addEventListener('change', async () => {
+                const stateCode = stateSel.value;
+                citySel.disabled = true;
+                citySel.innerHTML = '<option value="">Loading...</option>';
+
+                if (stateCode) {
+                    const cities = await fetchCities(stateCode);
+                    if (cities.length === 0) {
+                        citySel.innerHTML = '<option value="">No cities found</option>';
+                    } else {
+                        citySel.innerHTML = '<option value="">Select City</option>' +
+                            cities.map(c => `<option value="${c.name}">${c.name}</option>`).join('');
+                        citySel.disabled = false;
+                    }
+                } else {
+                    citySel.innerHTML = '<option value="">Select City</option>';
+                    citySel.disabled = true;
+                }
+            });
+        });
+    }
+
     // --- STATE ---
     let currentUserType = 'buyer';
     let selectedBuyerPlan = 'pro'; // Default to pro
@@ -199,11 +280,21 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div class="form-control w-full">
                         <label class="label">
-                            <span class="label-text text-[var(--foreground)] font-medium">Preferred Location *</span>
+                            <span class="label-text text-[var(--foreground)] font-medium">Preferred State *</span>
                         </label>
-                        <input type="text" placeholder="City, State" required class="input input-bordered w-full bg-[var(--input)] border-[var(--border)] text-[var(--foreground)] focus:outline-none focus:border-[var(--accent)]">
+                        <select class="state-select select select-bordered w-full bg-[var(--input)] border-[var(--border)] text-[var(--foreground)] focus:outline-none focus:border-[var(--accent)]" required>
+                            <option value="">Loading...</option>
+                        </select>
                     </div>
                     <div class="form-control w-full">
+                        <label class="label">
+                            <span class="label-text text-[var(--foreground)] font-medium">Preferred City *</span>
+                        </label>
+                        <select class="city-select select select-bordered w-full bg-[var(--input)] border-[var(--border)] text-[var(--foreground)] focus:outline-none focus:border-[var(--accent)]" required disabled>
+                            <option value="">Select State First</option>
+                        </select>
+                    </div>
+                    <div class="form-control w-full md:col-span-2">
                         <label class="label">
                             <span class="label-text text-[var(--foreground)] font-medium">Budget Range *</span>
                         </label>
@@ -269,14 +360,24 @@
                         <label class="label">
                             <span class="label-text text-[var(--foreground)] font-medium">Estimated Value *</span>
                         </label>
-                        <input type="text" placeholder="Property value estimate" required class="input input-bordered w-full bg-[var(--input)] border-[var(--border)] text-[var(--foreground)] focus:outline-none focus:border-[var(--accent)]">
+                        <input type="text" name="estimated_value" placeholder="Property value estimate" required class="input input-bordered w-full bg-[var(--input)] border-[var(--border)] text-[var(--foreground)] focus:outline-none focus:border-[var(--accent)]">
                     </div>
-                </div>
-                <div class="form-control w-full">
-                    <label class="label">
-                        <span class="label-text text-[var(--foreground)] font-medium">Property Location *</span>
-                    </label>
-                    <input type="text" placeholder="City, State where property is located" required class="input input-bordered w-full bg-[var(--input)] border-[var(--border)] text-[var(--foreground)] focus:outline-none focus:border-[var(--accent)]">
+                    <div class="form-control w-full">
+                        <label class="label">
+                            <span class="label-text text-[var(--foreground)] font-medium">State *</span>
+                        </label>
+                        <select class="state-select select select-bordered w-full bg-[var(--input)] border-[var(--border)] text-[var(--foreground)] focus:outline-none focus:border-[var(--accent)]" required>
+                            <option value="">Loading...</option>
+                        </select>
+                    </div>
+                    <div class="form-control w-full">
+                        <label class="label">
+                            <span class="label-text text-[var(--foreground)] font-medium">City *</span>
+                        </label>
+                        <select class="city-select select select-bordered w-full bg-[var(--input)] border-[var(--border)] text-[var(--foreground)] focus:outline-none focus:border-[var(--accent)]" required disabled>
+                            <option value="">Select State First</option>
+                        </select>
+                    </div>
                 </div>
             </div>`,
         partner: `
@@ -311,19 +412,29 @@
                     </label>
                     <input type="text" placeholder="Business license number" required class="input input-bordered w-full bg-[var(--input)] border-[var(--border)] text-[var(--foreground)] focus:outline-none focus:border-[var(--accent)]">
                 </div>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div class="form-control w-full">
                         <label class="label">
-                            <span class="label-text text-[var(--foreground)] font-medium">Service Areas *</span>
+                            <span class="label-text text-[var(--foreground)] font-medium">Service State *</span>
                         </label>
-                        <input type="text" placeholder="Cities or regions you serve" required class="input input-bordered w-full bg-[var(--input)] border-[var(--border)] text-[var(--foreground)] focus:outline-none focus:border-[var(--accent)]">
+                        <select class="state-select select select-bordered w-full bg-[var(--input)] border-[var(--border)] text-[var(--foreground)] focus:outline-none focus:border-[var(--accent)]" required>
+                            <option value="">Loading...</option>
+                        </select>
                     </div>
                     <div class="form-control w-full">
                         <label class="label">
-                            <span class="label-text text-[var(--foreground)] font-medium">Website URL *</span>
+                            <span class="label-text text-[var(--foreground)] font-medium">Service City *</span>
                         </label>
-                        <input type="url" placeholder="https://yourwebsite.com" required class="input input-bordered w-full bg-[var(--input)] border-[var(--border)] text-[var(--foreground)] focus:outline-none focus:border-[var(--accent)]">
+                        <select class="city-select select select-bordered w-full bg-[var(--input)] border-[var(--border)] text-[var(--foreground)] focus:outline-none focus:border-[var(--accent)]" required disabled>
+                            <option value="">Select State First</option>
+                        </select>
                     </div>
+                </div>
+                <div class="form-control w-full">
+                    <label class="label">
+                        <span class="label-text text-[var(--foreground)] font-medium">Website URL *</span>
+                    </label>
+                    <input type="url" placeholder="https://yourwebsite.com" required class="input input-bordered w-full bg-[var(--input)] border-[var(--border)] text-[var(--foreground)] focus:outline-none focus:border-[var(--accent)]">
                 </div>
             </div>`
     };
@@ -656,6 +767,9 @@
         // Update Dynamic Form Section
         dynamicFieldsContainer.innerHTML = formTemplates[type];
 
+        // Initialize Location Dropdowns
+        initLocationSelectors(dynamicFieldsContainer);
+
         // Attach formatter if Seller
         if (type === 'seller') {
             const estInput = dynamicFieldsContainer.querySelector('input[placeholder="Property value estimate"]');
@@ -726,9 +840,13 @@
 
             // Add role-specific fields
             if (currentUserType === 'buyer') {
-                const location = document.querySelector('input[placeholder="City, State"]');
-                const budget = document.querySelector('select');
-                if (location) formData.preferred_location = location.value;
+                const state = document.querySelector('.state-select');
+                const city = document.querySelector('.city-select');
+                const budget = document.querySelector('select:not(.state-select):not(.city-select)');
+
+                if (state && city && state.value && city.value) {
+                    formData.preferred_location = `${city.value}, ${state.value}`;
+                }
                 if (budget) formData.budget_range = budget.value;
                 formData.selected_plan = selectedBuyerPlan; // Send selected plan
             } else if (currentUserType === 'realtor') {
@@ -739,22 +857,29 @@
                 if (company) formData.company_brokerage = company.value;
                 if (experience) formData.years_of_experience = experience.value;
             } else if (currentUserType === 'seller') {
-                const type = document.querySelector('select');
-                const value = document.querySelector('input[placeholder="Property value estimate"]');
-                const location = document.querySelector('input[placeholder="City, State where property is located"]');
+                const type = document.querySelector('select:not(.state-select):not(.city-select)');
+                const value = document.querySelector('input[name="estimated_value"]'); // Changed selector to name
+                const state = document.querySelector('.state-select');
+                const city = document.querySelector('.city-select');
+
                 if (type) formData.property_type = type.value.toUpperCase();
                 if (value) formData.estimated_value = value.value.replace(/,/g, '');
-                if (location) formData.property_location = location.value;
+                if (state && city && state.value && city.value) {
+                    formData.property_location = `${city.value}, ${state.value}`;
+                }
             } else if (currentUserType === 'partner') {
                 const company = document.querySelector('input[placeholder="Your business or company name"]');
-                const type = document.querySelector('select');
-                const areas = document.querySelector('input[placeholder="Cities or regions you serve"]');
+                const type = document.querySelector('select:not(.state-select):not(.city-select)');
+                const state = document.querySelector('.state-select');
+                const city = document.querySelector('.city-select');
                 const website = document.querySelector('input[placeholder="https://yourwebsite.com"]');
                 const license = document.querySelector('input[placeholder="Business license number"]');
 
                 if (company) formData.company_name = company.value;
                 if (type) formData.partnership_type = type.value.toUpperCase().replace(/-/g, '_');
-                if (areas) formData.service_areas = areas.value;
+                if (state && city && state.value && city.value) {
+                    formData.service_areas = `${city.value}, ${state.value}`;
+                }
                 if (website) formData.website_url = website.value;
                 if (license) formData.business_license_number = license.value;
             }
@@ -944,7 +1069,9 @@
     }
 
     // Initialize with default 'buyer'
-    selectUserType('buyer');
+    document.addEventListener('DOMContentLoaded', () => {
+        selectUserType('buyer');
+    });
 
 </script>
 {% endblock %}

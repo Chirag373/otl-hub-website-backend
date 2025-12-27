@@ -44,16 +44,20 @@
                                 required>
                         </div>
                         <div class="space-y-2">
-                            <label class="text-sm font-medium text-[var(--foreground)]">City</label>
-                            <input type="text" name="city"
-                                class="w-full p-2 rounded-md bg-[var(--input)] border border-[var(--border)] text-[var(--foreground)] focus:ring-1 focus:ring-[var(--accent)] outline-none"
+                            <label class="text-sm font-medium text-[var(--foreground)]">State</label>
+                            <select name="state"
+                                class="state-select w-full p-2 rounded-md bg-[var(--input)] border border-[var(--border)] text-[var(--foreground)] focus:ring-1 focus:ring-[var(--accent)] outline-none"
                                 required>
+                                <option value="">Loading...</option>
+                            </select>
                         </div>
                         <div class="space-y-2">
-                            <label class="text-sm font-medium text-[var(--foreground)]">State</label>
-                            <input type="text" name="state"
-                                class="w-full p-2 rounded-md bg-[var(--input)] border border-[var(--border)] text-[var(--foreground)] focus:ring-1 focus:ring-[var(--accent)] outline-none"
-                                required>
+                            <label class="text-sm font-medium text-[var(--foreground)]">City</label>
+                            <select name="city"
+                                class="city-select w-full p-2 rounded-md bg-[var(--input)] border border-[var(--border)] text-[var(--foreground)] focus:ring-1 focus:ring-[var(--accent)] outline-none"
+                                required disabled>
+                                <option value="">Select State First</option>
+                            </select>
                         </div>
                         <div class="space-y-2">
                             <label class="text-sm font-medium text-[var(--foreground)]">Zip Code</label>
@@ -441,8 +445,88 @@
 
 {% block scripts %}
 <script>
+    // --- API CONFIG ---
+    const CSC_API_KEY = 'WnVWTGlEejlKbzMyOXd4c2VmdVQzZzFWTVJTb0xXWk1pNExvWVFzZQ==';
+    const CSC_BASE_URL = 'https://api.countrystatecity.in/v1';
+    let cachedStates = null;
+    let cachedCities = {};
+
+    async function fetchUSStates() {
+        if (cachedStates) return cachedStates;
+        try {
+            const res = await fetch(`${CSC_BASE_URL}/countries/US/states`, {
+                headers: { 'X-CSCAPI-KEY': CSC_API_KEY }
+            });
+            if (!res.ok) throw new Error('Failed to fetch states');
+            const data = await res.json();
+            data.sort((a, b) => a.name.localeCompare(b.name));
+            cachedStates = data;
+            return data;
+        } catch (e) {
+            console.error(e);
+            return [];
+        }
+    }
+
+    async function fetchCities(stateIso) {
+        if (cachedCities[stateIso]) return cachedCities[stateIso];
+        try {
+            const res = await fetch(`${CSC_BASE_URL}/countries/US/states/${stateIso}/cities`, {
+                headers: { 'X-CSCAPI-KEY': CSC_API_KEY }
+            });
+            if (!res.ok) throw new Error('Failed to fetch cities');
+            const data = await res.json();
+            data.sort((a, b) => a.name.localeCompare(b.name));
+            cachedCities[stateIso] = data;
+            return data;
+        } catch (e) {
+            console.error(e);
+            return [];
+        }
+    }
+
+    async function initLocationSelectors(container) {
+        const stateSels = container.querySelectorAll('.state-select');
+
+        if (stateSels.length === 0) return;
+
+        // Load States
+        const states = await fetchUSStates();
+        const stateOptions = '<option value="">Select State</option>' +
+            states.map(s => `<option value="${s.iso2}">${s.name}</option>`).join('');
+
+        stateSels.forEach(stateSel => {
+            stateSel.innerHTML = stateOptions;
+
+            // Find corresponding city select
+            const citySel = container.querySelector('.city-select');
+
+            if (!citySel) return;
+
+            stateSel.addEventListener('change', async () => {
+                const stateCode = stateSel.value;
+                citySel.disabled = true;
+                citySel.innerHTML = '<option value="">Loading...</option>';
+
+                if (stateCode) {
+                    const cities = await fetchCities(stateCode);
+                    if (cities.length === 0) {
+                        citySel.innerHTML = '<option value="">No cities found</option>';
+                    } else {
+                        citySel.innerHTML = '<option value="">Select City</option>' +
+                            cities.map(c => `<option value="${c.name}">${c.name}</option>`).join('');
+                        citySel.disabled = false;
+                    }
+                } else {
+                    citySel.innerHTML = '<option value="">Select City</option>';
+                    citySel.disabled = true;
+                }
+            });
+        });
+    }
+
     // --- MOCKED DATA OR FROM BACKEND ---
-    const propertyData = JSON.parse('{{ seller_profile_json|escapejs|default:"{}" }}');
+    const propertyData = JSON.parse('{{ seller_profile_json| escapejs |default:"{ }" }}');
 
     // Default or existing data
     let property = {
@@ -474,7 +558,7 @@
     const totalSteps = 4;
     let selectedImages = [];
 
-    function openEditPropertyModal(step = 1) {
+    async function openEditPropertyModal(step = 1) {
         const form = document.getElementById('add-property-form');
         form.setAttribute('data-editing', 'true'); // Flag to prevent reset
 
@@ -484,8 +568,23 @@
         // fallback to propertyData.property_type (display) might not match select options if they differ.
         if (form.property_type) form.property_type.value = propertyData.property_type_val || propertyData.property_type || "";
         if (form.street_address) form.street_address.value = propertyData.street_address || "";
-        if (form.city) form.city.value = propertyData.city || "";
-        if (form.state) form.state.value = propertyData.state || "";
+
+        // Async population for State/City
+        if (form.state) {
+            form.state.value = propertyData.state || "";
+            // Trigger city load
+            if (form.state.value) {
+                const cities = await fetchCities(form.state.value);
+                const citySel = form.city;
+                if (citySel) {
+                    citySel.innerHTML = '<option value="">Select City</option>' +
+                        cities.map(c => `<option value="${c.name}">${c.name}</option>`).join('');
+                    citySel.disabled = false;
+                    if (propertyData.city) citySel.value = propertyData.city;
+                }
+            }
+        }
+
         if (form.zip_code) form.zip_code.value = propertyData.zip_code || "";
 
         // Populate Step 2
@@ -623,6 +722,10 @@
             if (sqftInput) {
                 sqftInput.addEventListener('input', (e) => formatNumberInput(e.target));
             }
+            if (sqftInput) {
+                sqftInput.addEventListener('input', (e) => formatNumberInput(e.target));
+            }
+            initLocationSelectors(document.getElementById('add-property-form'));
         });
         if (step === 1) {
             const form = document.getElementById('add-property-form');
@@ -654,11 +757,11 @@
                 const div = document.createElement('div');
                 div.className = "relative aspect-square rounded-lg overflow-hidden border border-[var(--border)] h-32 w-full";
                 div.innerHTML = `
-                    <img src="${e.target.result}" class="w-full h-full object-cover">
-                    <button type="button" class="absolute top-1 right-1 bg-black/50 hover:bg-red-500 text-white p-1 rounded-full transition-colors" onclick="removeImage(this)">
-                        <i data-lucide="x" class="w-3 h-3"></i>
-                    </button>
-                `;
+        <img src="${e.target.result}" class="w-full h-full object-cover">
+            <button type="button" class="absolute top-1 right-1 bg-black/50 hover:bg-red-500 text-white p-1 rounded-full transition-colors" onclick="removeImage(this)">
+                <i data-lucide="x" class="w-3 h-3"></i>
+            </button>
+            `;
                 grid.appendChild(div);
                 if (window.lucide) lucide.createIcons();
             };
@@ -894,9 +997,9 @@
             const editBtnContainer = document.createElement('div');
             editBtnContainer.className = "absolute top-4 right-4 z-10";
             editBtnContainer.innerHTML = `
-                <button onclick="openEditPropertyModal(4)" class="p-2 bg-white/80 hover:bg-white rounded-md transition-colors text-black">
-                    <i data-lucide="edit" class="h-4 w-4"></i>
-                </button>
+            <button onclick="openEditPropertyModal(4)" class="p-2 bg-white/80 hover:bg-white rounded-md transition-colors text-black">
+                <i data-lucide="edit" class="h-4 w-4"></i>
+            </button>
             `;
             dom.propHeroImage.appendChild(editBtnContainer);
 
@@ -951,10 +1054,10 @@
                 : `<span class="px-3 py-1 bg-[var(--muted)]/30 text-[var(--foreground)] text-sm rounded-full">${items}</span>`;
 
             return `
-                <div>
-                    <h3 class="text-lg font-semibold text-[var(--foreground)] mb-3">${title}</h3>
-                    <div class="flex flex-wrap gap-2">${badges}</div>
-                </div>
+            <div>
+                <h3 class="text-lg font-semibold text-[var(--foreground)] mb-3">${title}</h3>
+                <div class="flex flex-wrap gap-2">${badges}</div>
+            </div>
             `;
         };
 
@@ -996,15 +1099,15 @@
                     ${options.map(opt => `<option value="${opt}" ${opt === value ? 'selected' : ''}>${opt}</option>`).join('')}
                 </select>
             </div>
-        `;
+            `;
 
         // Helper for Checkboxes (Single)
         const createCheckbox = (id, label, checked) => `
             <div class="flex items-center space-x-2">
                 <input type="checkbox" id="${id}" class="rounded border-[var(--border)] text-[var(--accent)] focus:ring-[var(--accent)]" ${checked ? 'checked' : ''}>
-                <label for="${id}" class="text-sm font-normal text-[var(--foreground)] cursor-pointer">${label}</label>
+                    <label for="${id}" class="text-sm font-normal text-[var(--foreground)] cursor-pointer">${label}</label>
             </div>
-        `;
+            `;
 
         // Helper for Group Checkboxes
         const createCheckboxGroup = (groupId, title, options, selectedValues) => `
@@ -1021,7 +1124,7 @@
                     `).join('')}
                 </div>
             </div>
-        `;
+            `;
 
         let html = '';
 
@@ -1041,7 +1144,7 @@
                     ${createSelect('input-cooling', 'Cooling', COOLING_OPTIONS, editedFeatures.cooling)}
                 </div>
             </div>
-        `;
+            `;
 
         html += `<div class="pt-4 border-t border-[var(--border)]">` + createCheckboxGroup('appliances', 'Appliances', APPLIANCES_OPTIONS, editedFeatures.appliances || []) + `</div>`;
 
