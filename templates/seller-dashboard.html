@@ -328,7 +328,13 @@
         if (dom.inputZip) dom.inputZip.value = profile.zip_code || '';
         if (dom.inputCounty) dom.inputCounty.value = profile.county || '';
 
-        if (dom.inputEstValue) dom.inputEstValue.value = profile.estimated_value || '';
+        if (dom.inputEstValue && profile.estimated_value) {
+            // Format with commas and 2 decimal places
+            dom.inputEstValue.value = Number(profile.estimated_value).toLocaleString('en-US', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            });
+        }
         if (dom.inputDescription) dom.inputDescription.value = profile.property_description || '';
         if (dom.inputLeaseback) dom.inputLeaseback.checked = profile.leaseback_required;
 
@@ -386,6 +392,38 @@
         if (dom.inputLeaseback) dom.inputLeaseback.addEventListener('change', (e) => {
             updateLeasebackUI(e.target.checked);
         });
+
+        // Real-time formatting for Estimated Value
+        if (dom.inputEstValue) {
+            dom.inputEstValue.addEventListener('input', (e) => {
+                formatNumberInput(e.target);
+            });
+        }
+    }
+
+    function formatNumberInput(input) {
+        // cleanup: remove existing commas, keep digits and dots
+        let val = input.value.replace(/,/g, '').replace(/[^0-9.]/g, '');
+
+        // Prevent multiple dots
+        const parts = val.split('.');
+        if (parts.length > 2) {
+            val = parts[0] + '.' + parts.slice(1).join('');
+        }
+
+        if (val === '') {
+            input.value = '';
+            return;
+        }
+
+        // Split integer and decimal for formatting
+        const sides = val.split('.');
+
+        // Format integer part with commas
+        sides[0] = sides[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+
+        // Join back
+        input.value = sides.join('.');
     }
 
     function setEditMode(isEditing) {
@@ -411,7 +449,8 @@
             zip_code: dom.inputZip.value,
             county: dom.inputCounty.value,
             property_type: dom.inputPropType.value,
-            estimated_value: dom.inputEstValue.value,
+            // Remove commas for backend numeric processing
+            estimated_value: dom.inputEstValue.value.replace(/,/g, ''),
 
             property_description: dom.inputDescription.value,
             leaseback_required: dom.inputLeaseback.checked

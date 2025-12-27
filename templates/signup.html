@@ -624,6 +624,19 @@
 
     // --- ACTIONS ---
 
+    function formatNumberInput(input) {
+        let val = input.value.replace(/,/g, '').replace(/[^0-9.]/g, '');
+        const parts = val.split('.');
+        if (parts.length > 2) val = parts[0] + '.' + parts.slice(1).join('');
+        if (val === '') {
+            input.value = '';
+            return;
+        }
+        const sides = val.split('.');
+        sides[0] = sides[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        input.value = sides.join('.');
+    }
+
     function selectUserType(type) {
         currentUserType = type;
 
@@ -642,6 +655,14 @@
 
         // Update Dynamic Form Section
         dynamicFieldsContainer.innerHTML = formTemplates[type];
+
+        // Attach formatter if Seller
+        if (type === 'seller') {
+            const estInput = dynamicFieldsContainer.querySelector('input[placeholder="Property value estimate"]');
+            if (estInput) {
+                estInput.addEventListener('input', (e) => formatNumberInput(e.target));
+            }
+        }
 
         // Update Pricing Section
         pricingUserTypeLabel.textContent = type;
@@ -722,7 +743,7 @@
                 const value = document.querySelector('input[placeholder="Property value estimate"]');
                 const location = document.querySelector('input[placeholder="City, State where property is located"]');
                 if (type) formData.property_type = type.value.toUpperCase();
-                if (value) formData.estimated_value = value.value;
+                if (value) formData.estimated_value = value.value.replace(/,/g, '');
                 if (location) formData.property_location = location.value;
             } else if (currentUserType === 'partner') {
                 const company = document.querySelector('input[placeholder="Your business or company name"]');

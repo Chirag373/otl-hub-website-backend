@@ -117,26 +117,6 @@
     </div>
 </div>
 
-<!-- Delete Account Section -->
-<div class="bg-[var(--card)] rounded-lg border border-red-900/50 overflow-hidden">
-    <div class="px-6 py-4 border-b border-red-900/50 bg-red-900/10">
-        <h2 class="text-lg font-semibold text-red-500">Danger Zone</h2>
-        <p class="text-sm text-red-400/80">Irreversible actions for your account</p>
-    </div>
-
-    <div class="p-6">
-        <div class="flex items-center justify-between">
-            <div class="space-y-0.5">
-                <label class="text-base font-medium text-[var(--foreground)]">Delete Account</label>
-                <p class="text-sm text-[var(--muted-foreground)]">Permanently delete your account and all data</p>
-            </div>
-            <button onclick="confirmDelete()"
-                class="px-4 py-2 border border-red-600 text-red-500 rounded-md hover:bg-red-600 hover:text-white transition-colors font-medium">
-                Delete Account
-            </button>
-        </div>
-    </div>
-</div>
 {% endblock %}
 
 {% block scripts %}

@@ -80,7 +80,7 @@
                         </div>
                         <div class="space-y-2">
                             <label class="text-sm font-medium text-[var(--foreground)]">Square Feet</label>
-                            <input type="number" name="sqft"
+                            <input type="text" name="sqft"
                                 class="w-full p-2 rounded-md bg-[var(--input)] border border-[var(--border)] text-[var(--foreground)] focus:ring-1 focus:ring-[var(--accent)] outline-none">
                         </div>
                         <div class="space-y-2">
@@ -90,7 +90,7 @@
                         </div>
                         <div class="md:col-span-2 space-y-2">
                             <label class="text-sm font-medium text-[var(--foreground)]">Listing Price ($)</label>
-                            <input type="number" name="estimated_value"
+                            <input type="text" name="estimated_value"
                                 class="w-full p-2 rounded-md bg-[var(--input)] border border-[var(--border)] text-[var(--foreground)] focus:ring-1 focus:ring-[var(--accent)] outline-none">
                         </div>
                         <div class="md:col-span-2 space-y-2">
@@ -491,9 +491,9 @@
         // Populate Step 2
         if (form.bedrooms) form.bedrooms.value = propertyData.bedrooms || "";
         if (form.bathrooms) form.bathrooms.value = propertyData.bathrooms || "";
-        if (form.sqft) form.sqft.value = propertyData.sqft || "";
+        if (form.sqft) form.sqft.value = propertyData.sqft ? Number(propertyData.sqft).toLocaleString() : "";
         if (form.garage_spaces) form.garage_spaces.value = propertyData.garage_spaces || "";
-        if (form.estimated_value) form.estimated_value.value = propertyData.estimated_value || "";
+        if (form.estimated_value) form.estimated_value.value = propertyData.estimated_value ? Number(propertyData.estimated_value).toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 2 }) : "";
         if (form.property_description) form.property_description.value = propertyData.property_description || "";
 
         // Populate Step 3 (Features)
@@ -598,6 +598,32 @@
 
     function validateStep(step) {
         // Basic validation
+
+        // --- FORMATTING LOGIC ---
+        function formatNumberInput(input) {
+            let val = input.value.replace(/,/g, '').replace(/[^0-9.]/g, '');
+            const parts = val.split('.');
+            if (parts.length > 2) val = parts[0] + '.' + parts.slice(1).join('');
+            if (val === '') {
+                input.value = '';
+                return;
+            }
+            const sides = val.split('.');
+            sides[0] = sides[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+            input.value = sides.join('.');
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const estInput = document.querySelector('input[name="estimated_value"]');
+            const sqftInput = document.querySelector('input[name="sqft"]');
+
+            if (estInput) {
+                estInput.addEventListener('input', (e) => formatNumberInput(e.target));
+            }
+            if (sqftInput) {
+                sqftInput.addEventListener('input', (e) => formatNumberInput(e.target));
+            }
+        });
         if (step === 1) {
             const form = document.getElementById('add-property-form');
             if (!form.street_address.value || !form.city.value || !form.state.value || !form.zip_code.value) {
@@ -685,6 +711,13 @@
     async function submitProperty() {
         const form = document.getElementById('add-property-form');
         const formData = new FormData(form);
+
+        // Sanitize numeric fields (remove commas)
+        const estValue = formData.get('estimated_value');
+        if (estValue) formData.set('estimated_value', estValue.replace(/,/g, ''));
+
+        const sqft = formData.get('sqft');
+        if (sqft) formData.set('sqft', sqft.replace(/,/g, ''));
 
         // Add structured features
         const features = {
