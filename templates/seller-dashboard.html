@@ -226,6 +226,19 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Map Section -->
+            <div class="form-control w-full md:col-span-2 mt-4">
+                <label class="label">
+                    <span class="label-text text-[var(--foreground)] font-medium">Location on Map</span>
+                </label>
+                <div id="seller-map" class="w-full h-64 rounded-lg border border-[var(--border)] relative z-0"></div>
+                <!-- Leaflet CSS & JS -->
+                <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+                    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+                <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+                    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+            </div>
         </form>
 
         <div id="save-notification" class="hidden mt-4 p-4 rounded-lg border"></div>
@@ -238,6 +251,11 @@
 
 {% block scripts %}
 <script>
+
+    // --- MAP VARIABLES ---
+    let map = null;
+    let marker = null;
+    let geocodeTimeout = null;
 
     // --- API CONFIG ---
     const CSC_API_KEY = 'WnVWTGlEejlKbzMyOXd4c2VmdVQzZzFWTVJTb0xXWk1pNExvWVFzZQ==';
@@ -309,30 +327,14 @@
                     } else {
                         citySel.innerHTML = '<option value="">Select City</option>' +
                             cities.map(c => `<option value="${c.name}">${c.name}</option>`).join('');
-
-                        // Only enable if we are in edit mode. 
-                        // If not in edit mode (disabled attr controlled by setEditMode), we should respect that.
-                        // However, setEditMode will toggle the property. 
-                        // Here we are just populating options. 
-                        // We can set disabled=false here, but setEditMode will override if not editing.
-                        // Actually, logic flow:
-                        // 1. Init: disabled=true. 
-                        // 2. Load options.
-                        // 3. If User clicks Edit -> setEditMode(true) -> ALL inputs enabled.
-                        // So here we should leave it as is roughly, but let's just set disabled=false for functionality 
-                        // and let `setEditMode` handle the general read-only state.
-                        // CAUTION: If we populate while NOT editing, we shouldn't enable it if it's supposed to be disabled.
-                        // But `initLocationSelectors` runs once on load mostly.
-                        // Let's just set it to false IF the container/form is in edit mode?
-                        // Actually simpler: Just populate options. The `disabled` state is controlled by `setEditMode`.
-                        // EXCEPT: The listener sets `citySel.disabled = false`. We might need to check if we are allowed to edit.
-                        // But for now, let's keep it standard. If they change state, they must be editing.
                         citySel.disabled = false;
                     }
                 } else {
                     citySel.innerHTML = '<option value="">Select City</option>';
                     citySel.disabled = true;
                 }
+                // Trigger map update on state change
+                triggerMapUpdate();
             });
         });
     }
@@ -373,21 +375,87 @@
         leasebackIcon: document.getElementById('leaseback-icon'),
         leasebackAlert: document.getElementById('leaseback-alert'),
 
-
-
         // Actions
         btnEdit: document.getElementById('btn-edit-profile'),
         btnCancel: document.getElementById('btn-cancel-profile'),
         btnSave: document.getElementById('btn-save-profile'),
-        editActions: document.getElementById('edit-actions')
+        editActions: document.getElementById('edit-actions'),
+
+        // Map
+        mapContainer: document.getElementById('seller-map')
     };
 
     // --- INITIALIZATION ---
     async function init() {
         if (window.lucide) window.lucide.createIcons();
+        initMap();
         await initLocationSelectors(document.getElementById('profile-form'));
         await fetchProfile();
         setupEventListeners();
+    }
+
+    function initMap() {
+        if (!dom.mapContainer || typeof L === 'undefined') return;
+
+        // Default view: USA center roughly
+        map = L.map('seller-map').setView([39.8283, -98.5795], 4);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+    }
+
+    function triggerMapUpdate() {
+        if (geocodeTimeout) clearTimeout(geocodeTimeout);
+        geocodeTimeout = setTimeout(updateMapLocation, 1000); // Debounce 1s
+    }
+
+    async function updateMapLocation() {
+        if (!map) return;
+
+        const addrNum = dom.inputAddrNumber?.value || '';
+        const street = dom.inputStreet?.value || '';
+        const city = dom.inputCity?.value || '';
+        const state = dom.inputState?.options[dom.inputState.selectedIndex]?.text || '';
+        // If state is simplified ISO code, fetching full name might be better, but Nominatim handles ISOs too often.
+        // Let's use the text if selected, or value if not found.
+        const stateVal = dom.inputState?.value || '';
+        const zip = dom.inputZip?.value || '';
+
+        // Construct query
+        // Format: [Street], [City], [State], [Zip], [Country]
+        let queryParts = [];
+        if (addrNum || street) queryParts.push(`${addrNum} ${street}`.trim());
+        if (city) queryParts.push(city);
+        if (stateVal) queryParts.push(stateVal); // Use ISO or text
+        if (zip) queryParts.push(zip);
+
+        if (queryParts.length < 2) return; // Need at least some info context
+
+        const query = queryParts.join(', ');
+
+        try {
+            const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=1`;
+            const res = await fetch(url, { headers: { 'User-Agent': 'OTL-Platform/1.0' } });
+            if (!res.ok) return;
+            const data = await res.json();
+
+            if (data && data.length > 0) {
+                const lat = parseFloat(data[0].lat);
+                const lon = parseFloat(data[0].lon);
+
+                // Update Map
+                map.setView([lat, lon], 16);
+
+                if (marker) {
+                    marker.setLatLng([lat, lon]);
+                } else {
+                    marker = L.marker([lat, lon]).addTo(map);
+                }
+            }
+        } catch (e) {
+            console.error("Geocoding error:", e);
+        }
     }
 
     // --- LOGIC ---
@@ -444,6 +512,9 @@
                     } else {
                         dom.inputCity.disabled = false;
                     }
+
+                    // Initial Map Update
+                    updateMapLocation();
                 }
             });
         } else {
@@ -480,10 +551,6 @@
         if (dom.inputPropType && profile.property_type) {
             dom.inputPropType.value = propTypeMap[profile.property_type] || profile.property_type.toUpperCase().replace(/ /g, '_');
         }
-
-
-
-
     }
 
     function updateLeasebackUI(isChecked) {
@@ -505,7 +572,10 @@
 
     // --- EVENT LISTENERS ---
     function setupEventListeners() {
-        if (dom.btnEdit) dom.btnEdit.addEventListener('click', () => setEditMode(true));
+        if (dom.btnEdit) dom.btnEdit.addEventListener('click', () => {
+            setEditMode(true);
+            setTimeout(() => { map.invalidateSize(); }, 300); // Fix map render if it was hidden/resized
+        });
         if (dom.btnCancel) dom.btnCancel.addEventListener('click', () => {
             setEditMode(false);
             populateData(); // Reset
@@ -525,6 +595,15 @@
                 formatNumberInput(e.target);
             });
         }
+
+        // Location Inputs -> Map Update
+        const locationInputs = [dom.inputAddrNumber, dom.inputStreet, dom.inputCity, dom.inputZip];
+        locationInputs.forEach(input => {
+            if (input) {
+                input.addEventListener('input', triggerMapUpdate);
+                input.addEventListener('change', triggerMapUpdate);
+            }
+        });
     }
 
     function formatNumberInput(input) {
