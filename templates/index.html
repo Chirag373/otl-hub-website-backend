@@ -66,16 +66,9 @@
                     <label class="label font-heading text-lg text-[var(--muted-foreground)] mb-1">
                         <span class="label-text text-[var(--muted-foreground)] text-lg">Location</span>
                     </label>
-                    <div class="flex gap-2" id="location-search-container">
-                        <select id="search-state"
-                            class="state-select select select-bordered w-1/2 h-[54px] px-2 bg-[#464646] border-[var(--border)] rounded-lg text-[var(--foreground)] focus:outline-none focus:border-[var(--accent)] font-body text-base">
-                            <option value="">State</option>
-                        </select>
-                        <select id="search-city"
-                            class="city-select select select-bordered w-1/2 h-[54px] px-2 bg-[#464646] border-[var(--border)] rounded-lg text-[var(--foreground)] focus:outline-none focus:border-[var(--accent)] font-body text-base"
-                            disabled>
-                            <option value="">City</option>
-                        </select>
+                    <div id="location-search-container">
+                        <input type="text" id="search-location" name="location" placeholder="City, Zip, Address"
+                            class="input input-bordered w-full h-[54px] px-6 py-3 bg-[#464646] border-[var(--border)] rounded-lg text-[var(--foreground)] focus:outline-none focus:border-[var(--accent)] font-body text-lg" />
                     </div>
                 </div>
                 <div class="form-control w-full">
@@ -167,84 +160,8 @@
 {% block extra_scripts %}
 <script>
     // --- API CONFIG ---
-    const CSC_API_KEY = 'WnVWTGlEejlKbzMyOXd4c2VmdVQzZzFWTVJTb0xXWk1pNExvWVFzZQ==';
-    const CSC_BASE_URL = 'https://api.countrystatecity.in/v1';
-    let cachedStates = null;
-    let cachedCities = {};
+    // (Removed Location API logic as per user request to use single field)
 
-    async function fetchUSStates() {
-        if (cachedStates) return cachedStates;
-        try {
-            const res = await fetch(`${CSC_BASE_URL}/countries/US/states`, {
-                headers: { 'X-CSCAPI-KEY': CSC_API_KEY }
-            });
-            if (!res.ok) throw new Error('Failed to fetch states');
-            const data = await res.json();
-            data.sort((a, b) => a.name.localeCompare(b.name));
-            cachedStates = data;
-            return data;
-        } catch (e) {
-            console.error(e);
-            return [];
-        }
-    }
-
-    async function fetchCities(stateIso) {
-        if (cachedCities[stateIso]) return cachedCities[stateIso];
-        try {
-            const res = await fetch(`${CSC_BASE_URL}/countries/US/states/${stateIso}/cities`, {
-                headers: { 'X-CSCAPI-KEY': CSC_API_KEY }
-            });
-            if (!res.ok) throw new Error('Failed to fetch cities');
-            const data = await res.json();
-            data.sort((a, b) => a.name.localeCompare(b.name));
-            cachedCities[stateIso] = data;
-            return data;
-        } catch (e) {
-            console.error(e);
-            return [];
-        }
-    }
-
-    async function initLocationSelectors(container) {
-        const stateSels = container.querySelectorAll('.state-select');
-
-        if (stateSels.length === 0) return;
-
-        // Load States
-        const states = await fetchUSStates();
-        const stateOptions = '<option value="">Select State</option>' +
-            states.map(s => `<option value="${s.iso2}">${s.name}</option>`).join('');
-
-        stateSels.forEach(stateSel => {
-            stateSel.innerHTML = stateOptions;
-
-            // Find corresponding city select
-            const citySel = container.querySelector('.city-select');
-
-            if (!citySel) return;
-
-            stateSel.addEventListener('change', async () => {
-                const stateCode = stateSel.value;
-                citySel.disabled = true;
-                citySel.innerHTML = '<option value="">Loading...</option>';
-
-                if (stateCode) {
-                    const cities = await fetchCities(stateCode);
-                    if (cities.length === 0) {
-                        citySel.innerHTML = '<option value="">No cities found</option>';
-                    } else {
-                        citySel.innerHTML = '<option value="">Select City</option>' +
-                            cities.map(c => `<option value="${c.name}">${c.name}</option>`).join('');
-                        citySel.disabled = false;
-                    }
-                } else {
-                    citySel.innerHTML = '<option value="">Select City</option>';
-                    citySel.disabled = true;
-                }
-            });
-        });
-    }
 
     // Filter Toggle Logic
     const filterBtn = document.getElementById('filter-toggle-btn');
@@ -285,11 +202,7 @@
         const formData = new FormData(form);
 
         // Update state filters
-        const state = document.getElementById('search-state').value;
-        const city = document.getElementById('search-city').value;
-        let location = '';
-        if (state && city) location = `${city}, ${state}`;
-        else if (state) location = state;
+        const location = document.getElementById('search-location').value;
 
         searchState.filters = {
             location: location,
@@ -538,7 +451,6 @@
 
     // Run on load
     document.addEventListener('DOMContentLoaded', () => {
-        initLocationSelectors(document.getElementById('search-form'));
         fetchProperties(true);
     });
 </script>

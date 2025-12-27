@@ -129,19 +129,23 @@
             </div>
             <div class="form-control w-full">
                 <label class="label">
-                    <span class="label-text text-[var(--foreground)] font-medium">City</span>
+                    <span class="label-text text-[var(--foreground)] font-medium">State</span>
                 </label>
-                <input type="text" id="input-city"
-                    class="input input-bordered w-full bg-[var(--input)] border-[var(--border)] text-[var(--foreground)] disabled:opacity-50 disabled:bg-[var(--input)] disabled:text-[var(--muted-foreground)] focus:outline-none focus:border-[var(--accent)]"
+                <select id="input-state"
+                    class="state-select select select-bordered w-full bg-[var(--input)] border-[var(--border)] text-[var(--foreground)] disabled:opacity-50 disabled:bg-[var(--input)] disabled:text-[var(--muted-foreground)] focus:outline-none focus:border-[var(--accent)]"
                     disabled>
+                    <option value="">Loading...</option>
+                </select>
             </div>
             <div class="form-control w-full">
                 <label class="label">
-                    <span class="label-text text-[var(--foreground)] font-medium">State</span>
+                    <span class="label-text text-[var(--foreground)] font-medium">City</span>
                 </label>
-                <input type="text" id="input-state"
-                    class="input input-bordered w-full bg-[var(--input)] border-[var(--border)] text-[var(--foreground)] disabled:opacity-50 disabled:bg-[var(--input)] disabled:text-[var(--muted-foreground)] focus:outline-none focus:border-[var(--accent)]"
+                <select id="input-city"
+                    class="city-select select select-bordered w-full bg-[var(--input)] border-[var(--border)] text-[var(--foreground)] disabled:opacity-50 disabled:bg-[var(--input)] disabled:text-[var(--muted-foreground)] focus:outline-none focus:border-[var(--accent)]"
                     disabled>
+                    <option value="">Select State First</option>
+                </select>
             </div>
             <div class="form-control w-full">
                 <label class="label">
@@ -234,6 +238,105 @@
 
 {% block scripts %}
 <script>
+
+    // --- API CONFIG ---
+    const CSC_API_KEY = 'WnVWTGlEejlKbzMyOXd4c2VmdVQzZzFWTVJTb0xXWk1pNExvWVFzZQ==';
+    const CSC_BASE_URL = 'https://api.countrystatecity.in/v1';
+    let cachedStates = null;
+    let cachedCities = {};
+
+    async function fetchUSStates() {
+        if (cachedStates) return cachedStates;
+        try {
+            const res = await fetch(`${CSC_BASE_URL}/countries/US/states`, {
+                headers: { 'X-CSCAPI-KEY': CSC_API_KEY }
+            });
+            if (!res.ok) throw new Error('Failed to fetch states');
+            const data = await res.json();
+            data.sort((a, b) => a.name.localeCompare(b.name));
+            cachedStates = data;
+            return data;
+        } catch (e) {
+            console.error(e);
+            return [];
+        }
+    }
+
+    async function fetchCities(stateIso) {
+        if (cachedCities[stateIso]) return cachedCities[stateIso];
+        try {
+            const res = await fetch(`${CSC_BASE_URL}/countries/US/states/${stateIso}/cities`, {
+                headers: { 'X-CSCAPI-KEY': CSC_API_KEY }
+            });
+            if (!res.ok) throw new Error('Failed to fetch cities');
+            const data = await res.json();
+            data.sort((a, b) => a.name.localeCompare(b.name));
+            cachedCities[stateIso] = data;
+            return data;
+        } catch (e) {
+            console.error(e);
+            return [];
+        }
+    }
+
+    async function initLocationSelectors(container) {
+        const stateSels = container.querySelectorAll('.state-select');
+
+        if (stateSels.length === 0) return;
+
+        // Load States
+        const states = await fetchUSStates();
+        const stateOptions = '<option value="">Select State</option>' +
+            states.map(s => `<option value="${s.iso2}">${s.name}</option>`).join('');
+
+        stateSels.forEach(stateSel => {
+            stateSel.innerHTML = stateOptions;
+
+            // Find corresponding city select
+            const citySel = container.querySelector('.city-select');
+
+            if (!citySel) return;
+
+            stateSel.addEventListener('change', async () => {
+                const stateCode = stateSel.value;
+                citySel.disabled = true;
+                citySel.innerHTML = '<option value="">Loading...</option>';
+
+                if (stateCode) {
+                    const cities = await fetchCities(stateCode);
+                    if (cities.length === 0) {
+                        citySel.innerHTML = '<option value="">No cities found</option>';
+                    } else {
+                        citySel.innerHTML = '<option value="">Select City</option>' +
+                            cities.map(c => `<option value="${c.name}">${c.name}</option>`).join('');
+
+                        // Only enable if we are in edit mode. 
+                        // If not in edit mode (disabled attr controlled by setEditMode), we should respect that.
+                        // However, setEditMode will toggle the property. 
+                        // Here we are just populating options. 
+                        // We can set disabled=false here, but setEditMode will override if not editing.
+                        // Actually, logic flow:
+                        // 1. Init: disabled=true. 
+                        // 2. Load options.
+                        // 3. If User clicks Edit -> setEditMode(true) -> ALL inputs enabled.
+                        // So here we should leave it as is roughly, but let's just set disabled=false for functionality 
+                        // and let `setEditMode` handle the general read-only state.
+                        // CAUTION: If we populate while NOT editing, we shouldn't enable it if it's supposed to be disabled.
+                        // But `initLocationSelectors` runs once on load mostly.
+                        // Let's just set it to false IF the container/form is in edit mode?
+                        // Actually simpler: Just populate options. The `disabled` state is controlled by `setEditMode`.
+                        // EXCEPT: The listener sets `citySel.disabled = false`. We might need to check if we are allowed to edit.
+                        // But for now, let's keep it standard. If they change state, they must be editing.
+                        citySel.disabled = false;
+                    }
+                } else {
+                    citySel.innerHTML = '<option value="">Select City</option>';
+                    citySel.disabled = true;
+                }
+            });
+        });
+    }
+
     // --- DATA ---
     let profile = {};
 
@@ -282,6 +385,7 @@
     // --- INITIALIZATION ---
     async function init() {
         if (window.lucide) window.lucide.createIcons();
+        await initLocationSelectors(document.getElementById('profile-form'));
         await fetchProfile();
         setupEventListeners();
     }
@@ -323,8 +427,30 @@
 
         if (dom.inputAddrNumber) dom.inputAddrNumber.value = profile.address_number || '';
         if (dom.inputStreet) dom.inputStreet.value = profile.street_address || '';
-        if (dom.inputCity) dom.inputCity.value = profile.city || '';
         if (dom.inputState) dom.inputState.value = profile.state || '';
+
+        // Fetch and populate cities if state is present
+        if (profile.state) {
+            fetchCities(profile.state).then(cities => {
+                if (dom.inputCity) {
+                    dom.inputCity.innerHTML = '<option value="">Select City</option>' +
+                        cities.map(c => `<option value="${c.name}">${c.name}</option>`).join('');
+                    dom.inputCity.value = profile.city || "";
+
+                    // Ensure correct disabled state (it might have been enabled by initLocationSelectors or fetchCities flow)
+                    // If NOT in edit mode, force disable.
+                    if (document.getElementById('edit-actions').classList.contains('hidden')) {
+                        dom.inputCity.disabled = true;
+                    } else {
+                        dom.inputCity.disabled = false;
+                    }
+                }
+            });
+        } else {
+            if (dom.inputCity) {
+                dom.inputCity.innerHTML = '<option value="">Select State First</option>';
+            }
+        }
         if (dom.inputZip) dom.inputZip.value = profile.zip_code || '';
         if (dom.inputCounty) dom.inputCounty.value = profile.county || '';
 
@@ -512,6 +638,8 @@
         return cookieValue;
     }
 
-    init();
+    document.addEventListener('DOMContentLoaded', () => {
+        init();
+    });
 </script>
 {% endblock %}

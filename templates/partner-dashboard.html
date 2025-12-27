@@ -129,11 +129,23 @@
             </div>
             <div class="form-control w-full">
                 <label class="label">
-                    <span class="label-text text-[var(--foreground)] font-medium">Service Areas</span>
+                    <span class="label-text text-[var(--foreground)] font-medium">Service State</span>
                 </label>
-                <input type="text" id="input-areas"
-                    class="input input-bordered w-full bg-[var(--input)] border-[var(--border)] text-[var(--foreground)] disabled:opacity-50 disabled:bg-[var(--input)] disabled:text-[var(--muted-foreground)] focus:outline-none focus:border-[var(--accent)]"
+                <select id="input-state"
+                    class="state-select select select-bordered w-full bg-[var(--input)] border-[var(--border)] text-[var(--foreground)] disabled:opacity-50 disabled:bg-[var(--input)] disabled:text-[var(--muted-foreground)] focus:outline-none focus:border-[var(--accent)]"
                     disabled>
+                    <option value="">Loading...</option>
+                </select>
+            </div>
+            <div class="form-control w-full">
+                <label class="label">
+                    <span class="label-text text-[var(--foreground)] font-medium">Service City</span>
+                </label>
+                <select id="input-city"
+                    class="city-select select select-bordered w-full bg-[var(--input)] border-[var(--border)] text-[var(--foreground)] disabled:opacity-50 disabled:bg-[var(--input)] disabled:text-[var(--muted-foreground)] focus:outline-none focus:border-[var(--accent)]"
+                    disabled>
+                    <option value="">Select State First</option>
+                </select>
             </div>
             <div class="form-control w-full">
                 <label class="label">
@@ -179,6 +191,92 @@
 
 {% block scripts %}
 <script>
+    // --- API CONFIG ---
+    const CSC_API_KEY = 'WnVWTGlEejlKbzMyOXd4c2VmdVQzZzFWTVJTb0xXWk1pNExvWVFzZQ==';
+    const CSC_BASE_URL = 'https://api.countrystatecity.in/v1';
+    let cachedStates = null;
+    let cachedCities = {};
+
+    async function fetchUSStates() {
+        if (cachedStates) return cachedStates;
+        try {
+            const res = await fetch(`${CSC_BASE_URL}/countries/US/states`, {
+                headers: { 'X-CSCAPI-KEY': CSC_API_KEY }
+            });
+            if (!res.ok) throw new Error('Failed to fetch states');
+            const data = await res.json();
+            data.sort((a, b) => a.name.localeCompare(b.name));
+            cachedStates = data;
+            return data;
+        } catch (e) {
+            console.error(e);
+            return [];
+        }
+    }
+
+    async function fetchCities(stateIso) {
+        if (cachedCities[stateIso]) return cachedCities[stateIso];
+        try {
+            const res = await fetch(`${CSC_BASE_URL}/countries/US/states/${stateIso}/cities`, {
+                headers: { 'X-CSCAPI-KEY': CSC_API_KEY }
+            });
+            if (!res.ok) throw new Error('Failed to fetch cities');
+            const data = await res.json();
+            data.sort((a, b) => a.name.localeCompare(b.name));
+            cachedCities[stateIso] = data;
+            return data;
+        } catch (e) {
+            console.error(e);
+            return [];
+        }
+    }
+
+    async function initLocationSelectors(container) {
+        const stateSels = container.querySelectorAll('.state-select');
+
+        if (stateSels.length === 0) return;
+
+        // Load States
+        const states = await fetchUSStates();
+        const stateOptions = '<option value="">Select State</option>' +
+            states.map(s => `<option value="${s.iso2}">${s.name}</option>`).join('');
+
+        stateSels.forEach(stateSel => {
+            stateSel.innerHTML = stateOptions;
+
+            // Find corresponding city select
+            const citySel = container.querySelector('.city-select');
+
+            if (!citySel) return;
+
+            stateSel.addEventListener('change', async () => {
+                const stateCode = stateSel.value;
+                citySel.disabled = true;
+                citySel.innerHTML = '<option value="">Loading...</option>';
+
+                if (stateCode) {
+                    const cities = await fetchCities(stateCode);
+                    if (cities.length === 0) {
+                        citySel.innerHTML = '<option value="">No cities found</option>';
+                    } else {
+                        citySel.innerHTML = '<option value="">Select City</option>' +
+                            cities.map(c => `<option value="${c.name}">${c.name}</option>`).join('');
+
+                        // Edit mode check
+                        if (document.getElementById('edit-actions').classList.contains('hidden')) {
+                            citySel.disabled = true;
+                        } else {
+                            citySel.disabled = false;
+                        }
+                    }
+                } else {
+                    citySel.innerHTML = '<option value="">Select City</option>';
+                    citySel.disabled = true;
+                }
+            });
+        });
+    }
+
     // --- DATA ---
     let profile = {};
 
@@ -201,7 +299,8 @@
         inputPhone: document.getElementById('input-phone'),
         inputCompany: document.getElementById('input-company'),
         inputType: document.getElementById('input-type'),
-        inputAreas: document.getElementById('input-areas'),
+        inputState: document.getElementById('input-state'),
+        inputCity: document.getElementById('input-city'),
         inputLicense: document.getElementById('input-license'),
         inputWebsite: document.getElementById('input-website'),
         // These fields are in template but not model yet
@@ -219,9 +318,11 @@
     };
 
     // --- INITIALIZATION ---
-    function init() {
+    // --- INITIALIZATION ---
+    async function init() {
         if (window.lucide) lucide.createIcons();
-        fetchProfile();
+        await initLocationSelectors(document.getElementById('profile-form'));
+        await fetchProfile();
         setupEventListeners();
     }
 
@@ -291,10 +392,11 @@
             },
             company_name: dom.inputCompany.value,
             partnership_type: dom.inputType.value,
-            service_areas: dom.inputAreas.value,
+            service_areas: (dom.inputCity && dom.inputState && dom.inputCity.value && dom.inputState.value)
+                ? `${dom.inputCity.value}, ${dom.inputState.value}`
+                : "",
             website_url: dom.inputWebsite.value,
             business_license_number: dom.inputLicense.value,
-            // bio/experience not in model yet
         };
 
         try {
@@ -361,7 +463,33 @@
         if (dom.inputPhone) dom.inputPhone.value = profile.phone;
         if (dom.inputCompany) dom.inputCompany.value = profile.companyName;
         if (dom.inputType) dom.inputType.value = profile.partnershipType;
-        if (dom.inputAreas) dom.inputAreas.value = profile.serviceAreas;
+
+        // Handle Location
+        if (profile.serviceAreas) {
+            const parts = profile.serviceAreas.split(', ');
+            const cityName = parts[0] || "";
+            const stateIso = parts[1] || "";
+
+            if (dom.inputState) dom.inputState.value = stateIso;
+            if (stateIso) {
+                fetchCities(stateIso).then(cities => {
+                    if (dom.inputCity) {
+                        dom.inputCity.innerHTML = '<option value="">Select City</option>' +
+                            cities.map(c => `<option value="${c.name}">${c.name}</option>`).join('');
+                        dom.inputCity.value = cityName;
+
+                        if (document.getElementById('edit-actions').classList.contains('hidden')) {
+                            dom.inputCity.disabled = true;
+                        } else {
+                            dom.inputCity.disabled = false;
+                        }
+                    }
+                });
+            } else {
+                if (dom.inputCity) dom.inputCity.innerHTML = '<option value="">Select State First</option>';
+            }
+        }
+
         if (dom.inputLicense) dom.inputLicense.value = profile.businessLicense;
         if (dom.inputWebsite) dom.inputWebsite.value = profile.website;
         if (dom.inputExperience) dom.inputExperience.value = profile.experience || "";
@@ -388,13 +516,15 @@
         dom.btnEdit.parentElement.classList.toggle('hidden', isEditing);
         dom.editActions.classList.toggle('hidden', !isEditing);
 
-        const inputs = document.querySelectorAll('#profile-form input, #profile-form textarea');
+        const inputs = document.querySelectorAll('#profile-form input, #profile-form textarea, #profile-form select');
         inputs.forEach(input => input.disabled = !isEditing);
 
         // Email is usually read-only
         if (dom.inputEmail) dom.inputEmail.disabled = true;
     }
 
-    init();
+    document.addEventListener('DOMContentLoaded', () => {
+        init();
+    });
 </script>
 {% endblock %}
