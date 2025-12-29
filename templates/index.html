@@ -140,7 +140,7 @@
             Latest Properties
         </h2>
 
-        <div id="property-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div id="property-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 items-stretch">
             <!-- Properties will be loaded here via JS -->
             <div class="col-span-full text-center py-12">
                 <span class="loading loading-spinner loading-lg text-[var(--accent)]"></span>
@@ -375,12 +375,12 @@
 
 
         return `
-            <article class="card card-compact bg-[var(--card)] overflow-hidden border border-[var(--border)] shadow-lg rounded-lg">
+            <article class="card bg-[var(--card)] overflow-hidden border border-[var(--border)] shadow-lg rounded-lg flex flex-col h-full">
                 <figure class="relative overflow-hidden mx-3 mt-3 rounded-lg group aspect-[3/2]">
                     <div id="carousel-${p.id}" class="carousel carousel-center w-full h-full p-0 space-x-0 bg-gray-800 rounded-lg">
                         ${imageHtml}
                     </div>
-                    
+
                     ${hasMultipleImages ? `
                     <div class="absolute flex justify-between transform -translate-y-1/2 left-2 right-2 top-1/2 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
                         <button onclick="scrollCarousel('${p.id}', -1)" class="btn btn-circle btn-sm btn-ghost bg-black/40 hover:bg-black/60 text-white border-none pointer-events-auto">❮</button>
@@ -395,7 +395,7 @@
                     </div>
                 </figure>
 
-                <div class="card-body p-7">
+                <div class="card-body p-7 flex flex-col flex-grow">
                     <div class="mb-4">
                         <h3 class="card-title font-heading text-3xl font-bold text-[var(--accent)] mb-1">
                             ${price}
@@ -421,8 +421,8 @@
                         </div>
                     </div>
 
-                    <div class="mb-2">
-                        <p class="text-[var(--foreground)] text-sm mb-2">
+                    <div class="mb-2 flex-grow">
+                        <p class="text-[var(--foreground)] text-sm mb-2 line-clamp-2">
                             ${(() => {
                 const desc = p.description || "No description available.";
                 const words = desc.split(/\s+/);
@@ -439,7 +439,7 @@
                     </div>
 
                     <div class="card-actions mt-4 pt-4 border-t border-[var(--border)]">
-                        <a href="/property/detail?id=${p.id}" 
+                        <a href="/property/detail?id=${p.id}"
                            class="btn btn-outline btn-block text-[var(--foreground)] hover:bg-[var(--accent)] hover:text-white border-[var(--border)] hover:border-[var(--accent)] transition-all">
                             View Details
                         </a>
