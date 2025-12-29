@@ -395,8 +395,16 @@
         const featuresContainer = document.getElementById('prop-features');
         let features = [];
         // Handle various potential formats for features
-        if (Array.isArray(p.features)) features = p.features;
-        else if (typeof p.features === 'object' && p.features !== null) features = Object.values(p.features);
+        if (Array.isArray(p.features)) {
+            features = p.features;
+        } else if (typeof p.features === 'object' && p.features !== null) {
+            // Smart layout: if value is boolean true, use key. If string, use value.
+            features = Object.entries(p.features).map(([k, v]) => {
+                if (v === true || String(v).toLowerCase() === 'true') return k;
+                if (v === false || String(v).toLowerCase() === 'false') return null;
+                return v;
+            }).filter(Boolean);
+        }
 
         if (features.length === 0) features = ["Air Conditioning", "Heating", "Parking"]; // Mock if empty
 
