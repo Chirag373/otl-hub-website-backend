@@ -61,6 +61,7 @@
             opacity: 0;
             transform: scale(0.95);
         }
+
         to {
             opacity: 1;
             transform: scale(1);
@@ -104,11 +105,11 @@
         <!-- Header Section -->
         <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
             <div>
-                <h1 id="prop-price" class="font-heading text-4xl md:text-5xl font-bold text-[var(--accent)] mb-2">$0
-                </h1>
-                <div class="flex items-center gap-2 text-[var(--muted-foreground)]">
-                    <i data-lucide="map-pin" class="w-5 h-5"></i>
-                    <span id="prop-address" class="text-lg font-medium">Loading address...</span>
+                <div class="flex items-center flex-wrap gap-3 mb-2">
+                    <h1 id="prop-price" class="font-heading text-4xl md:text-5xl font-bold text-[var(--accent)]">$0</h1>
+                    <span class="text-[var(--muted-foreground)] text-3xl leading-none hidden md:inline">•</span>
+                    <span id="prop-location-header"
+                        class="text-[var(--muted-foreground)] text-2xl font-medium">Loading...</span>
                 </div>
             </div>
             <div class="flex gap-3">
@@ -313,7 +314,7 @@
 
         // Basic Info
         document.getElementById('prop-price').textContent = p.price ? `$${Number(p.price).toLocaleString()}` : "$ -";
-        document.getElementById('prop-address').textContent = p.title || "Address Hidden";
+        document.getElementById('prop-location-header').textContent = p.location || "Location TBD";
         document.getElementById('prop-location-detail').textContent = p.location || "";
 
         // Stats
@@ -327,8 +328,37 @@
         document.getElementById('prop-added').textContent = `Listed ${date}`;
 
         // Description - Assuming 'description' field exists or we fallback
+        // Description - Assuming 'description' field exists or we fallback
         const desc = p.description || p.property_description || "No description provided for this property.";
-        document.getElementById('prop-description').textContent = desc;
+        const descContainer = document.getElementById('prop-description');
+        const charLimit = 250;
+
+        if (desc.length > charLimit) {
+            const shortText = desc.substring(0, charLimit);
+
+            // Initial render
+            descContainer.innerHTML = `
+                <span id="desc-content">${shortText}...</span>
+                <button id="desc-toggle" class="text-[var(--accent)] font-bold cursor-pointer hover:underline ml-1 text-base">Show more</button>
+            `;
+
+            const toggleBtn = document.getElementById('desc-toggle');
+            const contentSpan = document.getElementById('desc-content');
+            let isExpanded = false;
+
+            toggleBtn.addEventListener('click', function () {
+                isExpanded = !isExpanded;
+                if (isExpanded) {
+                    contentSpan.textContent = desc;
+                    this.textContent = "Show less";
+                } else {
+                    contentSpan.textContent = shortText + "...";
+                    this.textContent = "Show more";
+                }
+            });
+        } else {
+            descContainer.textContent = desc;
+        }
 
         // Images (Swiper)
         const swiperWrapper = document.getElementById('swiper-wrapper');
@@ -370,12 +400,36 @@
 
         if (features.length === 0) features = ["Air Conditioning", "Heating", "Parking"]; // Mock if empty
 
-        featuresContainer.innerHTML = features.map(f => `
+        // Icon mapping helper
+        const getFeatureIcon = (feature) => {
+            const f = feature.toLowerCase();
+            if (f.includes('air') || f.includes('ac') || f.includes('cool')) return 'wind';
+            if (f.includes('heat') || f.includes('fire')) return 'flame';
+            if (f.includes('park') || f.includes('garage')) return 'car-front';
+            if (f.includes('pool') || f.includes('swim') || f.includes('spa')) return 'waves';
+            if (f.includes('wifi') || f.includes('internet')) return 'wifi';
+            if (f.includes('gym') || f.includes('fit')) return 'dumbbell';
+            if (f.includes('security') || f.includes('safe') || f.includes('alarm')) return 'shield-check';
+            if (f.includes('garden') || f.includes('yard') || f.includes('lawn')) return 'flower-2';
+            if (f.includes('view')) return 'mountain';
+            if (f.includes('wash') || f.includes('dry') || f.includes('laundry')) return 'washing-machine';
+            if (f.includes('kitchen') || f.includes('dish')) return 'utensils';
+            if (f.includes('balcony') || f.includes('patio') || f.includes('deck')) return 'sun';
+            if (f.includes('elevator') || f.includes('lift')) return 'arrow-up-down';
+            if (f.includes('pet') || f.includes('dog') || f.includes('cat')) return 'paw-print';
+            if (f.includes('wheelchair') || f.includes('access')) return 'accessibility';
+            if (f.includes('storage')) return 'package';
+            return 'check-circle'; // Default
+        };
+
+        featuresContainer.innerHTML = features.map(f => {
+            const iconName = getFeatureIcon(f.toString());
+            return `
             <div class="flex items-center gap-3 p-3 bg-[var(--card)] border border-[var(--border)] rounded-lg feature-card">
-                <i data-lucide="check-circle" class="w-5 h-5 text-green-500"></i>
+                <i data-lucide="${iconName}" class="w-5 h-5 text-[var(--accent)]"></i>
                 <span class="text-[var(--foreground)] font-medium text-sm capitalize">${f.toString().replace(/_/g, ' ')}</span>
             </div>
-        `).join('');
+        `}).join('');
 
         // Re-init icons
         if (window.lucide) lucide.createIcons();
@@ -432,7 +486,7 @@
         document.getElementById('error-state').classList.remove('hidden');
     }
 
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
         loadPropertyDetails();
         initShareModal();
     });
@@ -446,7 +500,7 @@
         const copySuccess = document.getElementById('copy-success');
 
         // Show modal when share button is clicked
-        shareBtn.addEventListener('click', function() {
+        shareBtn.addEventListener('click', function () {
             const currentUrl = window.location.href;
             shareUrlInput.value = currentUrl;
             modal.classList.remove('hidden');
@@ -454,19 +508,19 @@
         });
 
         // Close modal when close button is clicked
-        closeBtn.addEventListener('click', function() {
+        closeBtn.addEventListener('click', function () {
             modal.classList.add('hidden');
         });
 
         // Close modal when clicking outside
-        modal.addEventListener('click', function(e) {
+        modal.addEventListener('click', function (e) {
             if (e.target === modal) {
                 modal.classList.add('hidden');
             }
         });
 
         // Copy link to clipboard
-        copyBtn.addEventListener('click', async function() {
+        copyBtn.addEventListener('click', async function () {
             try {
                 await navigator.clipboard.writeText(shareUrlInput.value);
                 copySuccess.classList.remove('hidden');
