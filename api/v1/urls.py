@@ -6,7 +6,7 @@ from api.v1.views import (
     PropertyImageDeleteView, PropertySearchView, BuyerFavoritesView, BuyerFavoriteToggleView,
     ChangePasswordView, DeleteAccountView, UpdateNotificationSettingsView
 )
-from api.v1.payment import PaymentSuccessView, BillingPortalView
+from api.v1.payment import PaymentSuccessView, BillingPortalView, CreateAccessPassSessionView, AccessPassSuccessView
 
 from rest_framework_simplejwt.views import TokenRefreshView, TokenBlacklistView
 
@@ -31,4 +31,8 @@ urlpatterns = [
     path("user/settings/", UpdateNotificationSettingsView.as_view(), name="update-settings"),
     path("payment/success/", PaymentSuccessView.as_view(), name="payment-success"),
     path("billing/portal/", BillingPortalView.as_view(), name="billing-portal"),
+    
+    # Access Pass
+    path("payment/create-access-pass-session/", CreateAccessPassSessionView.as_view(), name="create-access-pass-session"),
+    path("payment/access-pass-success/", AccessPassSuccessView.as_view(), name="access-pass-success"),
 ]

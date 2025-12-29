@@ -70,7 +70,7 @@ class SellerProfileAdmin(admin.ModelAdmin):
     list_display = (
         "user",
         "property_type",
-        "property_location",
+        "city",
         "estimated_value",
         "has_active_listing",
         "created_at",
@@ -80,7 +80,7 @@ class SellerProfileAdmin(admin.ModelAdmin):
         "user__email",
         "user__first_name",
         "user__last_name",
-        "property_location",
+        "city",
     )
     readonly_fields = ("created_at", "updated_at")
 
@@ -88,7 +88,7 @@ class SellerProfileAdmin(admin.ModelAdmin):
         ("User Information", {"fields": ("user",)}),
         (
             "Property Details",
-            {"fields": ("property_type", "property_location", "estimated_value")},
+            {"fields": ("property_type", "city", "state", "estimated_value")},
         ),
         ("Listing Status", {"fields": ("has_active_listing", "listing_created_at")}),
         ("Timestamps", {"fields": ("created_at", "updated_at")}),

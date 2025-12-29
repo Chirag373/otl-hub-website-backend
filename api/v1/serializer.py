@@ -313,6 +313,7 @@ class BuyerProfileSerializer(serializers.ModelSerializer):
         source="preferred_location", required=False, allow_blank=True
     )
     budget_range = serializers.SerializerMethodField()
+    access_pass_expiry = serializers.DateTimeField(read_only=True)
 
     # Nested serializers for agent
     agent = serializers.SerializerMethodField()
@@ -329,6 +330,7 @@ class BuyerProfileSerializer(serializers.ModelSerializer):
             "member_since",
             "location",
             "budget_range",
+            "access_pass_expiry",
             "agent",
 
         ]

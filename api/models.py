@@ -1,185 +1,72 @@
 from django.db import models
+from django.conf import settings
 from django.core.validators import MinValueValidator
-from django.utils.translation import gettext_lazy as _
-from core.models import User
-
 
 class BuyerProfile(models.Model):
-    """Profile specific to Buyer users"""
-
     class BudgetRange(models.TextChoices):
-        BUDGET_RANGE_STEP_1 = "0-200000", "$0 - $200,000"
-        BUDGET_RANGE_STEP_2 = "200000-400000", "$200,000 - $400,000"
-        BUDGET_RANGE_STEP_3 = "400000-600000", "$400,000 - $600,000"
-        BUDGET_RANGE_STEP_4 = "600000-800000", "$600,000 - $800,000"
-        BUDGET_RANGE_STEP_5 = "800000-1000000", "$800,000 - $1,000,000"
-        BUDGET_RANGE_STEP_6 = "1000000+", "$1,000,000+"
+        RANGE_0_200K = "0-200000", "$0 - $200,000"
+        RANGE_200K_400K = "200000-400000", "$200,000 - $400,000"
+        RANGE_400K_600K = "400000-600000", "$400,000 - $600,000"
+        RANGE_600K_800K = "600000-800000", "$600,000 - $800,000"
+        RANGE_800K_1M = "800000-1000000", "$800,000 - $1,000,000"
+        RANGE_1M_PLUS = "1000000+", "$1,000,000+"
 
-    user = models.OneToOneField(
-        User,
-        on_delete=models.CASCADE,
-        related_name="buyer_profile",
-        limit_choices_to={"role": User.UserRole.BUYER},
-    )
-    preferred_location = models.CharField(
-        max_length=255, blank=True, help_text=_("City, State for property search")
-    )
-    budget_range = models.CharField(
-        max_length=100,
-        blank=True,
-        choices=BudgetRange.choices,
-        help_text=_("Budget range for property purchase"),
-    )
-
-    # Assigned realtor/agent
-    assigned_agent = models.ForeignKey(
-        User,
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
-        related_name="assigned_buyers",
-        limit_choices_to={"role": User.UserRole.REALTOR},
-        help_text=_("Assigned realtor/agent for this buyer"),
-    )
-
-
-
-    # Favorite Properties
-    favorites = models.ManyToManyField(
-        'SellerProfile', 
-        related_name='favorited_by', 
-        blank=True,
-        help_text=_("Properties favorited by this buyer")
-    )
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="buyer_profile")
+    preferred_location = models.CharField(max_length=255, blank=True, help_text="City, State for property search")
+    budget_range = models.CharField(max_length=100, blank=True, choices=BudgetRange.choices)
+    
+    # Subscription/Membership fields
+    is_membership_active = models.BooleanField(default=False)
+    membership_end_date = models.DateTimeField(null=True, blank=True)
+    
+    access_pass_expiry = models.DateTimeField(null=True, blank=True, help_text='Expiration date of the current Access Pass')
+    access_pass_extensions_used = models.IntegerField(default=0, help_text='Number of extensions used (max 2)')
+    
+    assigned_agent = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, related_name="assigned_buyers")
+    favorites = models.ManyToManyField("SellerProfile", blank=True, related_name="favorited_by")
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         db_table = "buyer_profiles"
-
+        
     def __str__(self):
-        return f"Buyer Profile: {self.user.email}"
-
-
-class RealtorProfile(models.Model):
-    """Profile specific to Realtor users"""
-
-    class ExperienceLevel(models.TextChoices):
-        ENTRY = "ENTRY", _("0-2 years")
-        INTERMEDIATE = "INTERMEDIATE", _("3-5 years")
-        EXPERIENCED = "EXPERIENCED", _("6-10 years")
-        EXPERT = "EXPERT", _("10+ years")
-
-    user = models.OneToOneField(
-        User,
-        on_delete=models.CASCADE,
-        related_name="realtor_profile",
-        limit_choices_to={"role": User.UserRole.REALTOR},
-    )
-    license_number = models.CharField(
-        max_length=100, unique=True, help_text=_("Real estate license number")
-    )
-    company_brokerage = models.CharField(
-        max_length=255, help_text=_("Company or brokerage name")
-    )
-    years_of_experience = models.CharField(
-        max_length=20, choices=ExperienceLevel.choices, default=ExperienceLevel.ENTRY
-    )
-    description = models.TextField(
-        blank=True, help_text=_("Professional bio or description")
-    )
-
-    # Subscription details
-
-
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-    class Meta:
-        db_table = "realtor_profiles"
-        indexes = [
-            models.Index(fields=["license_number"]),
-        ]
-
-    def __str__(self):
-        return f"Realtor Profile: {self.user.email}"
+        return f"{self.user.email} - Buyer"
 
 
 class SellerProfile(models.Model):
-    """Profile specific to Seller users"""
-
     class PropertyType(models.TextChoices):
-        SINGLE_FAMILY = "SINGLE_FAMILY", _("Single family")
-        CONDO = "CONDO", _("Condo")
-        TOWNHOME = "TOWNHOME", _("Townhome")
-        APARTMENT_UNIT = "APARTMENT_UNIT", _("Apartment unit")
-
-
-
-    user = models.OneToOneField(
-        User,
-        on_delete=models.CASCADE,
-        related_name="seller_profile",
-        limit_choices_to={"role": User.UserRole.SELLER},
-    )
-
-    # Property Address Details
-    address_number = models.CharField(
-        max_length=50, blank=True, help_text=_("Street number")
-    )
-    street_address = models.CharField(
-        max_length=255, blank=True, help_text=_("Street name and type")
-    )
-    city = models.CharField(max_length=100, blank=True, help_text=_("City"))
-    state = models.CharField(max_length=50, blank=True, help_text=_("State"))
-    zip_code = models.CharField(
-        max_length=10, blank=True, help_text=_("ZIP/Postal code")
-    )
-    county = models.CharField(max_length=100, blank=True, help_text=_("County"))
-
-    # Property Details
-    property_type = models.CharField(
-        max_length=50, choices=PropertyType.choices, blank=True
-    )
-    property_description = models.TextField(
-        blank=True, help_text=_("Detailed property description")
-    )
-    estimated_value = models.DecimalField(
-        max_digits=12,
-        decimal_places=2,
-        null=True,
-        blank=True,
-        validators=[MinValueValidator(0)],
-    )
-
-    # Extended Property Details
-    bedrooms = models.IntegerField(default=0, help_text=_("Number of bedrooms"))
-    bathrooms = models.DecimalField(
-        max_digits=4, decimal_places=1, default=0, help_text=_("Number of bathrooms")
-    )
-    sqft = models.IntegerField(default=0, help_text=_("Square footage"))
-    garage_spaces = models.IntegerField(default=0, help_text=_("Garage spaces"))
+        SINGLE_FAMILY = "SINGLE_FAMILY", "Single Family"
+        CONDO = "CONDO", "Condo"
+        TOWNHOME = "TOWNHOME", "Townhome"
+        APARTMENT_UNIT = "APARTMENT_UNIT", "Apartment Unit"
+        
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="seller_profile")
     
-    # Detailed Features (JSON)
-    property_features = models.JSONField(default=dict, blank=True, help_text=_("Structured property features"))
-
-
-    leaseback_required = models.BooleanField(
-        default=False, help_text=_("Whether seller requires leaseback arrangement")
-    )
-
-    # Legacy field for backward compatibility
-    property_location = models.CharField(
-        max_length=255,
-        blank=True,
-        help_text=_("City, State where property is located (legacy field)"),
-    )
-
-    # Listing status
+    # Address
+    address_number = models.CharField(max_length=50, blank=True)
+    street_address = models.CharField(max_length=255, blank=True)
+    city = models.CharField(max_length=100, blank=True)
+    state = models.CharField(max_length=100, blank=True)
+    zip_code = models.CharField(max_length=20, blank=True)
+    county = models.CharField(max_length=100, blank=True)
+    
+    property_type = models.CharField(max_length=50, blank=True, choices=PropertyType.choices)
+    property_description = models.TextField(blank=True)
+    
+    estimated_value = models.DecimalField(max_digits=12, decimal_places=2, validators=[MinValueValidator(0)], null=True, blank=True)
+    
+    # Extended
+    bedrooms = models.IntegerField(default=0)
+    bathrooms = models.DecimalField(max_digits=4, decimal_places=1, default=0)
+    sqft = models.IntegerField(default=0)
+    garage_spaces = models.IntegerField(default=0)
+    property_features = models.JSONField(default=dict, blank=True)
+    
     has_active_listing = models.BooleanField(default=False)
-    listing_created_at = models.DateTimeField(null=True, blank=True)
-
+    leaseback_required = models.BooleanField(default=False)
+    
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -187,8 +74,62 @@ class SellerProfile(models.Model):
         db_table = "seller_profiles"
 
     def __str__(self):
-        return f"Seller Profile: {self.user.email}"
+        return f"{self.user.email} - Seller"
 
+
+class RealtorProfile(models.Model):
+    class ExperienceLevel(models.TextChoices):
+        ENTRY = "ENTRY", "0-2 years"
+        INTERMEDIATE = "INTERMEDIATE", "3-5 years"
+        EXPERIENCED = "EXPERIENCED", "6-10 years"
+        EXPERT = "EXPERT", "10+ years"
+        
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="realtor_profile")
+    license_number = models.CharField(max_length=100, unique=True, help_text="Real estate license number")
+    company_brokerage = models.CharField(max_length=255, help_text="Company or brokerage name")
+    years_of_experience = models.CharField(max_length=20, choices=ExperienceLevel.choices, default=ExperienceLevel.ENTRY)
+    
+    description = models.TextField(blank=True)
+    
+    is_active_subscription = models.BooleanField(default=False)
+    subscription_start_date = models.DateTimeField(null=True, blank=True)
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = "realtor_profiles"
+
+    def __str__(self):
+        return f"{self.user.email} - Realtor"
+
+
+class PartnerProfile(models.Model):
+    class PartnershipType(models.TextChoices):
+        REAL_ESTATE_AGENT = "REAL_ESTATE_AGENT", "Real Estate Agency"
+        MORTGAGE = "MORTGAGE", "Mortgage Lender"
+        HOME_INSPECTION = "HOME_INSPECTION", "Home Inspector"
+        CONTRACTOR = "CONTRACTOR", "Contractor"
+        MOVING_COMPANY = "MOVING_COMPANY", "Moving Company"
+        PROPERTY_APPRAISER = "PROPERTY_APPRAISER", "Property Appraiser"
+        OTHER = "OTHER", "Other"
+
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="partner_profile")
+    company_name = models.CharField(max_length=255, help_text="Business or company name")
+    partnership_type = models.CharField(max_length=50, choices=PartnershipType.choices)
+    service_areas = models.TextField(help_text="Cities or regions served")
+    
+    website_url = models.URLField(blank=True)
+    business_license_number = models.CharField(max_length=100, blank=True)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        db_table = "partner_profiles"
+
+    def __str__(self):
+        return f"{self.user.email} - Partner"
 
 class PropertyImage(models.Model):
     seller_profile = models.ForeignKey(SellerProfile, on_delete=models.CASCADE, related_name='images')
@@ -197,52 +138,4 @@ class PropertyImage(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        db_table = "property_images"
-
-
-class PartnerProfile(models.Model):
-    """Profile specific to Partner users (business partners/service providers)"""
-
-    class PartnershipType(models.TextChoices):
-        REAL_ESTATE_AGENT = "REAL_ESTATE_AGENT", _("Real Estate Agent")
-        MORTGAGE = "MORTGAGE", _("Mortgage Lender")
-        HOME_INSPECTION = "HOME_INSPECTION", _("Home Inspection")
-        PROPERTY_APPRAISER = "PROPERTY_APPRAISER", _("Property Appraiser")
-        CONTRACTOR = "CONTRACTOR", _("Contractor")
-        MOVING_COMPANY = "MOVING_COMPANY", _("Moving Company")
-        OTHER = "OTHER", _("Other Services")
-
-    user = models.OneToOneField(
-        User,
-        on_delete=models.CASCADE,
-        related_name="partner_profile",
-        limit_choices_to={"role": User.UserRole.PARTNER},
-    )
-    company_name = models.CharField(
-        max_length=255, help_text=_("Business or company name")
-    )
-    partnership_type = models.CharField(max_length=50, choices=PartnershipType.choices)
-    service_areas = models.TextField(
-        help_text=_("Cities or regions served (comma-separated)")
-    )
-    website_url = models.URLField(
-        max_length=255, blank=True, help_text=_("Website URL")
-    )
-    business_license_number = models.CharField(
-        max_length=100, unique=True, help_text=_("Business license number"), default=""
-    )
-
-    # Subscription details
-
-
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-    class Meta:
-        db_table = "partner_profiles"
-        indexes = [
-            models.Index(fields=["partnership_type"]),
-        ]
-
-    def __str__(self):
-        return f"Partner Profile: {self.company_name}"
+        db_table = 'property_images'

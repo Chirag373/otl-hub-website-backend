@@ -443,11 +443,22 @@
 
     const planConfigs = {
         buyer: {
-            setupFee: 99,
-            subtitle: "See what you'll pay for your buyer account",
-            plans: {
-                basic: { id: 'basic', name: 'Basic', price: 25, duration: '3 Months', access: '1 Property Access' },
-                pro: { id: 'pro', name: 'Pro', price: 50, duration: '6 Months', access: '3 Properties Access', recommended: true }
+            // Setup fee removed as per new logic $120 upfront covers the 3 months.
+            subtitle: "See what you'll pay for your buyer membership",
+            membership: {
+                name: 'Buyer Membership',
+                monthlyPrice: 40,
+                commitmentMonths: 3,
+                upfrontPrice: 120, // 40 * 3
+                description: "Required to browse listings & view details",
+                afterCommitment: "After 3 months: Month-to-month at $40 or cancel anytime"
+            },
+            accessPass: {
+                name: 'Buyer Access Pass',
+                price: 650,
+                duration: '30 Days',
+                description: "Required to unlock, contact & submit offers",
+                note: "Purchase inside platform"
             }
         },
         seller: {
@@ -486,14 +497,16 @@
             </div>
         `;
 
-        // Setup Fee Notice
-        html += `
-            <div class="mb-6 p-3 bg-[var(--muted)]/30 rounded-lg border border-[var(--border)] text-center">
-                <p class="text-sm font-medium text-[var(--foreground)]">
-                    <span class="text-[var(--accent)] font-bold">Note:</span> One-time setup fee of $${config.setupFee} applies
-                </p>
-            </div>
-        `;
+        // Setup Fee Notice (Only for non-buyer types now, or handled differently)
+        if (type !== 'buyer') {
+            html += `
+                <div class="mb-6 p-3 bg-[var(--muted)]/30 rounded-lg border border-[var(--border)] text-center">
+                    <p class="text-sm font-medium text-[var(--foreground)]">
+                        <span class="text-[var(--accent)] font-bold">Note:</span> One-time setup fee of $${config.setupFee} applies
+                    </p>
+                </div>
+            `;
+        }
 
         // Plans Grid or Single Plan
         if (type === 'buyer') {
@@ -513,71 +526,88 @@
     }
 
     function renderBuyerPlans(config) {
-        const basic = config.plans.basic;
-        const pro = config.plans.pro;
-        const isBasic = selectedBuyerPlan === 'basic';
-
-        // Helper to generate card class
-        const getCardClass = (isSelected, isRecommended) => {
-            let classes = "cursor-pointer relative rounded-lg border-2 p-4 transition-all hover:border-[var(--accent)]/50 ";
-            if (isSelected) {
-                classes += "border-[var(--accent)] bg-[var(--accent)]/5 ";
-            } else {
-                classes += "border-[var(--border)] bg-[var(--card)] ";
-            }
-            if (isRecommended && !isSelected) {
-                classes += "shadow-md "; // subtle boost for recommended
-            }
-            return classes;
-        };
+        const m = config.membership;
+        const ap = config.accessPass;
 
         return `
-            <div class="grid grid-cols-2 gap-3 mb-6">
-                <!-- Basic Plan -->
-                <div onclick="selectBuyerPlan('basic')" class="${getCardClass(isBasic, false)}">
-                    <div class="text-center">
-                        <div class="font-heading text-lg text-[var(--foreground)] mb-1">${basic.name}</div>
-                        <div class="text-xl font-bold text-[var(--accent)] mb-1">$${basic.price}</div>
-                        <div class="text-xs text-[var(--muted-foreground)] font-medium">${basic.access}</div>
-                        <div class="text-xs text-[var(--muted-foreground)]">${basic.duration}</div>
+            <div class="space-y-6">
+                <!-- 1. Membership Card (Primary Selection) -->
+                <div class="relative rounded-lg border-2 border-[var(--accent)] bg-[var(--accent)]/5 p-5 transition-all shadow-md">
+                    <div class="absolute -top-3 left-1/2 transform -translate-x-1/2">
+                        <span class="bg-gradient-to-r from-[var(--accent)] to-[var(--accent-hover)] text-white text-[10px] uppercase font-bold px-3 py-1 rounded-full shadow-sm">
+                            Step 1: Membership
+                        </span>
                     </div>
-                    ${isBasic ? '<div class="absolute top-2 right-2 text-[var(--accent)]"><i data-lucide="check-circle" class="w-4 h-4"></i></div>' : ''}
+                    
+                    <div class="text-center mt-2">
+                        <div class="font-heading text-xl text-[var(--foreground)] mb-1">${m.name}</div>
+                        <div class="flex items-center justify-center gap-1 mb-1">
+                             <span class="text-3xl font-bold text-[var(--accent)]">$${m.upfrontPrice}</span>
+                             <span class="text-sm text-[var(--muted-foreground)] font-medium self-end mb-1">billed upfront</span>
+                        </div>
+                        <div class="text-xs text-[var(--muted-foreground)] font-medium bg-[var(--card)] inline-block px-2 py-1 rounded border border-[var(--border)] mb-2">
+                            $${m.monthlyPrice}/mo (3 Month Commitment)
+                        </div>
+                        <p class="text-xs text-[var(--muted-foreground)] italic mb-2">${m.afterCommitment}</p>
+                        
+                         <div class="text-sm text-[var(--foreground)] font-medium border-t border-[var(--border)] pt-3 mt-3">
+                            ${m.description}
+                        </div>
+                    </div>
+                     <div class="absolute top-2 right-2 text-[var(--accent)]"><i data-lucide="check-circle" class="w-5 h-5"></i></div>
                 </div>
 
-                <!-- Pro Plan -->
-                <div onclick="selectBuyerPlan('pro')" class="${getCardClass(!isBasic, true)}">
-                    ${!isBasic ? `
-                    <div class="absolute -top-3 left-1/2 transform -translate-x-1/2">
-                        <span class="bg-gradient-to-r from-[var(--accent)] to-[var(--accent-hover)] text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-sm">RECOMMENDED</span>
-                    </div>
-                    ` : ''}
-                    <div class="text-center ${!isBasic ? 'mt-1' : ''}">
-                        <div class="font-heading text-lg text-[var(--foreground)] mb-1">${pro.name}</div>
-                        <div class="text-xl font-bold text-[var(--accent)] mb-1">$${pro.price}</div>
-                        <div class="text-xs text-[var(--muted-foreground)] font-medium">${pro.access}</div>
-                        <div class="text-xs text-[var(--muted-foreground)]">${pro.duration}</div>
-                    </div>
-                     ${!isBasic ? '<div class="absolute top-2 right-2 text-[var(--accent)]"><i data-lucide="check-circle" class="w-4 h-4"></i></div>' : ''}
+                <!-- 2. Access Pass Info (Informational) -->
+                <div class="rounded-lg border border-[var(--border)] border-dashed p-4 bg-[var(--muted)]/10 opacity-90">
+                     <div class="flex items-center justify-between mb-2">
+                        <span class="text-xs font-bold uppercase text-[var(--muted-foreground)] tracking-wider">Step 2: Access Pass</span>
+                        <span class="text-xs bg-[var(--muted)] text-[var(--muted-foreground)] px-2 py-0.5 rounded">Optional / As Needed</span>
+                     </div>
+                     <div class="flex justify-between items-end">
+                        <div>
+                             <div class="font-heading text-base text-[var(--foreground)]">${ap.name}</div>
+                             <div class="text-xs text-[var(--muted-foreground)]">${ap.description}</div>
+                        </div>
+                        <div class="text-right">
+                             <div class="text-lg font-bold text-[var(--foreground)]">$${ap.price}</div>
+                             <div class="text-xs text-[var(--muted-foreground)]">/ ${ap.duration}</div>
+                        </div>
+                     </div>
+                     <div class="mt-2 text-[10px] text-[var(--accent)] font-medium text-center bg-[var(--accent)]/5 rounded py-1">
+                        * ${ap.note}
+                     </div>
                 </div>
             </div>
 
-            <!-- Selection Indicator -->
-            <div class="p-3 bg-[var(--accent)]/10 rounded-lg border border-[var(--accent)]/20 text-center mb-2">
-                <p class="text-sm text-[var(--foreground)]">
-                    Selected: <span class="font-bold">${isBasic ? basic.name : pro.name}</span> - 
-                    <span class="font-mono">$${isBasic ? basic.price : pro.price}</span> + 
-                    <span class="text-[var(--muted-foreground)] text-xs">$${config.setupFee} setup fee</span>
+            <!-- Total Section -->
+             <div class="mt-6 p-4 bg-[var(--accent)]/10 rounded-lg border border-[var(--accent)]/20">
+                <div class="flex justify-between items-center mb-1">
+                    <span class="text-sm text-[var(--foreground)] font-medium">Due Today (Membership):</span>
+                    <span class="text-lg font-bold text-[var(--accent)]">$${m.upfrontPrice}</span>
+                </div>
+                 <p class="text-xs text-[var(--muted-foreground)] text-right">
+                    Includes 3 months of access
                 </p>
-                <p class="text-lg font-bold text-[var(--accent)] mt-1">
-                    Total: $${(isBasic ? basic.price : pro.price) + config.setupFee}
-                </p>
+            </div>
+
+            <!-- Important Notes -->
+            <div class="mt-6 pt-4 border-t border-[var(--border)]">
+                <h4 class="text-sm font-bold text-[var(--foreground)] mb-2">Important Notes:</h4>
+                <ul class="text-[11px] text-[var(--muted-foreground)] space-y-1 list-disc pl-4">
+                    <li><strong>Membership Required:</strong> Must maintain active membership to access platform.</li>
+                    <li><strong>Access Pass:</strong> Purchase separately ($${ap.price}/30 days) to unlock contacts.</li>
+                    <li><strong>No Guarantees:</strong> Access Pass does not guarantee seller response or deal success.</li>
+                    <li><strong>Scope:</strong> Fee is for contact access only. We are not a brokerage.</li>
+                    <li><strong>Extensions:</strong> Up to 2 extensions (+15 days) available if listings are scarce.</li>
+                    <li>Unused time or unlocks do not roll over.</li>
+                </ul>
             </div>
         `;
     }
 
     function selectBuyerPlan(plan) {
-        selectedBuyerPlan = plan;
-        renderPricingPlan('buyer'); // Re-render to update classes
+        // No-op for now as there's only one path, but functional reference kept safe.
+        // Console log removed to clean up
     }
 
     function renderSinglePlan(type, config) {
@@ -660,7 +690,14 @@
 
     function renderFeaturesList(type) {
         const featuresMap = {
-            buyer: ["Access to detailed property info", "Virtual tours and media", "Direct seller communication", "Saved favorites and alerts", "Market analysis tools", "Priority support"],
+            buyer: [
+                "Browse all public property listings",
+                "View photos, details & descriptions",
+                "Save & track favorite properties",
+                "Receive alerts & updates",
+                "View unlocked seller contacts",
+                "Access Pass required for new contacts"
+            ],
             realtor: ["Professional realtor dashboard", "Advanced property search", "Client CRM", "Lead generation tools", "Market analysis reports", "Commission tools"],
             seller: ["Professional listing creation", "High-quality photo uploads", "Virtual tour creation", "Market analysis and pricing", "Direct buyer connection", "Marketing exposure"],
             partner: ["Partner dashboard and analytics", "Lead generation tools", "Client referral system", "Service booking", "Business profile page", "Marketing tools"]

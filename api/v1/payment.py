@@ -20,11 +20,9 @@ def get_product_details(signup_data):
     
     if role == 'BUYER':
         # Buyer Pricing
-        plan = signup_data.get('selected_plan')
-        if plan == 'basic':
-            return 12400, "Buyer Basic Plan", "Includes $99 setup fee + $25 basic plan"
-        else:
-            return 14900, "Buyer Pro Plan", "Includes $99 setup fee + $50 pro plan"
+        # Buyer Pricing - Single Membership Plan
+        # $40/mo * 3 months commitment = $120 upfront
+        return 12000, "Buyer Membership", "3-Month Membership Commitment ($40/mo billed upfront)"
             
     elif role == 'SELLER':
         # Seller Pricing
@@ -45,12 +43,66 @@ def get_price_for_user(signup_data):
     amount, _, _ = get_product_details(signup_data)
     return amount
 
-class PaymentSuccessView(APIView):
+class CreateAccessPassSessionView(APIView):
     """
-    Handle successful payment
+    Create a Stripe Checkout Session for Buyer Access Pass
     """
-    permission_classes = []
+    def post(self, request):
+        if not request.user.is_authenticated or request.user.role != 'BUYER':
+            return Response({'error': 'Unauthorized'}, status=status.HTTP_401_UNAUTHORIZED)
+            
+        try:
+            # $650 for 30 days
+            price_amount = 65000 
+            product_name = "Buyer Access Pass"
+            description = "30-Day Access Pass to unlock seller contacts"
+            
+            success_url = request.build_absolute_uri(reverse('access-pass-success')) + "?session_id={CHECKOUT_SESSION_ID}"
+            cancel_url = request.build_absolute_uri('/buyer/dashboard')
+            
+            # Prepare session arguments
+            session_kwargs = {
+                'payment_method_types': ['card'],
+                'line_items': [{
+                    'price_data': {
+                        'currency': 'usd',
+                        'product_data': {
+                            'name': product_name,
+                            'description': description,
+                        },
+                        'unit_amount': price_amount,
+                    },
+                    'quantity': 1,
+                }],
+                'mode': 'payment',
+                'invoice_creation': {"enabled": True},
+                'success_url': success_url,
+                'cancel_url': cancel_url,
+                'client_reference_id': str(request.user.id),
+                'metadata': {
+                    'type': 'access_pass',
+                    'user_id': str(request.user.id)
+                }
+            }
+            
+            # Start logic: Either 'customer' OR 'customer_email'
+            if request.user.stripe_customer_id:
+                session_kwargs['customer'] = request.user.stripe_customer_id
+            else:
+                session_kwargs['customer_email'] = request.user.email
+                session_kwargs['customer_creation'] = 'always' # Create a customer if one doesn't exist
+            
+            checkout_session = stripe.checkout.Session.create(**session_kwargs)
+            return Response({'url': checkout_session.url})
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
+class AccessPassSuccessView(APIView):
+    """
+    Handle successful Access Pass payment
+    """
+    permission_classes = [] # Allow callback to hit this, but we'll verify session
+    
     def get(self, request):
         session_id = request.GET.get('session_id')
         if not session_id:
@@ -59,6 +111,66 @@ class PaymentSuccessView(APIView):
         try:
             session = stripe.checkout.Session.retrieve(session_id)
         except stripe.error.StripeError as e:
+             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+             
+        if session.payment_status == 'paid':
+             # Verify it's an Access Pass session
+             if session.metadata.get('type') == 'access_pass':
+                 user_id = session.metadata.get('user_id')
+                 try:
+                     from core.models import User
+                     from api.models import BuyerProfile
+                     from django.utils import timezone
+                     from datetime import timedelta
+                     
+                     user = User.objects.get(id=user_id)
+                     profile = BuyerProfile.objects.get(user=user)
+                     
+                     # 1. Update Expiry Date
+                     # If already active, add 30 days to existing expiry? 
+                     # Or just set to now + 30 days? 
+                     # Requirement: "Extensions ... +15 days". But this is a new pass purchase ($650).
+                     # "Valid for 30 days".
+                     # "Buyer cannot unlock new seller contacts without buying another Access Pass" -> Implies strictly specific durations.
+                     # Let's add 30 days from NOW, or extend if currently active.
+                     
+                     now = timezone.now()
+                     if profile.access_pass_expiry and profile.access_pass_expiry > now:
+                         profile.access_pass_expiry += timedelta(days=30)
+                     else:
+                         profile.access_pass_expiry = now + timedelta(days=30)
+                         
+                     profile.save()
+                     
+                     return redirect('/buyer/dashboard?success=access_pass_activated')
+                     
+                 except Exception as e:
+                     return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+        return redirect('/buyer/dashboard?error=payment_failed')
+
+
+class PaymentSuccessView(APIView):
+    """
+    Handle successful payment
+    """
+    permission_classes = []
+
+    def get(self, request):
+        session_id = request.GET.get('session_id')
+        print(f"DEBUG: PaymentSuccessView called with session_id: {session_id}")
+        
+        if not session_id:
+            return Response({'error': 'No session_id provided'}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            session = stripe.checkout.Session.retrieve(session_id)
+            print(f"DEBUG: Stripe Session Status: {session.payment_status}")
+            print(f"DEBUG: Session Client Ref ID: {session.client_reference_id}")
+            print(f"DEBUG: Session Email: {session.customer_email}")
+            
+        except stripe.error.StripeError as e:
+            print(f"DEBUG: Stripe Error: {str(e)}")
             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
         if session.payment_status == 'paid':
@@ -68,6 +180,8 @@ class PaymentSuccessView(APIView):
                 pending_signup_id = session.client_reference_id
                 pending_signup = PendingSignup.objects.get(id=pending_signup_id)
                 signup_data = pending_signup.signup_data
+                
+                print(f"DEBUG: Found PendingSignup: {pending_signup.email}")
                 
                 # Create the user
                 serializer = SignupSerializer(data=signup_data)
@@ -80,19 +194,33 @@ class PaymentSuccessView(APIView):
                         user.stripe_customer_id = session.customer
                         
                     user.save()
+                    print(f"DEBUG: User created successfully: {user.email}")
                     
                     # Delete pending signup
                     pending_signup.delete()
                     
                     # Redirect to Login Page
-                    # The user requested "redirect me to the login page"
-                    return redirect('/login?success=account_created')
+                    # Use reverse to ensure correct URL construction
+                    login_url = reverse('login')
+                    return redirect(f"{login_url}?success=account_created")
                     
             except PendingSignup.DoesNotExist:
+                 print(f"DEBUG: PendingSignup {session.client_reference_id} not found.")
+                 # Check if user already exists (maybe page refresh?)
+                 email = session.customer_email or session.metadata.get('email')
+                 if email:
+                     from core.models import User
+                     if User.objects.filter(email=email).exists():
+                         print(f"DEBUG: User {email} already exists. Redirecting to login.")
+                         login_url = reverse('login')
+                         return redirect(f"{login_url}?success=account_created")
+                 
                  return Response({'error': 'Signup data not found or already processed.'}, status=status.HTTP_404_NOT_FOUND)
             except Exception as e:
+                print(f"DEBUG: Exception in PaymentSuccessView: {str(e)}")
                 return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+        print(f"DEBUG: Payment status not 'paid': {session.payment_status}")
         return Response({'error': 'Payment not completed.'}, status=status.HTTP_400_BAD_REQUEST)
 
 class BillingPortalView(APIView):

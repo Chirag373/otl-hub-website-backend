@@ -263,8 +263,25 @@
     // --- INITIALIZATION ---
     function init() {
         if (window.lucide) lucide.createIcons();
+        checkUrlParams();
         fetchProfile();
         setupEventListeners();
+    }
+
+    function checkUrlParams() {
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('success') === 'access_pass_activated') {
+            Toastify({
+                text: "Access Pass Activated Successfully!",
+                duration: 5000,
+                close: true,
+                gravity: "top",
+                position: "center",
+                style: { background: "var(--success)", color: "white" }
+            }).showToast();
+            // Clean URL
+            window.history.replaceState({}, document.title, window.location.pathname);
+        }
     }
 
     // --- API CALLS ---
@@ -290,15 +307,61 @@
                 location: data.location || "",
                 member_since: data.member_since || "",
                 agent: data.agent, // API returns {name, phone, email, brokerage_company} or null
-
+                // Add access pass info if available in serializer (assuming it is or will be added)
+                // If not in serializer yet, we might need to rely on what's there or update serializer.
+                // Assuming data.access_pass_expiry exists?
+                // Let's assume the serializer returns it. If not, we might need to add it.
+                // Checking BuyerProfileSerializer... it does NOT have access_pass_expiry.
+                // I will need to update BuyerProfileSerializer to return 'access_pass_expiry'.
             };
 
             populateData();
+            // We need to fetch specific access pass stats if not in profile
+            // For now, I'll update the serializer in the next step to include this info.
+            // Assuming it will be there:
+            stats.accessPassExpiry = data.access_pass_expiry; // Expecting ISO string or null
+
             calculateStats(); // Recalculate based on real subscription data if available
 
         } catch (error) {
             console.error('Error fetching profile:', error);
             // Show error toast?
+        }
+    }
+
+    async function purchaseAccessPass() {
+        const btn = document.getElementById('btn-buy-access-pass');
+        if (btn) {
+            btn.disabled = true;
+            btn.innerHTML = `<span class="loading loading-spinner loading-xs"></span> Redirection...`;
+        }
+
+        try {
+            const response = await fetch('/api/v1/payment/create-access-pass-session/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken')
+                }
+            });
+
+            const data = await response.json();
+            if (response.ok && data.url) {
+                window.location.href = data.url;
+            } else {
+                alert('Failed to initiate checkout: ' + (data.error || 'Unknown error'));
+                if (btn) {
+                    btn.disabled = false;
+                    btn.innerHTML = "Purchase Access Pass ($650)";
+                }
+            }
+        } catch (e) {
+            console.error(e);
+            alert('Error connecting to server');
+            if (btn) {
+                btn.disabled = false;
+                btn.innerHTML = "Purchase Access Pass ($650)";
+            }
         }
     }
 
@@ -317,23 +380,8 @@
             // So we need to send nested 'user' object? 
             // NO, `source='user.first_name'` on a generic field usually implies read-only unless overridden.
             // HOWEVER, the serializer has a custom `update` method that pops `user`.
-            // Serializers with `source='dotted.field'` usually expect the input to be in the nested structure corresponding to the field name IF it's writable?
-            // Actually, for writable dotted fields, DRF is tricky. 
-            // BUT, let's look at the serializer fields:
-            // first_name = serializers.CharField(source="user.first_name")
-            // This usually means the input field name is `first_name`. DRF's default behavior for `source` on write is complicated.
-            // But the custom `update` method: `user_data = validated_data.pop("user", {})`.
             // This implies `validated_data` will contain a 'user' key. 
             // To get a 'user' key in validated_data from a flat 'first_name' input, the field mapping must happen.
-
-            // Let's assume the API expects the same JSON structure it outputs for updates:
-            // { "first_name": "John", "location": "Houston" ... } 
-            // If the serializer is set up correctly for Writable Nested Fields, it might handle it.
-            // BUT, `BuyerProfileSerializer` defined `first_name` using `source`. 
-            // If we send `{"first_name": "New"}`, does it end up in `validated_data['user']['first_name']`?
-            // No, standard DRF doesn't auto-nest for source.
-            // It likely expects: `{"user": {"first_name": "..."}}` if we want to update user. 
-            // OR `first_name` if we treat it flat.
 
             // Let's try sending flat payload first as that's what `get_serializer` usually outputs.
             // If that fails, we might need to adjust.
@@ -458,73 +506,80 @@
     }
 
     function calculateStats() {
-        // Mock calcs if subscription data missing
-        if (!profile.subscription) return;
+        // Access Pass Logic
+        // Logic: 
+        // If expiry date exists and is in future -> Active
+        // If expiry date exists and is in past -> Expired
+        // If no expiry date -> Not Purchased
 
-        // Days Remaining Calculation (approximate if format string)
-        // If API returns "January 2025", Date.parse works
-        const now = new Date();
-        const expiry = new Date(profile.subscription.expiration_date);
-
-        // Check if date valid
-        if (isNaN(expiry.getTime())) return;
-
-        const diffTime = expiry - now;
-        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-        const daysLeft = Math.max(0, diffDays);
-
-        // Access Calculation
-        const remainingViews = stats.planLimit === "unlimited" ? "Unlimited" : Math.max(0, stats.planLimit - stats.propertiesViewed);
-
-        // Update DOM Stats
-        if (dom.statViewsCount) dom.statViewsCount.textContent = stats.propertiesViewed;
-        if (dom.statViewsRemaining) dom.statViewsRemaining.textContent = remainingViews === "Unlimited" ? "Unlimited access" : `${remainingViews} views remaining`;
-        if (dom.statDaysLeft) dom.statDaysLeft.textContent = `${daysLeft}d`;
-
-        // Access Status Card Logic
-        renderAccessStatus(daysLeft, remainingViews);
-    }
-
-    function renderAccessStatus(daysLeft, remainingViews) {
         if (!dom.accessCounterContainer) return;
 
-        let statusClass = "alert-success";
-        let statusIcon = "check-circle";
-        let message = "";
+        let html = '';
+        const now = new Date();
+        const expiryStr = stats.accessPassExpiry;
+        const expiry = expiryStr ? new Date(expiryStr) : null;
 
-        if (daysLeft <= 0) {
-            statusClass = "alert-error";
-            statusIcon = "alert-triangle";
-            message = "⚠️ Your access has expired. Please renew to continue viewing properties.";
-        } else if (daysLeft <= 7) {
-            statusClass = "alert-warning";
-            statusIcon = "alert-triangle";
-            message = `⚠️ Your plan expires in ${daysLeft} days. Renew to maintain access.`;
+        const isActive = expiry && expiry > now;
+
+        if (isActive) {
+            const diffTime = expiry - now;
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+            html = `
+                <div class="flex items-center justify-between mb-2">
+                    <div class="flex items-center gap-2 text-success">
+                        <i data-lucide="check-circle" class="h-5 w-5"></i>
+                        <h4 class="font-bold text-lg">Access Pass Active</h4>
+                    </div>
+                     <span class="badge badge-success badge-outline">Active</span>
+                </div>
+                <div class="text-sm text-[var(--muted-foreground)] mb-4">
+                     You can unlock unlimited seller contacts.
+                </div>
+                <div class="bg-[var(--muted)]/20 p-3 rounded-lg flex justify-between items-center">
+                    <span class="text-sm">Days Remaining:</span>
+                    <span class="font-bold font-mono text-lg">${diffDays} Days</span>
+                </div>
+             `;
+        } else {
+            // Not active or expired
+            const isExpired = expiry && expiry <= now;
+
+            html = `
+                <div class="flex items-center justify-between mb-2">
+                     <div class="flex items-center gap-2 ${isExpired ? 'text-error' : 'text-[var(--foreground)]'}">
+                        <i data-lucide="${isExpired ? 'alert-circle' : 'lock'}" class="h-5 w-5"></i>
+                        <h4 class="font-bold text-lg">${isExpired ? 'Access Pass Expired' : 'Buyer Access Pass'}</h4>
+                    </div>
+                    ${isExpired ? '<span class="badge badge-error badge-outline">Expired</span>' : ''}
+                </div>
+                <div class="text-sm text-[var(--muted-foreground)] mb-4">
+                     Unlock seller contacts, submit offers, and contact seller agents directly.
+                </div>
+                
+                <div class="bg-[var(--accent)]/5 border border-[var(--accent)]/20 p-4 rounded-lg mb-4">
+                    <div class="flex justify-between items-end mb-2">
+                        <span class="font-bold text-[var(--accent)] text-xl">$650</span>
+                        <span class="text-xs text-[var(--muted-foreground)]">30 Days Access</span>
+                    </div>
+                    <ul class="text-xs text-[var(--muted-foreground)] space-y-1 list-disc pl-4">
+                        <li>Unlimited seller contact unlocks</li>
+                        <li>Direct offer submission</li>
+                    </ul>
+                </div>
+
+                <button id="btn-buy-access-pass" onclick="purchaseAccessPass()" class="btn btn-primary w-full bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-white border-none">
+                    Purchase Access Pass ($650)
+                </button>
+             `;
         }
-
-        const html = `
-                <div class="flex items-center gap-2 mb-2 ${daysLeft <= 7 ? 'text-warning' : 'text-success'}">
-                    <i data-lucide="${statusIcon}" class="h-4 w-4"></i>
-                    <h4 class="font-medium text-sm">Pro Plan Status</h4>
-                </div>
-                <div class="space-y-2 text-sm text-[var(--muted-foreground)]">
-                    <div class="flex items-center justify-between">
-                        <span>Time Remaining:</span>
-                        <span class="font-medium flex items-center space-x-1 text-[var(--foreground)]">
-                            <i data-lucide="clock" class="h-3 w-3"></i>
-                            <span>${daysLeft > 0 ? daysLeft + ' days' : 'Expired'}</span>
-                        </span>
-                    </div>
-                    <div class="flex items-center justify-between">
-                        <span>Properties Left:</span>
-                        <span class="font-medium text-[var(--foreground)]">${remainingViews}</span>
-                    </div>
-                </div>
-                ${message ? `<div class="mt-3 text-xs ${daysLeft <= 0 ? 'text-error' : 'text-warning'}">${message}</div>` : ''}
-            `;
 
         dom.accessCounterContainer.innerHTML = html;
         if (window.lucide) lucide.createIcons();
+    }
+
+    function renderAccessStatus(daysLeft, remainingViews) {
+        // Deprecated/Replaced by calculateStats
     }
 
     // Helper to get cookies
