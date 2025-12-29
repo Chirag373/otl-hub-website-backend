@@ -50,6 +50,22 @@
     .feature-card:hover {
         transform: translateY(-2px);
     }
+
+    /* Share Modal Styles */
+    #share-modal {
+        animation: modalFadeIn 0.2s ease-out;
+    }
+
+    @keyframes modalFadeIn {
+        from {
+            opacity: 0;
+            transform: scale(0.95);
+        }
+        to {
+            opacity: 1;
+            transform: scale(1);
+        }
+    }
 </style>
 {% endblock %}
 
@@ -96,7 +112,7 @@
                 </div>
             </div>
             <div class="flex gap-3">
-                <button
+                <button id="share-btn"
                     class="btn btn-outline gap-2 text-[var(--foreground)] hover:bg-[var(--muted)] border-[var(--border)]">
                     <i data-lucide="share-2" class="w-4 h-4"></i> Share
                 </button>
@@ -218,6 +234,37 @@
         <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
             integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
     </main>
+
+    <!-- Share Modal -->
+    <div id="share-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-[var(--card)] rounded-lg shadow-xl max-w-md w-full p-6">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="font-heading text-lg font-bold text-[var(--foreground)]">Share Property</h3>
+                <button id="close-share-modal" class="btn btn-ghost btn-sm">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <div class="space-y-4">
+                <p class="text-[var(--muted-foreground)] text-sm">Copy the link below to share this property:</p>
+
+                <div class="flex gap-2">
+                    <input type="text" id="share-url" readonly
+                        class="input input-bordered flex-1 text-sm bg-[var(--muted)]/10 border-[var(--border)]"
+                        value="">
+                    <button id="copy-link-btn" class="btn btn-primary gap-2">
+                        <i data-lucide="copy" class="w-4 h-4"></i>
+                        Copy
+                    </button>
+                </div>
+
+                <div id="copy-success" class="hidden text-green-600 text-sm font-medium flex items-center gap-2">
+                    <i data-lucide="check" class="w-4 h-4"></i>
+                    Link copied to clipboard!
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 {% endblock %}
 
@@ -385,6 +432,71 @@
         document.getElementById('error-state').classList.remove('hidden');
     }
 
-    document.addEventListener('DOMContentLoaded', loadPropertyDetails);
+    document.addEventListener('DOMContentLoaded', function() {
+        loadPropertyDetails();
+        initShareModal();
+    });
+
+    function initShareModal() {
+        const shareBtn = document.getElementById('share-btn');
+        const modal = document.getElementById('share-modal');
+        const closeBtn = document.getElementById('close-share-modal');
+        const copyBtn = document.getElementById('copy-link-btn');
+        const shareUrlInput = document.getElementById('share-url');
+        const copySuccess = document.getElementById('copy-success');
+
+        // Show modal when share button is clicked
+        shareBtn.addEventListener('click', function() {
+            const currentUrl = window.location.href;
+            shareUrlInput.value = currentUrl;
+            modal.classList.remove('hidden');
+            copySuccess.classList.add('hidden');
+        });
+
+        // Close modal when close button is clicked
+        closeBtn.addEventListener('click', function() {
+            modal.classList.add('hidden');
+        });
+
+        // Close modal when clicking outside
+        modal.addEventListener('click', function(e) {
+            if (e.target === modal) {
+                modal.classList.add('hidden');
+            }
+        });
+
+        // Copy link to clipboard
+        copyBtn.addEventListener('click', async function() {
+            try {
+                await navigator.clipboard.writeText(shareUrlInput.value);
+                copySuccess.classList.remove('hidden');
+
+                // Hide success message after 3 seconds
+                setTimeout(() => {
+                    copySuccess.classList.add('hidden');
+                }, 3000);
+
+                // Change button text temporarily
+                const originalText = copyBtn.innerHTML;
+                copyBtn.innerHTML = '<i data-lucide="check" class="w-4 h-4"></i> Copied!';
+                if (window.lucide) lucide.createIcons();
+
+                setTimeout(() => {
+                    copyBtn.innerHTML = originalText;
+                    if (window.lucide) lucide.createIcons();
+                }, 2000);
+
+            } catch (err) {
+                console.error('Failed to copy: ', err);
+                // Fallback for older browsers
+                shareUrlInput.select();
+                document.execCommand('copy');
+                copySuccess.classList.remove('hidden');
+                setTimeout(() => {
+                    copySuccess.classList.add('hidden');
+                }, 3000);
+            }
+        });
+    }
 </script>
 {% endblock %}
