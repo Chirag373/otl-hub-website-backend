@@ -466,7 +466,13 @@
                 }
 
                 // Default view
-                window.propMap = L.map('property-map').setView([39.8283, -98.5795], 4);
+                window.propMap = L.map('property-map', {
+                    scrollWheelZoom: false,
+                    doubleClickZoom: false,
+                    touchZoom: false,
+                    zoomControl: false,
+                    dragging: false
+                }).setView([39.8283, -98.5795], 4);
                 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                 }).addTo(window.propMap);
