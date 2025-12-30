@@ -5,7 +5,7 @@ from api.v1.views import (
     BuyerProfileView, RealtorProfileView, SellerProfileView, PartnerProfileView, PartnerListView, 
     PropertyImageDeleteView, PropertySearchView, BuyerFavoritesView, BuyerFavoriteToggleView,
     ChangePasswordView, DeleteAccountView, UpdateNotificationSettingsView,
-    PricingPlanListView, PricingPlanUpdateView
+    PricingPlanListView, PricingPlanUpdateView, AccessPassTypeViewSet
 )
 from api.v1.payment import PaymentSuccessView, BillingPortalView, CreateAccessPassSessionView, AccessPassSuccessView
 
@@ -39,4 +39,8 @@ urlpatterns = [
     # Access Pass
     path("payment/create-access-pass-session/", CreateAccessPassSessionView.as_view(), name="create-access-pass-session"),
     path("payment/access-pass-success/", AccessPassSuccessView.as_view(), name="access-pass-success"),
+    
+    # Access Pass Types (Admin)
+    path("access-pass-types/", AccessPassTypeViewSet.as_view({'get': 'list', 'post': 'create'}), name="access-pass-types-list"),
+    path("access-pass-types/<int:pk>/", AccessPassTypeViewSet.as_view({'get': 'retrieve', 'put': 'update', 'patch': 'partial_update', 'delete': 'destroy'}), name="access-pass-types-detail"),
 ]

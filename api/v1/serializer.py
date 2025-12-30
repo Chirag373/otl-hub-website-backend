@@ -755,7 +755,13 @@ class PartnerProfileSerializer(serializers.ModelSerializer):
         return instance
 
 
-from api.models import PricingPlan
+from api.models import PricingPlan, AccessPassType
+from rest_framework import serializers
+
+class AccessPassTypeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AccessPassType
+        fields = '__all__'
 
 class PricingPlanSerializer(serializers.ModelSerializer):
     class Meta:

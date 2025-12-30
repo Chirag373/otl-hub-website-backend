@@ -141,6 +141,30 @@ class PropertyImage(models.Model):
         db_table = 'property_images'
 
 
+class AccessPassType(models.Model):
+    name = models.CharField(max_length=50) # e.g. "Basic", "Pro"
+    slug = models.SlugField(unique=True) # e.g. "basic", "pro"
+    price = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    days_duration = models.IntegerField(default=30)
+    
+    # Extension logic
+    extension_days = models.IntegerField(default=15, help_text="Number of days given per extension")
+    extension_price = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    max_extensions = models.IntegerField(default=2)
+    
+    # Unlocks
+    properties_limit = models.IntegerField(default=10, help_text="Number of properties this pass unlocks")
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        db_table = "access_pass_types"
+
+    def __str__(self):
+        return f"{self.name} Access Pass"
+
+
 class PricingPlan(models.Model):
     PLAN_TYPES = (
         ('buyer', 'Buyer'),
@@ -162,7 +186,13 @@ class PricingPlan(models.Model):
     # Specific to Buyer
     buyer_upfront_price = models.DecimalField(max_digits=10, decimal_places=2, default=0, help_text="For Buyer Membership (upfront)")
     buyer_monthly_price = models.DecimalField(max_digits=10, decimal_places=2, default=0, help_text="For Buyer Membership (monthly)")
-    buyer_access_pass_price = models.DecimalField(max_digits=10, decimal_places=2, default=0, help_text="For Buyer Access Pass")
+    
+    # New: Configurable trial/min months
+    buyer_min_months = models.IntegerField(default=3, help_text="Minimum months for initial subscription")
+    
+    # buyer_access_pass_price is likely obsolete if we use AccessPassType, 
+    # but keeping it for backward compat or as a default if no types found
+    buyer_access_pass_price = models.DecimalField(max_digits=10, decimal_places=2, default=0, help_text="Legacy: Basic Access Pass Price")
     
     updated_at = models.DateTimeField(auto_now=True)
 

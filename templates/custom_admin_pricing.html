@@ -5,18 +5,22 @@
 {% block content %}
 <div class="min-h-screen bg-[var(--bg)] p-4 sm:p-8">
     <div class="max-w-5xl mx-auto space-y-8">
-        
+
         <!-- Header -->
-        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-[var(--border)] pb-6 gap-4">
+        <div
+            class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-[var(--border)] pb-6 gap-4">
             <div>
                 <h1 class="font-heading text-3xl text-[var(--foreground)]">Pricing Management</h1>
-                <p class="text-[var(--muted-foreground)] mt-1">Update price configurations for all user roles. Changes reflect immediately.</p>
+                <p class="text-[var(--muted-foreground)] mt-1">Update price configurations for all user roles. Changes
+                    reflect immediately.</p>
             </div>
             <div class="flex gap-2">
-                 <a href="/admin/" class="btn btn-sm btn-ghost text-[var(--muted-foreground)] hover:text-[var(--foreground)]">
+                <a href="/admin/"
+                    class="btn btn-sm btn-ghost text-[var(--muted-foreground)] hover:text-[var(--foreground)]">
                     Django Admin
                 </a>
-                <a href="{% url 'index' %}" class="btn btn-sm btn-outline border-[var(--border)] text-[var(--foreground)] hover:bg-[var(--accent)] hover:border-[var(--accent)] hover:text-[var(--bg)]">
+                <a href="{% url 'index' %}"
+                    class="btn btn-sm btn-outline border-[var(--border)] text-[var(--foreground)] hover:bg-[var(--accent)] hover:border-[var(--accent)] hover:text-[var(--bg)]">
                     Back to Home
                 </a>
             </div>
@@ -26,26 +30,37 @@
         <div id="toast-container" class="fixed top-4 right-4 z-50"></div>
 
         <!-- Role Tabs -->
-        <div class="flex flex-wrap gap-2 p-1 bg-[var(--card)] rounded-lg border border-[var(--border)] inline-flex w-full sm:w-auto">
-            <button onclick="switchTab('buyer')" id="tab-buyer" class="role-tab flex-1 sm:flex-none px-6 py-2 rounded-md text-sm font-medium transition-all text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--muted)]/50">
+        <div
+            class="flex flex-wrap gap-2 p-1 bg-[var(--card)] rounded-lg border border-[var(--border)] inline-flex w-full sm:w-auto">
+            <button onclick="switchTab('buyer')" id="tab-buyer"
+                class="role-tab flex-1 sm:flex-none px-6 py-2 rounded-md text-sm font-medium transition-all text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--muted)]/50">
                 Buyer
             </button>
-            <button onclick="switchTab('seller')" id="tab-seller" class="role-tab flex-1 sm:flex-none px-6 py-2 rounded-md text-sm font-medium transition-all text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--muted)]/50">
+            <button onclick="switchTab('seller')" id="tab-seller"
+                class="role-tab flex-1 sm:flex-none px-6 py-2 rounded-md text-sm font-medium transition-all text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--muted)]/50">
                 Seller
             </button>
-            <button onclick="switchTab('realtor')" id="tab-realtor" class="role-tab flex-1 sm:flex-none px-6 py-2 rounded-md text-sm font-medium transition-all text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--muted)]/50">
+            <button onclick="switchTab('realtor')" id="tab-realtor"
+                class="role-tab flex-1 sm:flex-none px-6 py-2 rounded-md text-sm font-medium transition-all text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--muted)]/50">
                 Realtor
             </button>
-            <button onclick="switchTab('partner')" id="tab-partner" class="role-tab flex-1 sm:flex-none px-6 py-2 rounded-md text-sm font-medium transition-all text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--muted)]/50">
+            <button onclick="switchTab('partner')" id="tab-partner"
+                class="role-tab flex-1 sm:flex-none px-6 py-2 rounded-md text-sm font-medium transition-all text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--muted)]/50">
                 Partner
+            </button>
+            <button onclick="switchTab('access_passes')" id="tab-access_passes"
+                class="role-tab flex-1 sm:flex-none px-6 py-2 rounded-md text-sm font-medium transition-all text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--muted)]/50">
+                Access Passes
             </button>
         </div>
 
         <!-- Content Area -->
-        <div id="content-area" class="bg-[var(--card)] rounded-xl border border-[var(--border)] shadow-xl overflow-hidden relative min-h-[400px]">
-            
+        <div id="content-area"
+            class="bg-[var(--card)] rounded-xl border border-[var(--border)] shadow-xl overflow-hidden relative min-h-[400px]">
+
             <!-- Loading State -->
-            <div id="loading-spinner" class="absolute inset-0 flex flex-col items-center justify-center bg-[var(--card)] z-10">
+            <div id="loading-spinner"
+                class="absolute inset-0 flex flex-col items-center justify-center bg-[var(--card)] z-10">
                 <span class="loading loading-spinner loading-lg text-[var(--accent)]"></span>
                 <p class="mt-4 text-[var(--muted-foreground)] animate-pulse">Loading pricing configurations...</p>
             </div>
@@ -58,13 +73,16 @@
         </div>
 
         <!-- Action Bar (Sticky Bottom) -->
-        <div class="fixed bottom-0 left-0 right-0 bg-[var(--card)] border-t border-[var(--border)] p-4 sm:px-8 sm:py-4 flex justify-end items-center gap-4 transform translate-y-full transition-transform duration-300" id="action-bar">
+        <div class="fixed bottom-0 left-0 right-0 bg-[var(--card)] border-t border-[var(--border)] p-4 sm:px-8 sm:py-4 flex justify-end items-center gap-4 transform translate-y-full transition-transform duration-300"
+            id="action-bar">
             <span class="text-sm text-[var(--muted-foreground)] mr-auto hidden sm:inline-block">
                 <i data-lucide="info" class="w-4 h-4 inline mr-1"></i>
                 You have unsaved changes
             </span>
-            <button onclick="resetChanges()" class="btn btn-ghost text-[var(--muted-foreground)] hover:text-[var(--foreground)]">Discard</button>
-            <button onclick="saveCurrentTab()" id="save-btn" class="btn bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-[var(--bg)] border-none min-w-[120px]">
+            <button onclick="resetChanges()"
+                class="btn btn-ghost text-[var(--muted-foreground)] hover:text-[var(--foreground)]">Discard</button>
+            <button onclick="saveCurrentTab()" id="save-btn"
+                class="btn bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-[var(--bg)] border-none min-w-[120px]">
                 Save Changes
             </button>
         </div>
@@ -76,27 +94,70 @@
     <div class="form-control w-full">
         <label class="label">
             <span class="label-text text-[var(--foreground)] font-medium text-base field-label">Field Name</span>
-             <span class="label-text-alt text-[var(--muted-foreground)] field-help"></span>
+            <span class="label-text-alt text-[var(--muted-foreground)] field-help"></span>
         </label>
         <div class="relative">
             <span class="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--muted-foreground)] font-heading">$</span>
-            <input type="number" step="0.01" min="0" class="field-input input input-bordered w-full pl-8 bg-[var(--input)] border-[var(--border)] text-[var(--foreground)] focus:outline-none focus:border-[var(--accent)] text-lg placeholder:text-sm" placeholder="0.00">
+            <input type="number" step="0.01" min="0"
+                class="field-input input input-bordered w-full pl-8 bg-[var(--input)] border-[var(--border)] text-[var(--foreground)] focus:outline-none focus:border-[var(--accent)] text-lg placeholder:text-sm"
+                placeholder="0.00">
         </div>
         <label class="label">
             <span class="label-text-alt text-error field-error"></span>
         </label>
     </div>
 </template>
+
+<!-- Template for Access Pass -->
+<template id="access-pass-template">
+    <div class="bg-[var(--bg)] rounded-lg p-6 border border-[var(--border)] space-y-4 relative">
+        <div class="flex justify-between items-start">
+            <div>
+                <h3 class="pass-name-display text-xl font-bold text-[var(--foreground)]">Basic Access</h3>
+                <p class="text-xs text-[var(--muted-foreground)] uppercase tracking-wider pass-slug">basic</p>
+            </div>
+            <button class="btn-delete btn btn-xs btn-ghost text-error hover:bg-error/10"><i data-lucide="trash-2"
+                    class="w-4 h-4"></i></button>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="form-control">
+                <label class="label"><span class="label-text text-sm">Pass Name</span></label>
+                <input type="text" name="name"
+                    class="input input-sm input-bordered bg-[var(--input)] text-[var(--foreground)] pass-name-input">
+            </div>
+            <div class="form-control">
+                <label class="label"><span class="label-text text-sm">Price ($)</span></label>
+                <input type="number" step="0.01" name="price"
+                    class="input input-sm input-bordered bg-[var(--input)] text-[var(--foreground)] pass-price">
+            </div>
+            <div class="form-control">
+                <label class="label"><span class="label-text text-sm">Extension Days</span></label>
+                <input type="number" name="extension_days"
+                    class="input input-sm input-bordered bg-[var(--input)] text-[var(--foreground)] pass-ext-days">
+            </div>
+            <div class="form-control">
+                <label class="label"><span class="label-text text-sm">Property Limit</span></label>
+                <input type="number" name="properties_limit"
+                    class="input input-sm input-bordered bg-[var(--input)] text-[var(--foreground)] pass-limit">
+            </div>
+        </div>
+    </div>
+</template>
+
 {% endblock %}
 
 {% block extra_scripts %}
 <script>
     const API_BASE = '/api/v1/pricing-plans';
+    const PASS_API_BASE = '/api/v1/access-pass-types';
+
+    // Updated configurations
     const VIEWS = {
         buyer: [
             { key: 'buyer_upfront_price', label: 'Upfront Membership Cost', help: 'Billed immediately upon signup.' },
-            { key: 'buyer_monthly_price', label: 'Monthly Rate', help: 'Cost per month after initial period (if applicable).' },
-            { key: 'buyer_access_pass_price', label: 'Access Pass Price', help: 'Cost for one-time access pass.' }
+            { key: 'buyer_monthly_price', label: 'Monthly Rate (After Initial Period)', help: 'Cost per month.' },
+            { key: 'buyer_min_months', label: 'Initial Period Dur. (Months)', help: 'Number of months covered by upfront cost.', noSymbol: true },
         ],
         seller: [
             { key: 'listing_fee', label: 'Listing Fee', help: 'Cost per property listing.' },
@@ -115,37 +176,45 @@
     };
 
     let pricingData = {};
+    let accessPassesData = [];
     let currentTab = 'buyer';
     let hasUnsavedChanges = false;
+    let deletedPasses = [];
 
     // --- INIT ---
     document.addEventListener('DOMContentLoaded', async () => {
         await fetchPricingData();
+        await fetchAccessPasses(); // New
         switchTab('buyer');
         lucide.createIcons();
     });
 
     // --- API ---
     async function fetchPricingData() {
-        const spinner = document.getElementById('loading-spinner');
-        const container = document.getElementById('forms-container');
-        
         try {
             const res = await fetch(API_BASE + '/');
             if (!res.ok) throw new Error('Failed to fetch data');
             const data = await res.json();
-            
-            // Map array to object by plan_type
+
             pricingData = data.reduce((acc, plan) => {
                 acc[plan.plan_type] = plan;
                 return acc;
             }, {});
-
-            spinner.classList.add('hidden');
-            container.classList.remove('opacity-0');
         } catch (error) {
             console.error(error);
             showToast('Failed to load pricing data', 'error');
+        }
+    }
+
+    async function fetchAccessPasses() {
+        try {
+            const res = await fetch(PASS_API_BASE + '/');
+            if (!res.ok) throw new Error('Failed to fetch access passes');
+            const data = await res.json();
+            accessPassesData = data;
+        } catch (error) {
+            console.error(error);
+            showToast('Failed to load access passes', 'error');
         }
     }
 
@@ -155,30 +224,13 @@
         btn.innerHTML = '<span class="loading loading-spinner loading-xs"></span> Saving...';
         btn.disabled = true;
 
-        const inputs = document.querySelectorAll(`input[data-plan="${currentTab}"]`);
-        const payload = {};
-
-        inputs.forEach(input => {
-            payload[input.name] = parseFloat(input.value) || 0;
-        });
-
-        // Current Plan ID/Type needed for update URL
-        // Assuming lookup_field is 'plan_type' in View
         try {
-            const res = await fetch(`${API_BASE}/${currentTab}/`, {
-                method: 'PATCH',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': getCookie('csrftoken')
-                },
-                body: JSON.stringify(payload)
-            });
+            if (currentTab === 'access_passes') {
+                await saveAccessPasses();
+            } else {
+                await savePricingPlan();
+            }
 
-            if (!res.ok) throw new Error('Update failed');
-
-            const updatedPlan = await res.json();
-            pricingData[currentTab] = updatedPlan; // Update local cache
-            
             showToast('Changes saved successfully!', 'success');
             setUnsavedChanges(false);
 
@@ -188,37 +240,122 @@
         } finally {
             btn.innerHTML = originalText;
             btn.disabled = false;
+            // Refetch to ensure sync
+            if (currentTab === 'access_passes') await fetchAccessPasses();
+            else await fetchPricingData();
+            renderTopLevel();
         }
+    }
+
+    async function savePricingPlan() {
+        const inputs = document.querySelectorAll(`input[data-plan="${currentTab}"]`);
+        const payload = {};
+
+        inputs.forEach(input => {
+            payload[input.name] = parseFloat(input.value) || 0;
+        });
+
+        const res = await fetch(`${API_BASE}/${currentTab}/`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            body: JSON.stringify(payload)
+        });
+
+        if (!res.ok) throw new Error('Update failed');
+        const updatedPlan = await res.json();
+        pricingData[currentTab] = updatedPlan;
+    }
+
+    async function saveAccessPasses() {
+        const container = document.getElementById('forms-container');
+        const passElements = container.querySelectorAll('.access-pass-card');
+
+        // Handle Updates/Creates
+        const promises = Array.from(passElements).map(async (el) => {
+            const id = el.dataset.id;
+            const payload = {
+                name: el.querySelector('.pass-name-input').value,
+                price: parseFloat(el.querySelector('.pass-price').value) || 0,
+                extension_days: parseInt(el.querySelector('.pass-ext-days').value) || 0,
+                properties_limit: parseInt(el.querySelector('.pass-limit').value) || 0,
+                slug: el.querySelector('.pass-name-input').value.toLowerCase().replace(/ /g, '-') // Auto slug
+            };
+
+            if (id === 'new') {
+                // Post
+                const res = await fetch(PASS_API_BASE + '/', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCookie('csrftoken') },
+                    body: JSON.stringify(payload)
+                });
+                if (!res.ok) throw new Error('Failed to create pass');
+            } else {
+                // Patch
+                const res = await fetch(`${PASS_API_BASE}/${id}/`, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCookie('csrftoken') },
+                    body: JSON.stringify(payload)
+                });
+                if (!res.ok) throw new Error('Failed to update pass');
+            }
+        });
+
+        // Handle Deletes
+        const delPromises = deletedPasses.map(async (id) => {
+            const res = await fetch(`${PASS_API_BASE}/${id}/`, {
+                method: 'DELETE',
+                headers: { 'X-CSRFToken': getCookie('csrftoken') }
+            });
+            if (!res.ok) throw new Error('Failed to delete pass');
+        });
+
+        await Promise.all([...promises, ...delPromises]);
+        deletedPasses = [];
     }
 
     // --- UI LOGIC ---
     function switchTab(role) {
         currentTab = role;
-        
+
         // Update Tabs UI
         document.querySelectorAll('.role-tab').forEach(t => {
             const isSelected = t.id === `tab-${role}`;
             t.classList.toggle('bg-[var(--accent)]', isSelected);
             t.classList.toggle('text-[var(--bg)]', isSelected);
-            t.classList.toggle('hover:bg-[var(--accent-hover)]', isSelected);
-            t.classList.toggle('hover:text-[var(--bg)]', isSelected);
-            
+
             if (!isSelected) {
-                t.classList.remove('bg-[var(--accent)]', 'text-[var(--bg)]', 'hover:bg-[var(--accent-hover)]', 'hover:text-[var(--bg)]');
-                t.classList.add('text-[var(--muted-foreground)]', 'hover:bg-[var(--muted)]/50', 'hover:text-[var(--foreground)]');
+                t.classList.remove('bg-[var(--accent)]', 'text-[var(--bg)]');
+                t.classList.add('text-[var(--muted-foreground)]');
             } else {
-                 t.classList.remove('text-[var(--muted-foreground)]', 'hover:bg-[var(--muted)]/50', 'hover:text-[var(--foreground)]');
+                t.classList.remove('text-[var(--muted-foreground)]');
             }
         });
 
-        renderForm(role);
-        setUnsavedChanges(false); // Reset on tab switch? Or warn? For simplicity, we just reset or ignore.
+        deletedPasses = []; // Reset transient deletes when switching
+        renderTopLevel();
+        setUnsavedChanges(false);
+    }
+
+    function renderTopLevel() {
+        if (currentTab === 'access_passes') {
+            renderAccessPasses();
+        } else {
+            renderForm(currentTab);
+        }
+
+        const spinner = document.getElementById('loading-spinner');
+        const container = document.getElementById('forms-container');
+        spinner.classList.add('hidden');
+        container.classList.remove('opacity-0');
     }
 
     function renderForm(role) {
         const container = document.getElementById('forms-container');
         container.innerHTML = '';
-        
+
         const fields = VIEWS[role];
         const data = pricingData[role] || {};
 
@@ -235,15 +372,20 @@
         fields.forEach(field => {
             const clone = template.content.cloneNode(true);
             const wrapper = clone.querySelector('.form-control');
-            
+
             clone.querySelector('.field-label').textContent = field.label;
             clone.querySelector('.field-help').textContent = field.help || '';
-            
+
             const input = clone.querySelector('.field-input');
             input.name = field.key;
             input.value = data[field.key];
             input.dataset.plan = role;
-            
+
+            if (field.noSymbol) {
+                clone.querySelector('.font-heading').classList.add('hidden');
+                input.classList.remove('pl-8');
+            }
+
             // Validation/Interaction
             input.addEventListener('input', () => setUnsavedChanges(true));
 
@@ -251,11 +393,92 @@
         });
 
         container.appendChild(grid);
-        
+
         const infoText = document.createElement('div');
         infoText.className = 'mt-8 p-4 bg-[var(--muted)]/20 rounded-lg border border-[var(--border)] text-sm text-[var(--muted-foreground)]';
         infoText.innerHTML = `<h4 class="font-bold text-[var(--foreground)] mb-2">Note:</h4> Prices are displayed in USD ($). Updates affect the live signup page immediately.`;
         container.appendChild(infoText);
+    }
+
+    function renderAccessPasses() {
+        const container = document.getElementById('forms-container');
+        container.innerHTML = '';
+
+        const header = document.createElement('div');
+        header.className = "flex justify-between items-center mb-6";
+        header.innerHTML = `
+            <h3 class="text-xl font-bold text-[var(--foreground)]">Access Passes</h3>
+            <button onclick="addNewPass()" class="btn btn-sm bg-[var(--accent)] text-[var(--bg)] hover:bg-[var(--accent-hover)] border-none">
+                <i data-lucide="plus" class="w-4 h-4 mr-1"></i> Add New Pass
+            </button>
+        `;
+        container.appendChild(header);
+
+        const grid = document.createElement('div');
+        grid.className = 'grid grid-cols-1 gap-6';
+        grid.id = 'access-passes-grid';
+
+        const template = document.getElementById('access-pass-template');
+
+        accessPassesData.forEach(pass => {
+            const clone = template.content.cloneNode(true);
+            const card = clone.querySelector('.bg-\\[var\\(--bg\\)\\]'); // Select wrapper
+            card.classList.add('access-pass-card');
+            card.dataset.id = pass.id;
+
+            clone.querySelector('.pass-name-display').textContent = pass.name;
+            clone.querySelector('.pass-slug').textContent = pass.slug;
+
+            const inputs = clone.querySelectorAll('input');
+            clone.querySelector('.pass-name-input').value = pass.name;
+            clone.querySelector('.pass-price').value = pass.price;
+            clone.querySelector('.pass-ext-days').value = pass.extension_days;
+            clone.querySelector('.pass-limit').value = pass.properties_limit;
+
+            inputs.forEach(i => i.addEventListener('input', () => setUnsavedChanges(true)));
+
+            const delBtn = clone.querySelector('.btn-delete');
+            delBtn.onclick = () => {
+                deletedPasses.push(pass.id);
+                setUnsavedChanges(true);
+                card.remove();
+            };
+
+            grid.appendChild(clone);
+        });
+
+        container.appendChild(grid);
+        lucide.createIcons();
+    }
+
+    function addNewPass() {
+        const grid = document.getElementById('access-passes-grid');
+        const template = document.getElementById('access-pass-template');
+        const clone = template.content.cloneNode(true);
+        const card = clone.querySelector('.bg-\\[var\\(--bg\\)\\]');
+        card.classList.add('access-pass-card');
+        card.dataset.id = 'new';
+
+        clone.querySelector('.pass-name-display').textContent = 'New Access Pass';
+        clone.querySelector('.pass-slug').textContent = 'pending...';
+
+        clone.querySelector('.pass-name-input').value = 'New Pass';
+        clone.querySelector('.pass-price').value = 0;
+        clone.querySelector('.pass-ext-days').value = 15;
+        clone.querySelector('.pass-limit').value = 10;
+
+        const inputs = clone.querySelectorAll('input');
+        inputs.forEach(i => i.addEventListener('input', () => setUnsavedChanges(true)));
+
+        const delBtn = clone.querySelector('.btn-delete');
+        delBtn.onclick = () => {
+            card.remove();
+            // No need to push to deletedPasses since it wasn't saved yet
+        };
+
+        grid.appendChild(clone);
+        setUnsavedChanges(true);
+        lucide.createIcons();
     }
 
     function setUnsavedChanges(status) {
@@ -269,12 +492,12 @@
     }
 
     function resetChanges() {
-        renderForm(currentTab);
+        renderTopLevel();
         setUnsavedChanges(false);
     }
 
     // --- UTILS ---
-    function showToast(msg, type='info') {
+    function showToast(msg, type = 'info') {
         Toastify({
             text: msg,
             duration: 3000,

@@ -296,3 +296,21 @@ class PricingPlanUpdateView(RetrieveUpdateAPIView):
 
 
 
+
+from api.models import AccessPassType
+from api.v1.serializer import AccessPassTypeSerializer
+from rest_framework import viewsets
+
+class AccessPassTypeViewSet(viewsets.ModelViewSet):
+    """
+    CRUD for Access Pass Types (Admin only for write, All for read?)
+    Actually, mostly Admin. Public might need read-only.
+    """
+    queryset = AccessPassType.objects.all()
+    serializer_class = AccessPassTypeSerializer
+    permission_classes = [IsAuthenticated, IsAdminUser] # Restrict to admin for now
+
+    def get_permissions(self):
+        if self.action in ['list', 'retrieve']:
+             return [AllowAny()]
+        return super().get_permissions()
