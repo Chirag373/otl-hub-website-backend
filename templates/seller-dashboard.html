@@ -189,14 +189,6 @@
 
 
 
-            <div class="form-control w-full md:col-span-2">
-                <label class="label">
-                    <span class="label-text text-[var(--foreground)] font-medium">Property Description</span>
-                </label>
-                <textarea id="input-description" rows="4"
-                    class="textarea textarea-bordered w-full bg-[var(--input)] border-[var(--border)] text-[var(--foreground)] disabled:opacity-50 disabled:bg-[var(--input)] disabled:text-[var(--muted-foreground)] focus:outline-none focus:border-[var(--accent)] resize-none"
-                    disabled></textarea>
-            </div>
 
             <div class="form-control w-full md:col-span-2">
                 <div class="bg-[var(--muted)]/20 rounded-lg p-4 border border-[var(--border)]">
@@ -367,7 +359,7 @@
         inputPropType: document.getElementById('input-prop-type'),
         inputEstValue: document.getElementById('input-est-value'),
 
-        inputDescription: document.getElementById('input-description'),
+
         inputLeaseback: document.getElementById('input-leaseback'),
 
         // Leaseback UI
@@ -532,7 +524,7 @@
                 maximumFractionDigits: 2
             });
         }
-        if (dom.inputDescription) dom.inputDescription.value = profile.property_description || '';
+
         if (dom.inputLeaseback) dom.inputLeaseback.checked = profile.leaseback_required;
 
         updateLeasebackUI(profile.leaseback_required);
@@ -657,7 +649,7 @@
             // Remove commas for backend numeric processing
             estimated_value: dom.inputEstValue.value.replace(/,/g, ''),
 
-            property_description: dom.inputDescription.value,
+
             leaseback_required: dom.inputLeaseback.checked
         };
 
