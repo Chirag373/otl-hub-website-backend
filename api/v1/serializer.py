@@ -753,3 +753,11 @@ class PartnerProfileSerializer(serializers.ModelSerializer):
 
         return instance
 
+
+from api.models import PricingPlan
+
+class PricingPlanSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PricingPlan
+        fields = '__all__'
+

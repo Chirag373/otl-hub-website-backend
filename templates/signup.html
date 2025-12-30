@@ -263,6 +263,50 @@
     let selectedBuyerPlan = 'pro'; // Default to pro
     let signedUpEmail = '';
 
+    // --- PRICING DATA FETCH ---
+    async function initPricing() {
+        try {
+            const res = await fetch('/api/v1/pricing-plans/');
+            if (res.ok) {
+                const data = await res.json();
+                updatePlanConfigs(data);
+            }
+        } catch (e) {
+            console.error("Failed to load dynamic pricing, using defaults", e);
+        }
+
+        // Initial Render
+        renderPricingPlan(currentUserType);
+    }
+
+    function updatePlanConfigs(data) {
+        data.forEach(p => {
+            if (p.plan_type === 'buyer') {
+                if (planConfigs.buyer && planConfigs.buyer.membership) {
+                    planConfigs.buyer.membership.upfrontPrice = parseFloat(p.buyer_upfront_price);
+                    planConfigs.buyer.membership.monthlyPrice = parseFloat(p.buyer_monthly_price);
+                    // Update derived description if it was hardcoded (e.g. "40 * 3")
+                    // But currently description is just text, we might want to update it if logic is tight
+                }
+                if (planConfigs.buyer && planConfigs.buyer.accessPass) {
+                    planConfigs.buyer.accessPass.price = parseFloat(p.buyer_access_pass_price);
+                }
+            } else if (p.plan_type === 'seller' && planConfigs.seller) {
+                planConfigs.seller.setupFee = parseFloat(p.setup_fee);
+                planConfigs.seller.listingFee = parseFloat(p.listing_fee);
+                planConfigs.seller.total = parseFloat(p.setup_fee) + parseFloat(p.listing_fee);
+            } else if (p.plan_type === 'realtor' && planConfigs.realtor) {
+                planConfigs.realtor.setupFee = parseFloat(p.setup_fee);
+                planConfigs.realtor.accessFee = parseFloat(p.access_fee);
+                planConfigs.realtor.monthly = parseFloat(p.monthly_fee);
+            } else if (p.plan_type === 'partner' && planConfigs.partner) {
+                planConfigs.partner.setupFee = parseFloat(p.setup_fee);
+                planConfigs.partner.accessFee = parseFloat(p.access_fee);
+                planConfigs.partner.monthly = parseFloat(p.monthly_fee);
+            }
+        });
+    }
+
     // --- DOM ELEMENTS ---
     const dynamicFieldsContainer = document.getElementById('dynamic-fields-container');
     const pricingPlanContainer = document.getElementById('pricing-plan-container');
@@ -1108,6 +1152,7 @@
     // Initialize with default 'buyer'
     document.addEventListener('DOMContentLoaded', () => {
         selectUserType('buyer');
+        initPricing();
     });
 
 </script>

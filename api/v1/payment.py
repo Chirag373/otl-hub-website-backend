@@ -11,32 +11,64 @@ from django.contrib.auth import login
 
 stripe.api_key = settings.STRIPE_SECRET_KEY
 
+from api.models import PricingPlan
+
 def get_product_details(signup_data):
     """
     Determine price and product name based on user role or other factors.
     Returns (amount_in_cents, product_name, description)
     """
-    role = signup_data.get('role')
+    role = signup_data.get('role', '').lower()
     
-    if role == 'BUYER':
-        # Buyer Pricing
-        # Buyer Pricing - Single Membership Plan
-        # $40/mo * 3 months commitment = $120 upfront
-        return 12000, "Buyer Membership", "3-Month Membership Commitment ($40/mo billed upfront)"
+    # Defaults
+    price_cents = 0
+    product_name = "Account Verification"
+    description = "Account Verification Fee"
+    
+    try:
+        plan = PricingPlan.objects.get(plan_type=role)
+        
+        if role == 'buyer':
+            # Subscription/Membership is upfront
+            # $120.00 -> 12000 cents
+            price_cents = int(plan.buyer_upfront_price * 100)
+            product_name = "Buyer Membership"
+            description = f"3-Month Membership Commitment (${plan.buyer_monthly_price}/mo billed upfront)"
             
-    elif role == 'SELLER':
-        # Seller Pricing
-        return 29800, "Seller Account Setup", "Includes $99 setup fee + $199 listing fee"
-        
-    elif role == 'REALTOR':
-        # Realtor Pricing
-        return 19800, "Realtor Subscription", "Includes $99 setup fee + $99 access fee"
-        
-    elif role == 'PARTNER':
-        # Partner Pricing
-        return 49800, "Partner Subscription", "Includes $199 setup fee + $299 access fee"
-        
-    return 1000, "Account Verification Fee", "Standard verification fee"
+        elif role == 'seller':
+            # Setup + Listing Fee
+            total = plan.setup_fee + plan.listing_fee
+            price_cents = int(total * 100)
+            product_name = "Seller Account Setup"
+            description = f"Includes ${plan.setup_fee} setup fee + ${plan.listing_fee} listing fee"
+            
+        elif role == 'realtor':
+            # Setup + Access Fee
+            total = plan.setup_fee + plan.access_fee
+            price_cents = int(total * 100)
+            product_name = "Realtor Subscription"
+            description = f"Includes ${plan.setup_fee} setup fee + ${plan.access_fee} access fee"
+            
+        elif role == 'partner':
+             # Setup + Access Fee
+            total = plan.setup_fee + plan.access_fee
+            price_cents = int(total * 100)
+            product_name = "Partner Subscription"
+            description = f"Includes ${plan.setup_fee} setup fee + ${plan.access_fee} access fee"
+            
+    except PricingPlan.DoesNotExist:
+        # Fallback to hardcoded if no DB entry found
+        if role == 'buyer':
+            return 12000, "Buyer Membership", "3-Month Membership Commitment ($40/mo billed upfront)"
+        elif role == 'seller':
+            return 29800, "Seller Account Setup", "Includes $99 setup fee + $199 listing fee"
+        elif role == 'realtor':
+             return 19800, "Realtor Subscription", "Includes $99 setup fee + $99 access fee"
+        elif role == 'partner':
+             return 49800, "Partner Subscription", "Includes $199 setup fee + $299 access fee"
+        return 1000, "Account Verification Fee", "Standard verification fee"
+
+    return price_cents, product_name, description
 
 # Keep the old function signature for backward compatibility just in case, or alias it
 def get_price_for_user(signup_data):
@@ -52,8 +84,14 @@ class CreateAccessPassSessionView(APIView):
             return Response({'error': 'Unauthorized'}, status=status.HTTP_401_UNAUTHORIZED)
             
         try:
-            # $650 for 30 days
-            price_amount = 65000 
+            # Determine price from PricingPlan
+            try:
+                from api.models import PricingPlan
+                plan = PricingPlan.objects.get(plan_type='buyer')
+                price_amount = int(plan.buyer_access_pass_price * 100)
+            except (PricingPlan.DoesNotExist, ImportError):
+                price_amount = 65000 # Fallback
+
             product_name = "Buyer Access Pass"
             description = "30-Day Access Pass to unlock seller contacts"
             

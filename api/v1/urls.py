@@ -4,7 +4,8 @@ from api.v1.auth import LoginView
 from api.v1.views import (
     BuyerProfileView, RealtorProfileView, SellerProfileView, PartnerProfileView, PartnerListView, 
     PropertyImageDeleteView, PropertySearchView, BuyerFavoritesView, BuyerFavoriteToggleView,
-    ChangePasswordView, DeleteAccountView, UpdateNotificationSettingsView
+    ChangePasswordView, DeleteAccountView, UpdateNotificationSettingsView,
+    PricingPlanListView, PricingPlanUpdateView
 )
 from api.v1.payment import PaymentSuccessView, BillingPortalView, CreateAccessPassSessionView, AccessPassSuccessView
 
@@ -26,6 +27,9 @@ urlpatterns = [
     path("buyer/favorites/<int:property_id>/", BuyerFavoriteToggleView.as_view(), name="buyer-favorite-toggle"),
 
     path("partners/", PartnerListView.as_view(), name="partner-list"),
+    path("pricing-plans/", PricingPlanListView.as_view(), name="pricing-plan-list"),
+    path("pricing-plans/<str:plan_type>/", PricingPlanUpdateView.as_view(), name="pricing-plan-update"),
+
     path("user/change-password/", ChangePasswordView.as_view(), name="change-password"),
     path("user/delete-account/", DeleteAccountView.as_view(), name="delete-account"),
     path("user/settings/", UpdateNotificationSettingsView.as_view(), name="update-settings"),

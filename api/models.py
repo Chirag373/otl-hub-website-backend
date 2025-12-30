@@ -139,3 +139,35 @@ class PropertyImage(models.Model):
 
     class Meta:
         db_table = 'property_images'
+
+
+class PricingPlan(models.Model):
+    PLAN_TYPES = (
+        ('buyer', 'Buyer'),
+        ('seller', 'Seller'),
+        ('realtor', 'Realtor'),
+        ('partner', 'Partner'),
+    )
+
+    plan_type = models.CharField(max_length=20, choices=PLAN_TYPES, unique=True)
+    
+    # Generic fees (used by multiple roles)
+    setup_fee = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    monthly_fee = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    access_fee = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    
+    # Specific to Seller
+    listing_fee = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    
+    # Specific to Buyer
+    buyer_upfront_price = models.DecimalField(max_digits=10, decimal_places=2, default=0, help_text="For Buyer Membership (upfront)")
+    buyer_monthly_price = models.DecimalField(max_digits=10, decimal_places=2, default=0, help_text="For Buyer Membership (monthly)")
+    buyer_access_pass_price = models.DecimalField(max_digits=10, decimal_places=2, default=0, help_text="For Buyer Access Pass")
+    
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = "pricing_plans"
+
+    def __str__(self):
+        return f"{self.get_plan_type_display()} Pricing"

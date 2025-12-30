@@ -140,19 +140,26 @@
                     submitBtn.innerHTML = 'Success!';
                     submitBtn.classList.remove('opacity-70');
 
-                    // Redirect based on role
-                    const role = data.user.role;
-                    let redirectUrl = "{% url 'buyer_dashboard' %}"; // Default
+                    // Redirect based on role or next param
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const nextUrl = urlParams.get('next');
 
-                    if (role === 'SELLER') {
-                        redirectUrl = "{% url 'seller_dashboard' %}";
-                    } else if (role === 'REALTOR') {
-                        redirectUrl = "{% url 'realtor_dashboard' %}";
-                    } else if (role === 'PARTNER') {
-                        redirectUrl = "{% url 'partner_dashboard' %}";
+                    if (nextUrl) {
+                        window.location.href = nextUrl;
+                    } else {
+                        const role = data.user.role;
+                        let redirectUrl = "{% url 'buyer_dashboard' %}"; // Default
+
+                        if (role === 'SELLER') {
+                            redirectUrl = "{% url 'seller_dashboard' %}";
+                        } else if (role === 'REALTOR') {
+                            redirectUrl = "{% url 'realtor_dashboard' %}";
+                        } else if (role === 'PARTNER') {
+                            redirectUrl = "{% url 'partner_dashboard' %}";
+                        }
+
+                        window.location.href = redirectUrl;
                     }
-
-                    window.location.href = redirectUrl;
                 } else {
                     // Handle error
                     throw new Error(data.detail || Object.values(data)[0] || 'Login failed');

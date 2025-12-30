@@ -2,7 +2,7 @@ from django.views.generic import TemplateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 import json
 from django.core.serializers.json import DjangoJSONEncoder
-from core.mixins import BuyerRequiredMixin, SellerRequiredMixin, RealtorRequiredMixin, PartnerRequiredMixin
+from core.mixins import BuyerRequiredMixin, SellerRequiredMixin, RealtorRequiredMixin, PartnerRequiredMixin, AdminRequiredMixin
 from api.v1.serializer import SellerProfileSerializer
 
 class IndexView(TemplateView):
@@ -89,3 +89,6 @@ class TermsOfServiceView(TemplateView):
 
 class PrivacyPolicyView(TemplateView):
     template_name = "privacy-policy.html"
+
+class CustomAdminPricingView(AdminRequiredMixin, TemplateView):
+    template_name = "custom_admin_pricing.html"

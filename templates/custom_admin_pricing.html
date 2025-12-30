@@ -1,0 +1,307 @@
+{% extends 'base.html' %}
+
+{% block title %}Admin - Pricing Management | OTL Platform{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-[var(--bg)] p-4 sm:p-8">
+    <div class="max-w-5xl mx-auto space-y-8">
+        
+        <!-- Header -->
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-[var(--border)] pb-6 gap-4">
+            <div>
+                <h1 class="font-heading text-3xl text-[var(--foreground)]">Pricing Management</h1>
+                <p class="text-[var(--muted-foreground)] mt-1">Update price configurations for all user roles. Changes reflect immediately.</p>
+            </div>
+            <div class="flex gap-2">
+                 <a href="/admin/" class="btn btn-sm btn-ghost text-[var(--muted-foreground)] hover:text-[var(--foreground)]">
+                    Django Admin
+                </a>
+                <a href="{% url 'index' %}" class="btn btn-sm btn-outline border-[var(--border)] text-[var(--foreground)] hover:bg-[var(--accent)] hover:border-[var(--accent)] hover:text-[var(--bg)]">
+                    Back to Home
+                </a>
+            </div>
+        </div>
+
+        <!-- Feedback Messages -->
+        <div id="toast-container" class="fixed top-4 right-4 z-50"></div>
+
+        <!-- Role Tabs -->
+        <div class="flex flex-wrap gap-2 p-1 bg-[var(--card)] rounded-lg border border-[var(--border)] inline-flex w-full sm:w-auto">
+            <button onclick="switchTab('buyer')" id="tab-buyer" class="role-tab flex-1 sm:flex-none px-6 py-2 rounded-md text-sm font-medium transition-all text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--muted)]/50">
+                Buyer
+            </button>
+            <button onclick="switchTab('seller')" id="tab-seller" class="role-tab flex-1 sm:flex-none px-6 py-2 rounded-md text-sm font-medium transition-all text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--muted)]/50">
+                Seller
+            </button>
+            <button onclick="switchTab('realtor')" id="tab-realtor" class="role-tab flex-1 sm:flex-none px-6 py-2 rounded-md text-sm font-medium transition-all text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--muted)]/50">
+                Realtor
+            </button>
+            <button onclick="switchTab('partner')" id="tab-partner" class="role-tab flex-1 sm:flex-none px-6 py-2 rounded-md text-sm font-medium transition-all text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--muted)]/50">
+                Partner
+            </button>
+        </div>
+
+        <!-- Content Area -->
+        <div id="content-area" class="bg-[var(--card)] rounded-xl border border-[var(--border)] shadow-xl overflow-hidden relative min-h-[400px]">
+            
+            <!-- Loading State -->
+            <div id="loading-spinner" class="absolute inset-0 flex flex-col items-center justify-center bg-[var(--card)] z-10">
+                <span class="loading loading-spinner loading-lg text-[var(--accent)]"></span>
+                <p class="mt-4 text-[var(--muted-foreground)] animate-pulse">Loading pricing configurations...</p>
+            </div>
+
+            <!-- Forms Container -->
+            <div id="forms-container" class="p-6 sm:p-8 opacity-0 transition-opacity duration-300">
+                <!-- Forms injected by JS -->
+            </div>
+
+        </div>
+
+        <!-- Action Bar (Sticky Bottom) -->
+        <div class="fixed bottom-0 left-0 right-0 bg-[var(--card)] border-t border-[var(--border)] p-4 sm:px-8 sm:py-4 flex justify-end items-center gap-4 transform translate-y-full transition-transform duration-300" id="action-bar">
+            <span class="text-sm text-[var(--muted-foreground)] mr-auto hidden sm:inline-block">
+                <i data-lucide="info" class="w-4 h-4 inline mr-1"></i>
+                You have unsaved changes
+            </span>
+            <button onclick="resetChanges()" class="btn btn-ghost text-[var(--muted-foreground)] hover:text-[var(--foreground)]">Discard</button>
+            <button onclick="saveCurrentTab()" id="save-btn" class="btn bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-[var(--bg)] border-none min-w-[120px]">
+                Save Changes
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Template for Form Fields -->
+<template id="field-template">
+    <div class="form-control w-full">
+        <label class="label">
+            <span class="label-text text-[var(--foreground)] font-medium text-base field-label">Field Name</span>
+             <span class="label-text-alt text-[var(--muted-foreground)] field-help"></span>
+        </label>
+        <div class="relative">
+            <span class="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--muted-foreground)] font-heading">$</span>
+            <input type="number" step="0.01" min="0" class="field-input input input-bordered w-full pl-8 bg-[var(--input)] border-[var(--border)] text-[var(--foreground)] focus:outline-none focus:border-[var(--accent)] text-lg placeholder:text-sm" placeholder="0.00">
+        </div>
+        <label class="label">
+            <span class="label-text-alt text-error field-error"></span>
+        </label>
+    </div>
+</template>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    const API_BASE = '/api/v1/pricing-plans';
+    const VIEWS = {
+        buyer: [
+            { key: 'buyer_upfront_price', label: 'Upfront Membership Cost', help: 'Billed immediately upon signup.' },
+            { key: 'buyer_monthly_price', label: 'Monthly Rate', help: 'Cost per month after initial period (if applicable).' },
+            { key: 'buyer_access_pass_price', label: 'Access Pass Price', help: 'Cost for one-time access pass.' }
+        ],
+        seller: [
+            { key: 'listing_fee', label: 'Listing Fee', help: 'Cost per property listing.' },
+            { key: 'setup_fee', label: 'Setup Fee', help: 'One-time account setup fee.' }
+        ],
+        realtor: [
+            { key: 'setup_fee', label: 'Setup Fee', help: 'One-time account setup fee.' },
+            { key: 'access_fee', label: 'Access Fee', help: 'Initial access fee.' },
+            { key: 'monthly_fee', label: 'Monthly Subscription', help: 'Recurring monthly cost.' }
+        ],
+        partner: [
+            { key: 'setup_fee', label: 'Setup Fee', help: 'One-time account setup fee.' },
+            { key: 'access_fee', label: 'Access Fee', help: 'Initial access fee.' },
+            { key: 'monthly_fee', label: 'Monthly Subscription', help: 'Recurring monthly cost.' }
+        ]
+    };
+
+    let pricingData = {};
+    let currentTab = 'buyer';
+    let hasUnsavedChanges = false;
+
+    // --- INIT ---
+    document.addEventListener('DOMContentLoaded', async () => {
+        await fetchPricingData();
+        switchTab('buyer');
+        lucide.createIcons();
+    });
+
+    // --- API ---
+    async function fetchPricingData() {
+        const spinner = document.getElementById('loading-spinner');
+        const container = document.getElementById('forms-container');
+        
+        try {
+            const res = await fetch(API_BASE + '/');
+            if (!res.ok) throw new Error('Failed to fetch data');
+            const data = await res.json();
+            
+            // Map array to object by plan_type
+            pricingData = data.reduce((acc, plan) => {
+                acc[plan.plan_type] = plan;
+                return acc;
+            }, {});
+
+            spinner.classList.add('hidden');
+            container.classList.remove('opacity-0');
+        } catch (error) {
+            console.error(error);
+            showToast('Failed to load pricing data', 'error');
+        }
+    }
+
+    async function saveCurrentTab() {
+        const btn = document.getElementById('save-btn');
+        const originalText = btn.innerText;
+        btn.innerHTML = '<span class="loading loading-spinner loading-xs"></span> Saving...';
+        btn.disabled = true;
+
+        const inputs = document.querySelectorAll(`input[data-plan="${currentTab}"]`);
+        const payload = {};
+
+        inputs.forEach(input => {
+            payload[input.name] = parseFloat(input.value) || 0;
+        });
+
+        // Current Plan ID/Type needed for update URL
+        // Assuming lookup_field is 'plan_type' in View
+        try {
+            const res = await fetch(`${API_BASE}/${currentTab}/`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                body: JSON.stringify(payload)
+            });
+
+            if (!res.ok) throw new Error('Update failed');
+
+            const updatedPlan = await res.json();
+            pricingData[currentTab] = updatedPlan; // Update local cache
+            
+            showToast('Changes saved successfully!', 'success');
+            setUnsavedChanges(false);
+
+        } catch (error) {
+            console.error(error);
+            showToast('Failed to save changes. Please try again.', 'error');
+        } finally {
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+        }
+    }
+
+    // --- UI LOGIC ---
+    function switchTab(role) {
+        currentTab = role;
+        
+        // Update Tabs UI
+        document.querySelectorAll('.role-tab').forEach(t => {
+            const isSelected = t.id === `tab-${role}`;
+            t.classList.toggle('bg-[var(--accent)]', isSelected);
+            t.classList.toggle('text-[var(--bg)]', isSelected);
+            t.classList.toggle('hover:bg-[var(--accent-hover)]', isSelected);
+            t.classList.toggle('hover:text-[var(--bg)]', isSelected);
+            
+            if (!isSelected) {
+                t.classList.remove('bg-[var(--accent)]', 'text-[var(--bg)]', 'hover:bg-[var(--accent-hover)]', 'hover:text-[var(--bg)]');
+                t.classList.add('text-[var(--muted-foreground)]', 'hover:bg-[var(--muted)]/50', 'hover:text-[var(--foreground)]');
+            } else {
+                 t.classList.remove('text-[var(--muted-foreground)]', 'hover:bg-[var(--muted)]/50', 'hover:text-[var(--foreground)]');
+            }
+        });
+
+        renderForm(role);
+        setUnsavedChanges(false); // Reset on tab switch? Or warn? For simplicity, we just reset or ignore.
+    }
+
+    function renderForm(role) {
+        const container = document.getElementById('forms-container');
+        container.innerHTML = '';
+        
+        const fields = VIEWS[role];
+        const data = pricingData[role] || {};
+
+        if (!data.id && !pricingData[role]) {
+            container.innerHTML = '<p class="text-error">No data found for this role. Run seed script.</p>';
+            return;
+        }
+
+        const grid = document.createElement('div');
+        grid.className = 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6';
+
+        const template = document.getElementById('field-template');
+
+        fields.forEach(field => {
+            const clone = template.content.cloneNode(true);
+            const wrapper = clone.querySelector('.form-control');
+            
+            clone.querySelector('.field-label').textContent = field.label;
+            clone.querySelector('.field-help').textContent = field.help || '';
+            
+            const input = clone.querySelector('.field-input');
+            input.name = field.key;
+            input.value = data[field.key];
+            input.dataset.plan = role;
+            
+            // Validation/Interaction
+            input.addEventListener('input', () => setUnsavedChanges(true));
+
+            grid.appendChild(wrapper);
+        });
+
+        container.appendChild(grid);
+        
+        const infoText = document.createElement('div');
+        infoText.className = 'mt-8 p-4 bg-[var(--muted)]/20 rounded-lg border border-[var(--border)] text-sm text-[var(--muted-foreground)]';
+        infoText.innerHTML = `<h4 class="font-bold text-[var(--foreground)] mb-2">Note:</h4> Prices are displayed in USD ($). Updates affect the live signup page immediately.`;
+        container.appendChild(infoText);
+    }
+
+    function setUnsavedChanges(status) {
+        hasUnsavedChanges = status;
+        const bar = document.getElementById('action-bar');
+        if (status) {
+            bar.classList.remove('translate-y-full');
+        } else {
+            bar.classList.add('translate-y-full');
+        }
+    }
+
+    function resetChanges() {
+        renderForm(currentTab);
+        setUnsavedChanges(false);
+    }
+
+    // --- UTILS ---
+    function showToast(msg, type='info') {
+        Toastify({
+            text: msg,
+            duration: 3000,
+            gravity: "top",
+            position: "right",
+            style: {
+                background: type === 'error' ? "var(--destructive)" : "var(--accent)",
+                color: "var(--bg)",
+                borderRadius: "var(--radius)",
+                boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)"
+            }
+        }).showToast();
+    }
+
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+</script>
+{% endblock %}

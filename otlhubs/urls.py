@@ -24,15 +24,21 @@ from core.views import (
     BuyerDashboardView, SellerDashboardView, SellerSettingsView, SellerPropertyView,
     RealtorDashboardView, RealtorSettingsView, RealtorClientsView, PartnerDashboardView, PartnerSettingsView,
     PartnersView, BuyerPropertySearchView, BuyerFavoritesView, BuyerSettingsView,
-    TermsOfServiceView, PrivacyPolicyView, PropertyDetailView, PublicPropertySearchView
+    TermsOfServiceView, PrivacyPolicyView, PropertyDetailView, PublicPropertySearchView,
+    CustomAdminPricingView
 )
 
+from django.views.generic import RedirectView
 from django.contrib.auth.views import LogoutView
 
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("api/v1/", include("api.v1.urls")),
     
+    # Custom Admin
+    path("custom-admin/pricing", CustomAdminPricingView.as_view(), name="custom_admin_pricing"),
+    path("custom-admin/", RedirectView.as_view(pattern_name='custom_admin_pricing', permanent=False)),
+
     # Core pages
     path("", IndexView.as_view(), name="index"),
     path("index", IndexView.as_view(), name="index_html"), # For frontend template compatibility

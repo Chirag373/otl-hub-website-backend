@@ -1,6 +1,8 @@
 from django.contrib.auth.mixins import UserPassesTestMixin
 from django.shortcuts import redirect
 from core.models import User
+from django.contrib.auth import logout
+from django.urls import reverse
 
 class RoleRequiredMixin(UserPassesTestMixin):
     allowed_roles = []
@@ -32,3 +34,14 @@ class RealtorRequiredMixin(RoleRequiredMixin):
 
 class PartnerRequiredMixin(RoleRequiredMixin):
     allowed_roles = [User.UserRole.PARTNER]
+
+class AdminRequiredMixin(UserPassesTestMixin):
+    def test_func(self):
+        return self.request.user.is_authenticated and (self.request.user.is_staff or self.request.user.is_superuser)
+
+    def handle_no_permission(self):
+        if self.request.user.is_authenticated:
+            # Force logout if they are not admin but trying to access admin page
+            logout(self.request)
+            return redirect(f"{reverse('login')}?next={self.request.path}")
+        return super().handle_no_permission()

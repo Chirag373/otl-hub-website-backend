@@ -1,16 +1,17 @@
 from rest_framework.generics import RetrieveUpdateAPIView, DestroyAPIView, ListAPIView
 from rest_framework.views import APIView
 from django.db.models import Q
-from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.permissions import IsAuthenticated, AllowAny, IsAdminUser
 from api.v1.serializer import (
     BuyerProfileSerializer,
     RealtorProfileSerializer,
     SellerProfileSerializer,
     PropertySearchSerializer,
     PartnerProfileSerializer,
+    PricingPlanSerializer,
 )
 from core.permissions import IsBuyer, IsRealtor, IsSeller, IsPartner
-from api.models import BuyerProfile, RealtorProfile, SellerProfile, PartnerProfile, PropertyImage
+from api.models import BuyerProfile, RealtorProfile, SellerProfile, PartnerProfile, PropertyImage, PricingPlan
 from rest_framework.response import Response
 from rest_framework import status
 from django.shortcuts import get_object_or_404
@@ -272,6 +273,26 @@ class UpdateNotificationSettingsView(APIView):
     def post(self, request):
 
         return Response({"message": "Notification settings updated"}, status=status.HTTP_200_OK)
+
+
+class PricingPlanListView(ListAPIView):
+    """
+    Public View to list all pricing plans
+    """
+    permission_classes = [AllowAny]
+    serializer_class = PricingPlanSerializer
+    queryset = PricingPlan.objects.all()
+
+
+class PricingPlanUpdateView(RetrieveUpdateAPIView):
+    """
+    Admin View to update a pricing plan
+    """
+    permission_classes = [IsAuthenticated, IsAdminUser]
+    serializer_class = PricingPlanSerializer
+    queryset = PricingPlan.objects.all()
+    lookup_field = 'plan_type'
+
 
 
 
