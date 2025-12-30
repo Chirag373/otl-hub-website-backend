@@ -90,10 +90,12 @@ class SellerPropertyView(SellerRequiredMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         if hasattr(self.request.user, 'seller_profile'):
-            context['seller_profile'] = self.request.user.seller_profile
+            profile = self.request.user.seller_profile
+            context['seller_profile'] = profile
+            context['total_views'] = profile.views.count() if hasattr(profile, 'views') else 0
             
             try:
-                serializer = SellerProfileSerializer(self.request.user.seller_profile)
+                serializer = SellerProfileSerializer(profile)
                 context['seller_profile_json'] = json.dumps(serializer.data, cls=DjangoJSONEncoder)
             except Exception as e:
                 print(f"Error serializing seller profile: {e}")

@@ -265,7 +265,7 @@
     </div>
 </div>
 
-<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
     <div class="bg-[var(--card)] rounded-lg border border-[var(--border)] p-6">
         <div class="flex items-center space-x-3">
             <div class="p-2 bg-green-100 rounded-lg">
@@ -285,19 +285,7 @@
             </div>
             <div>
                 <p class="text-sm text-[var(--muted-foreground)]">Total Views</p>
-                <p id="stat-views" class="text-2xl font-bold text-[var(--foreground)]">234</p>
-            </div>
-        </div>
-    </div>
-
-    <div class="bg-[var(--card)] rounded-lg border border-[var(--border)] p-6">
-        <div class="flex items-center space-x-3">
-            <div class="p-2 bg-blue-100 rounded-lg">
-                <i data-lucide="message-square" class="h-5 w-5 text-blue-600"></i>
-            </div>
-            <div>
-                <p class="text-sm text-[var(--muted-foreground)]">Offers Received</p>
-                <p id="stat-offers" class="text-2xl font-bold text-[var(--foreground)]">3</p>
+                <p id="stat-views" class="text-2xl font-bold text-[var(--foreground)]">{{ total_views }}</p>
             </div>
         </div>
     </div>
