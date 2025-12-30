@@ -171,3 +171,16 @@ class PricingPlan(models.Model):
 
     def __str__(self):
         return f"{self.get_plan_type_display()} Pricing"
+
+
+class PropertyView(models.Model):
+    seller_profile = models.ForeignKey(SellerProfile, on_delete=models.CASCADE, related_name='views')
+    ip_address = models.GenericIPAddressField()
+    timestamp = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = "property_views"
+        unique_together = ('seller_profile', 'ip_address')
+        indexes = [
+            models.Index(fields=["seller_profile", "ip_address"]),
+        ]

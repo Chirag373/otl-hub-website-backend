@@ -4,6 +4,16 @@ import json
 from django.core.serializers.json import DjangoJSONEncoder
 from core.mixins import BuyerRequiredMixin, SellerRequiredMixin, RealtorRequiredMixin, PartnerRequiredMixin, AdminRequiredMixin
 from api.v1.serializer import SellerProfileSerializer
+from api.models import PropertyView, SellerProfile
+from django.utils import timezone
+
+def get_client_ip(request):
+    x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+    if x_forwarded_for:
+        ip = x_forwarded_for.split(',')[0]
+    else:
+        ip = request.META.get('REMOTE_ADDR')
+    return ip
 
 class IndexView(TemplateView):
     template_name = "index.html"
@@ -29,6 +39,23 @@ class PublicPropertySearchView(TemplateView):
 class PropertyDetailView(TemplateView):
     template_name = "property-detail.html"
 
+    def get(self, request, *args, **kwargs):
+        property_id = request.GET.get('id')
+        if property_id:
+            try:
+                seller_profile = SellerProfile.objects.get(pk=property_id)
+                ip_address = get_client_ip(request)
+                
+                # Record unique view
+                PropertyView.objects.get_or_create(
+                    seller_profile=seller_profile,
+                    ip_address=ip_address
+                )
+            except Exception as e:
+                pass 
+                
+        return super().get(request, *args, **kwargs)
+
 class BuyerFavoritesView(BuyerRequiredMixin, TemplateView):
     template_name = "buyer-favorites.html"
 
@@ -38,6 +65,23 @@ class BuyerSettingsView(BuyerRequiredMixin, TemplateView):
 class SellerDashboardView(SellerRequiredMixin, TemplateView):
     template_name = "seller-dashboard.html"
     extra_context = {'active_page': 'dashboard'}
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        if hasattr(self.request.user, 'seller_profile'):
+            profile = self.request.user.seller_profile
+            
+            # Total Views
+            context['total_views'] = profile.views.count() if hasattr(profile, 'views') else 0
+            
+            # Avg Days on Market
+            if profile.has_active_listing:
+                days = (timezone.now() - profile.created_at).days
+                context['avg_days_on_market'] = max(0, days)
+            else:
+                context['avg_days_on_market'] = 0
+                
+        return context
 
 class SellerPropertyView(SellerRequiredMixin, TemplateView):
     template_name = "seller-property.html"
