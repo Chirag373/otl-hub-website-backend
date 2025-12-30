@@ -50,15 +50,14 @@
 
         <div class="flex items-center justify-between border-t border-[var(--border)] pt-6">
             <div class="space-y-0.5">
-                <label class="text-base font-medium text-[var(--foreground)]">Marketing Emails</label>
-                <p class="text-sm text-[var(--muted-foreground)]">Receive news, updates, and promotional offers</p>
+                <label class="text-base font-medium text-[var(--foreground)]">Questions?</label>
+                <p class="text-sm text-[var(--muted-foreground)]">Have a question or need assistance? Contact our
+                    support team.</p>
             </div>
-            <div class="relative inline-block w-12 mr-2 align-middle select-none transition duration-200 ease-in">
-                <input type="checkbox" name="toggle" id="marketing-emails"
-                    class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer border-[var(--input)] checked:right-0 checked:border-[var(--accent)]" />
-                <label for="marketing-emails"
-                    class="toggle-label block overflow-hidden h-6 rounded-full bg-[var(--input)] cursor-pointer"></label>
-            </div>
+            <a href="mailto:support@otlhub.com"
+                class="btn btn-outline border-[var(--border)] text-[var(--foreground)] hover:bg-[var(--accent)] hover:text-[var(--bg)] hover:border-[var(--accent)] transition-colors">
+                <i data-lucide="mail" class="w-4 h-4 mr-2"></i> Send us an email
+            </a>
         </div>
 
 
