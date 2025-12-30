@@ -2,7 +2,8 @@
     <div class="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="navbar h-16 p-0">
             <div class="navbar-start">
-                <a href="{% url 'index' %}" class="font-heading text-xl sm:text-2xl text-[#f3f4f6] no-underline hover:text-[#f3f4f6]">
+                <a href="{% url 'index' %}"
+                    class="font-heading text-xl sm:text-2xl text-[#f3f4f6] no-underline hover:text-[#f3f4f6]">
                     OTL Platform
                 </a>
             </div>
@@ -15,6 +16,41 @@
                 <a class="btn btn-ghost font-heading text-base text-[#c0c0c0] hover:text-[#f3f4f6] hover:bg-transparent transition-colors"
                     href="{% url 'partners' %}">Partners</a>
 
+                {% if user.is_authenticated %}
+                <div class="dropdown dropdown-end">
+                    <div tabindex="0" role="button" class="btn btn-ghost btn-circle avatar placeholder">
+                        <div class="bg-[var(--accent)] text-neutral-content rounded-full w-10">
+                            <span class="text-xs text-[var(--bg)] font-bold">
+                                {% if user.first_name and user.last_name %}
+                                {{ user.first_name|first|upper }}{{ user.last_name|first|upper }}
+                                {% else %}
+                                <i data-lucide="user" class="w-5 h-5 text-[var(--bg)]"></i>
+                                {% endif %}
+                            </span>
+                        </div>
+                    </div>
+                    <ul tabindex="0"
+                        class="mt-3 z-[1] p-2 shadow menu menu-sm dropdown-content bg-[var(--card)] border border-[var(--border)] rounded-box w-52 text-[var(--foreground)]">
+                        <li>
+                            {% if user.is_staff or user.is_superuser %}
+                            <a href="{% url 'custom_admin_pricing' %}">Dashboard</a>
+                            {% elif user.role == 'BUYER' %}
+                            <a href="{% url 'buyer_dashboard' %}">Dashboard</a>
+                            {% elif user.role == 'SELLER' %}
+                            <a href="{% url 'seller_dashboard' %}">Dashboard</a>
+                            {% elif user.role == 'REALTOR' %}
+                            <a href="{% url 'realtor_dashboard' %}">Dashboard</a>
+                            {% elif user.role == 'PARTNER' %}
+                            <a href="{% url 'partner_dashboard' %}">Dashboard</a>
+                            {% else %}
+                            <a href="#">Dashboard</a>
+                            {% endif %}
+                        </li>
+                        <li><a href="{% url 'logout' %}"
+                                class="text-red-400 hover:text-red-300 hover:bg-red-400/10">Logout</a></li>
+                    </ul>
+                </div>
+                {% else %}
                 <a href="{% url 'signup' %}"
                     class="btn btn-outline border-[#4a4a4a] text-[#c0c0c0] hover:bg-[#464646] hover:text-[#f3f4f6] font-heading font-normal h-auto py-2 min-h-0">
                     Sign Up
@@ -25,6 +61,7 @@
                         Login
                     </button>
                 </a>
+                {% endif %}
             </div>
 
             <div class="navbar-end md:hidden">
@@ -53,6 +90,30 @@
                 <a href="{% url 'partners' %}"
                     class="btn btn-ghost justify-start font-heading text-base text-[#c0c0c0] hover:text-[#f3f4f6] hover:bg-[#464646]">Partners</a>
                 <div class="divider my-2 border-[#4a4a4a]"></div>
+
+                {% if user.is_authenticated %}
+                {% if user.is_staff or user.is_superuser %}
+                <a href="{% url 'custom_admin_pricing' %}"
+                    class="btn btn-ghost justify-start font-heading text-base text-[#f3f4f6] hover:bg-[#464646]">Dashboard</a>
+                {% elif user.role == 'BUYER' %}
+                <a href="{% url 'buyer_dashboard' %}"
+                    class="btn btn-ghost justify-start font-heading text-base text-[#f3f4f6] hover:bg-[#464646]">Dashboard</a>
+                {% elif user.role == 'SELLER' %}
+                <a href="{% url 'seller_dashboard' %}"
+                    class="btn btn-ghost justify-start font-heading text-base text-[#f3f4f6] hover:bg-[#464646]">Dashboard</a>
+                {% elif user.role == 'REALTOR' %}
+                <a href="{% url 'realtor_dashboard' %}"
+                    class="btn btn-ghost justify-start font-heading text-base text-[#f3f4f6] hover:bg-[#464646]">Dashboard</a>
+                {% elif user.role == 'PARTNER' %}
+                <a href="{% url 'partner_dashboard' %}"
+                    class="btn btn-ghost justify-start font-heading text-base text-[#f3f4f6] hover:bg-[#464646]">Dashboard</a>
+                {% endif %}
+
+                <a href="{% url 'logout' %}"
+                    class="btn justify-start font-heading text-base bg-transparent text-red-400 hover:text-red-300 hover:bg-red-400/10 border-none shadow-none mt-2">
+                    Logout
+                </a>
+                {% else %}
                 <a href="{% url 'signup' %}"
                     class="btn btn-ghost justify-start font-heading text-base text-[#c0c0c0] hover:text-[#f3f4f6] hover:bg-[#464646]">Sign
                     Up</a>
@@ -60,6 +121,7 @@
                     class="btn justify-start font-heading text-base bg-transparent text-[#d4af37] hover:text-[#e0c066] hover:bg-[#464646] font-semibold border-none shadow-none">
                     Login
                 </a>
+                {% endif %}
             </div>
         </div>
     </div>

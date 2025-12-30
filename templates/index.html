@@ -376,7 +376,13 @@
 
         return `
             <article class="card bg-[var(--card)] overflow-hidden border border-[var(--border)] shadow-lg rounded-lg flex flex-col h-full">
-                <figure class="relative overflow-hidden mx-3 mt-3 rounded-lg group aspect-[3/2]">
+                <div class="px-4 pt-4 pb-0.5 ${p.leaseback_required ? '' : 'invisible'}">
+                     <span class="badge bg-green-600 text-white border-none font-bold text-[10px] px-2 py-0.5 rounded shadow-sm h-auto flex w-fit items-center gap-1 uppercase tracking-wider">
+                        Leaseback Required
+                    </span>
+                </div>
+
+                <figure class="relative overflow-hidden mx-3 mt-1 rounded-lg group aspect-[3/2]">
                     <div id="carousel-${p.id}" class="carousel carousel-center w-full h-full p-0 space-x-0 bg-gray-800 rounded-lg">
                         ${imageHtml}
                     </div>
@@ -388,7 +394,7 @@
                     </div>
                     ` : ''}
 
-                    <div class="absolute top-4 left-4 pointer-events-none">
+                    <div class="absolute top-4 left-4 pointer-events-none z-10">
                         <span class="badge bg-white/95 backdrop-blur-md text-neutral-900 border-none font-bold text-xs px-4 py-3 rounded-full shadow-lg h-auto">
                             For Sale
                         </span>

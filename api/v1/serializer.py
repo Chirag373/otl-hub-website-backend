@@ -665,7 +665,8 @@ class PropertySearchSerializer(serializers.ModelSerializer):
         fields = [
             'id', 'title', 'location', 'price', 
             'bedrooms', 'bathrooms', 'sqft', 
-            'image', 'images', 'type', 'features', 'dateAdded', 'description'
+            'image', 'images', 'type', 'features', 'dateAdded', 'description',
+            'leaseback_required'
         ]
 
     def get_title(self, obj):
