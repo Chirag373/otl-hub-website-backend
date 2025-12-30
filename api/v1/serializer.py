@@ -228,11 +228,21 @@ class SignupSerializer(serializers.ModelSerializer):
 
             )
         elif role == User.UserRole.SELLER:
+            city = ""
+            state = ""
+            if property_location:
+                parts = property_location.split(',')
+                if len(parts) >= 1:
+                    city = parts[0].strip()
+                if len(parts) >= 2:
+                    state = parts[1].strip()
+            
             SellerProfile.objects.create(
                 user=user,
                 property_type=property_type,
                 estimated_value=estimated_value,
-                property_location=property_location,
+                city=city,
+                state=state,
             )
         elif role == User.UserRole.PARTNER:
             PartnerProfile.objects.create(
