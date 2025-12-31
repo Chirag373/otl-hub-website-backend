@@ -190,7 +190,7 @@
                     <h3 class="font-heading text-xl font-bold text-[var(--foreground)] mb-4">Interested?</h3>
                     <p class="text-[var(--muted-foreground)] text-sm mb-6">Contact the seller directly to schedule a
                         viewing or ask questions.</p>
-                    <button
+                    <button id="btn-contact-seller"
                         class="btn btn-lg w-full bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-white border-none">
                         Contact Seller
                     </button>
@@ -267,12 +267,260 @@
         </div>
     </div>
 </div>
+<!-- Access Pass Modal -->
+<div id="access-modal"
+    class="fixed inset-0 bg-black/60 hidden z-50 flex items-center justify-center p-4 backdrop-blur-sm">
+    <div class="bg-[var(--card)] rounded-lg shadow-2xl max-w-md w-full border border-[var(--border)] overflow-hidden scale-95 opacity-0 transition-all duration-200"
+        id="access-modal-content">
+        <div class="p-6 relative">
+            <button onclick="closeAccessModal()"
+                class="absolute top-4 right-4 text-[var(--muted-foreground)] hover:text-[var(--foreground)] transition-colors">
+                <i data-lucide="x" class="w-6 h-6"></i>
+            </button>
+
+            <div class="flex flex-col items-center text-center mb-6">
+                <div
+                    class="w-16 h-16 bg-[var(--accent)]/10 rounded-full flex items-center justify-center mb-4 text-[var(--accent)]">
+                    <i data-lucide="lock" class="w-8 h-8"></i>
+                </div>
+                <h3 class="text-2xl font-bold text-[var(--foreground)]">Unlock Property Access</h3>
+                <p class="text-[var(--muted-foreground)] mt-2">Get full access to property details, seller contacts, and
+                    direct messaging.</p>
+            </div>
+
+            <div class="bg-[var(--accent)]/5 border border-[var(--accent)]/20 p-5 rounded-xl mb-6">
+                <div class="flex justify-between items-end mb-3">
+                    <span class="font-bold text-[var(--accent)] text-3xl">$650</span>
+                    <span class="text-sm font-medium text-[var(--muted-foreground)]">/ 30 Days</span>
+                </div>
+                <ul class="text-sm text-[var(--muted-foreground)] space-y-2.5">
+                    <li class="flex items-start gap-2">
+                        <i data-lucide="check-circle" class="w-4 h-4 text-[var(--accent)] mt-0.5 shrink-0"></i>
+                        <span>Reveal hidden property addresses</span>
+                    </li>
+                    <li class="flex items-start gap-2">
+                        <i data-lucide="check-circle" class="w-4 h-4 text-[var(--accent)] mt-0.5 shrink-0"></i>
+                        <span>Unlock seller phone numbers & emails</span>
+                    </li>
+                    <li class="flex items-start gap-2">
+                        <i data-lucide="check-circle" class="w-4 h-4 text-[var(--accent)] mt-0.5 shrink-0"></i>
+                        <span>Direct offer submission tools</span>
+                    </li>
+                </ul>
+            </div>
+
+            <button id="btn-buy-access-pass-modal" onclick="purchaseAccessPass()"
+                class="w-full py-3.5 bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-white font-bold rounded-lg transition-all transform active:scale-[0.98] shadow-lg shadow-[var(--accent)]/20">
+                Purchase Access Pass
+            </button>
+            <p class="text-xs text-center text-[var(--muted-foreground)] mt-4">Secure payment via Stripe. Cancel
+                anytime.</p>
+        </div>
+    </div>
+</div>
+
+<!-- Seller Contact Modal -->
+<div id="seller-modal"
+    class="fixed inset-0 bg-black/60 hidden z-50 flex items-center justify-center p-4 backdrop-blur-sm">
+    <div class="bg-[var(--card)] rounded-xl shadow-2xl max-w-md w-full border border-[var(--border)] overflow-hidden scale-95 opacity-0 transition-all duration-200"
+        id="seller-modal-content">
+        <div class="p-6 relative">
+            <button onclick="closeSellerModal()"
+                class="absolute top-4 right-4 text-[var(--muted-foreground)] hover:text-[var(--foreground)] transition-colors">
+                <i data-lucide="x" class="w-6 h-6"></i>
+            </button>
+
+            <div class="flex items-center gap-4 mb-6">
+                <div
+                    class="w-12 h-12 bg-[var(--accent)]/10 rounded-full flex items-center justify-center text-[var(--accent)]">
+                    <i data-lucide="user" class="w-6 h-6"></i>
+                </div>
+                <div>
+                    <h3 class="text-xl font-bold text-[var(--foreground)]">Seller Information</h3>
+                    <p class="text-sm text-[var(--muted-foreground)]">Contact the seller directly</p>
+                </div>
+            </div>
+
+            <div class="space-y-4">
+                <div class="p-4 bg-[var(--muted)]/20 rounded-lg border border-[var(--border)]">
+                    <span
+                        class="text-xs font-semibold text-[var(--muted-foreground)] uppercase tracking-wider">Name</span>
+                    <p id="seller-name" class="text-lg font-medium text-[var(--foreground)] mt-1">--</p>
+                </div>
+
+                <div class="grid grid-cols-1 gap-4">
+                    <a id="seller-email-link" href="#"
+                        class="flex items-center gap-3 p-4 bg-[var(--card)] hover:bg-[var(--accent)]/5 border border-[var(--border)] hover:border-[var(--accent)] rounded-lg transition-all group">
+                        <div
+                            class="w-10 h-10 rounded-full bg-blue-100/10 text-blue-500 flex items-center justify-center group-hover:scale-110 transition-transform">
+                            <i data-lucide="mail" class="w-5 h-5"></i>
+                        </div>
+                        <div class="overflow-hidden">
+                            <span class="text-xs font-semibold text-[var(--muted-foreground)] block">Email
+                                Address</span>
+                            <span id="seller-email"
+                                class="text-[var(--foreground)] font-medium truncate block">--</span>
+                        </div>
+                    </a>
+
+                    <a id="seller-phone-link" href="#"
+                        class="flex items-center gap-3 p-4 bg-[var(--card)] hover:bg-[var(--accent)]/5 border border-[var(--border)] hover:border-[var(--accent)] rounded-lg transition-all group">
+                        <div
+                            class="w-10 h-10 rounded-full bg-green-100/10 text-green-500 flex items-center justify-center group-hover:scale-110 transition-transform">
+                            <i data-lucide="phone" class="w-5 h-5"></i>
+                        </div>
+                        <div>
+                            <span class="text-xs font-semibold text-[var(--muted-foreground)] block">Phone Number</span>
+                            <span id="seller-phone" class="text-[var(--foreground)] font-medium">--</span>
+                        </div>
+                    </a>
+                </div>
+            </div>
+
+            <div class="mt-6 text-center">
+                <p class="text-xs text-[var(--muted-foreground)]">Please mention that you found this property on OTL
+                    Platform.</p>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}
 
 {% block extra_scripts %}
 <!-- Swiper JS -->
 <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 <script>
+    // --- DOM ELEMENTS ---
+    const dom = {
+        accessModal: document.getElementById('access-modal'),
+        accessModalContent: document.getElementById('access-modal-content'),
+
+        // Seller Modal
+        sellerModal: document.getElementById('seller-modal'),
+        sellerModalContent: document.getElementById('seller-modal-content'),
+        sellerName: document.getElementById('seller-name'),
+        sellerEmail: document.getElementById('seller-email'),
+        sellerPhone: document.getElementById('seller-phone'),
+        sellerEmailLink: document.getElementById('seller-email-link'),
+        sellerPhoneLink: document.getElementById('seller-phone-link')
+    };
+
+    // --- UTILS ---
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    // --- MODAL LOGIC ---
+    window.openAccessModal = () => {
+        if (dom.accessModal) {
+            dom.accessModal.classList.remove('hidden');
+            // Trigger animation
+            setTimeout(() => {
+                dom.accessModalContent.classList.remove('scale-95', 'opacity-0');
+                dom.accessModalContent.classList.add('scale-100', 'opacity-100');
+            }, 10);
+        }
+    };
+
+    window.closeAccessModal = () => {
+        if (dom.accessModal) {
+            dom.accessModalContent.classList.remove('scale-100', 'opacity-100');
+            dom.accessModalContent.classList.add('scale-95', 'opacity-0');
+            setTimeout(() => {
+                dom.accessModal.classList.add('hidden');
+            }, 200);
+        }
+    };
+
+    // Seller Modal Logic
+    window.openSellerModal = (p) => {
+        if (!p || !dom.sellerModal) return;
+
+        // Populate Data
+        if (p.seller_info) {
+            dom.sellerName.textContent = `${p.seller_info.first_name} ${p.seller_info.last_name}`;
+            dom.sellerEmail.textContent = p.seller_info.email;
+            dom.sellerPhone.textContent = p.seller_info.phone;
+
+            dom.sellerEmailLink.href = `mailto:${p.seller_info.email}`;
+            dom.sellerPhoneLink.href = `tel:${p.seller_info.phone}`;
+        } else {
+            dom.sellerName.textContent = "Seller Info Unavailable";
+            dom.sellerEmail.textContent = "--";
+            dom.sellerPhone.textContent = "--";
+        }
+
+        dom.sellerModal.classList.remove('hidden');
+        setTimeout(() => {
+            dom.sellerModalContent.classList.remove('scale-95', 'opacity-0');
+            dom.sellerModalContent.classList.add('scale-100', 'opacity-100');
+        }, 10);
+    };
+
+    window.closeSellerModal = () => {
+        if (dom.sellerModal) {
+            dom.sellerModalContent.classList.remove('scale-100', 'opacity-100');
+            dom.sellerModalContent.classList.add('scale-95', 'opacity-0');
+            setTimeout(() => {
+                dom.sellerModal.classList.add('hidden');
+            }, 200);
+        }
+    };
+
+    // Close modal on outside click
+    window.addEventListener('click', (e) => {
+        if (e.target === dom.accessModal) closeAccessModal();
+        if (e.target === dom.sellerModal) closeSellerModal();
+    });
+
+    async function purchaseAccessPass() {
+        const btn = document.getElementById('btn-buy-access-pass-modal');
+        if (btn) {
+            btn.disabled = true;
+            btn.innerHTML = `<span class="loading loading-spinner loading-xs text-white"></span> Redirecting...`;
+        }
+
+        try {
+            const response = await fetch('/api/v1/payment/create-access-pass-session/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken')
+                }
+            });
+
+            const data = await response.json();
+            if (response.ok && data.url) {
+                window.location.href = data.url;
+            } else {
+                alert('Failed to initiate checkout: ' + (data.error || 'Unknown error'));
+                if (btn) {
+                    btn.disabled = false;
+                    btn.innerHTML = "Purchase Access Pass";
+                }
+            }
+        } catch (e) {
+            console.error(e);
+            alert('Error connecting to server');
+            if (btn) {
+                btn.disabled = false;
+                btn.innerHTML = "Purchase Access Pass";
+            }
+        }
+    }
+
+
     async function loadPropertyDetails() {
         // Parse ID from URL query params
         const urlParams = new URLSearchParams(window.location.search);
@@ -441,6 +689,25 @@
 
         // Re-init icons
         if (window.lucide) lucide.createIcons();
+
+        // Contact Button Logic
+        const contactBtn = document.getElementById('btn-contact-seller');
+        if (contactBtn) {
+            if (p.is_locked) {
+                contactBtn.innerHTML = '<i data-lucide="lock" class="w-5 h-5 mr-2"></i> Unlock Info';
+                contactBtn.classList.remove('bg-[var(--accent)]', 'hover:bg-[var(--accent-hover)]', 'text-white');
+                contactBtn.classList.add('bg-[var(--muted)]', 'text-[var(--muted-foreground)]', 'cursor-not-allowed');
+                // Use the new modal
+                contactBtn.onclick = () => window.openAccessModal();
+            } else {
+                contactBtn.textContent = 'Contact Seller';
+                contactBtn.onclick = () => window.openSellerModal(p);
+                // Restore styles if needed
+                contactBtn.classList.add('bg-[var(--accent)]', 'hover:bg-[var(--accent-hover)]', 'text-white');
+                contactBtn.classList.remove('bg-[var(--muted)]', 'text-[var(--muted-foreground)]', 'cursor-not-allowed');
+            }
+            if (window.lucide) lucide.createIcons();
+        }
 
         // --- MAP LOGIC ---
         // Construct address for geocoding

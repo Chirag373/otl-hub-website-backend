@@ -129,6 +129,118 @@
 
 <div id="property-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
 </div>
+<!-- Access Pass Modal -->
+<div id="access-modal"
+    class="fixed inset-0 bg-black/60 hidden z-50 flex items-center justify-center p-4 backdrop-blur-sm">
+    <div class="bg-[var(--card)] rounded-xl shadow-2xl max-w-md w-full border border-[var(--border)] overflow-hidden scale-95 opacity-0 transition-all duration-200"
+        id="access-modal-content">
+        <div class="p-6 relative">
+            <button onclick="closeAccessModal()"
+                class="absolute top-4 right-4 text-[var(--muted-foreground)] hover:text-[var(--foreground)] transition-colors">
+                <i data-lucide="x" class="w-6 h-6"></i>
+            </button>
+
+            <div class="flex flex-col items-center text-center mb-6">
+                <div
+                    class="w-16 h-16 bg-[var(--accent)]/10 rounded-full flex items-center justify-center mb-4 text-[var(--accent)]">
+                    <i data-lucide="lock" class="w-8 h-8"></i>
+                </div>
+                <h3 class="text-2xl font-bold text-[var(--foreground)]">Unlock Property Access</h3>
+                <p class="text-[var(--muted-foreground)] mt-2">Get full access to property details, seller contacts, and
+                    direct messaging.</p>
+            </div>
+
+            <div class="bg-[var(--accent)]/5 border border-[var(--accent)]/20 p-5 rounded-xl mb-6">
+                <div class="flex justify-between items-end mb-3">
+                    <span class="font-bold text-[var(--accent)] text-3xl">$650</span>
+                    <span class="text-sm font-medium text-[var(--muted-foreground)]">/ 30 Days</span>
+                </div>
+                <ul class="text-sm text-[var(--muted-foreground)] space-y-2.5">
+                    <li class="flex items-start gap-2">
+                        <i data-lucide="check-circle" class="w-4 h-4 text-[var(--accent)] mt-0.5 shrink-0"></i>
+                        <span>Reveal hidden property addresses</span>
+                    </li>
+                    <li class="flex items-start gap-2">
+                        <i data-lucide="check-circle" class="w-4 h-4 text-[var(--accent)] mt-0.5 shrink-0"></i>
+                        <span>Unlock seller phone numbers & emails</span>
+                    </li>
+                    <li class="flex items-start gap-2">
+                        <i data-lucide="check-circle" class="w-4 h-4 text-[var(--accent)] mt-0.5 shrink-0"></i>
+                        <span>Direct offer submission tools</span>
+                    </li>
+                </ul>
+            </div>
+
+            <button id="btn-buy-access-pass-modal" onclick="purchaseAccessPass()"
+                class="w-full py-3.5 bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-white font-bold rounded-lg transition-all transform active:scale-[0.98] shadow-lg shadow-[var(--accent)]/20">
+                Purchase Access Pass
+            </button>
+            <p class="text-xs text-center text-[var(--muted-foreground)] mt-4">Secure payment via Stripe. Cancel
+                anytime.</p>
+        </div>
+    </div>
+</div>
+
+<!-- Seller Contact Modal -->
+<div id="seller-modal"
+    class="fixed inset-0 bg-black/60 hidden z-50 flex items-center justify-center p-4 backdrop-blur-sm">
+    <div class="bg-[var(--card)] rounded-xl shadow-2xl max-w-md w-full border border-[var(--border)] overflow-hidden scale-95 opacity-0 transition-all duration-200"
+        id="seller-modal-content">
+        <div class="p-6 relative">
+            <button onclick="closeSellerModal()"
+                class="absolute top-4 right-4 text-[var(--muted-foreground)] hover:text-[var(--foreground)] transition-colors">
+                <i data-lucide="x" class="w-6 h-6"></i>
+            </button>
+
+            <div class="flex items-center gap-4 mb-6">
+                <div
+                    class="w-12 h-12 bg-[var(--accent)]/10 rounded-full flex items-center justify-center text-[var(--accent)]">
+                    <i data-lucide="user" class="w-6 h-6"></i>
+                </div>
+                <div>
+                    <h3 class="text-xl font-bold text-[var(--foreground)]">Seller Information</h3>
+                    <p class="text-sm text-[var(--muted-foreground)]">Contact the seller directly</p>
+                </div>
+            </div>
+
+            <div class="space-y-4">
+                <div class="p-4 bg-[var(--muted)]/20 rounded-lg border border-[var(--border)]">
+                    <span
+                        class="text-xs font-semibold text-[var(--muted-foreground)] uppercase tracking-wider">Name</span>
+                    <p id="seller-name" class="text-lg font-medium text-[var(--foreground)] mt-1">--</p>
+                </div>
+
+                <div class="grid grid-cols-1 gap-4">
+                    <a id="seller-email-link" href="#"
+                        class="flex items-center gap-3 p-4 bg-[var(--card)] hover:bg-[var(--accent)]/5 border border-[var(--border)] hover:border-[var(--accent)] rounded-lg transition-all group">
+                        <div
+                            class="w-10 h-10 rounded-full bg-blue-100/10 text-blue-500 flex items-center justify-center group-hover:scale-110 transition-transform">
+                            <i data-lucide="mail" class="w-5 h-5"></i>
+                        </div>
+                        <div class="overflow-hidden">
+                            <span class="text-xs font-semibold text-[var(--muted-foreground)] block">Email
+                                Address</span>
+                            <span id="seller-email"
+                                class="text-[var(--foreground)] font-medium truncate block">--</span>
+                        </div>
+                    </a>
+
+                    <a id="seller-phone-link" href="#"
+                        class="flex items-center gap-3 p-4 bg-[var(--card)] hover:bg-[var(--accent)]/5 border border-[var(--border)] hover:border-[var(--accent)] rounded-lg transition-all group">
+                        <div
+                            class="w-10 h-10 rounded-full bg-green-100/10 text-green-500 flex items-center justify-center group-hover:scale-110 transition-transform">
+                            <i data-lucide="phone" class="w-5 h-5"></i>
+                        </div>
+                        <div>
+                            <span class="text-xs font-semibold text-[var(--muted-foreground)] block">Phone Number</span>
+                            <span id="seller-phone" class="text-[var(--foreground)] font-medium">--</span>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}
 
 {% block scripts %}
@@ -245,25 +357,34 @@
         btnSearch: document.getElementById('btn-search'),
         btnToggleFilters: document.getElementById('btn-toggle-filters'),
         btnClearFilters: document.getElementById('btn-clear-filters'),
-        advancedFilters: document.getElementById('advanced-filters')
+        advancedFilters: document.getElementById('advanced-filters'),
+
+        // Modal
+        accessModal: document.getElementById('access-modal'),
+        accessModalContent: document.getElementById('access-modal-content'),
+
+        // Seller Modal
+        sellerModal: document.getElementById('seller-modal'),
+        sellerModalContent: document.getElementById('seller-modal-content'),
+        sellerName: document.getElementById('seller-name'),
+        sellerEmail: document.getElementById('seller-email'),
+        sellerPhone: document.getElementById('seller-phone'),
+        sellerEmailLink: document.getElementById('seller-email-link'),
+        sellerPhoneLink: document.getElementById('seller-phone-link')
     };
 
     // --- INITIALIZATION ---
     function init() {
         if (window.lucide) lucide.createIcons();
+        window.propertiesById = {}; // Init storage
 
         // Parse URL params
         const urlParams = new URLSearchParams(window.location.search);
 
         // Map params to UI
-        // Map params to UI (State/City mapping from URL is complex due to async load, skipping for now as per simple integration request)
-        // If needed, we'd need to wait for states to load, set state, wait for cities, set city.
-        // For now, we omit pre-filling location from URL to keep it simple and robust.
-
         if (dom.inputType && urlParams.has('type')) dom.inputType.value = urlParams.get('type');
         if (dom.inputBeds && urlParams.has('beds')) dom.inputBeds.value = urlParams.get('beds');
         if (dom.inputBaths && urlParams.has('baths')) dom.inputBaths.value = urlParams.get('baths');
-        /* Price mapping if necessary, though URL usually sends min/max or nothing if complex */
 
         // Fetch favorites first, then properties via updateFilters to sync state
         fetchFavoriteIds().finally(() => {
@@ -288,6 +409,106 @@
             }
         }
         return cookieValue;
+    }
+
+    // --- MODAL LOGIC ---
+    window.openAccessModal = () => {
+        if (dom.accessModal) {
+            dom.accessModal.classList.remove('hidden');
+            // Trigger animation
+            setTimeout(() => {
+                dom.accessModalContent.classList.remove('scale-95', 'opacity-0');
+                dom.accessModalContent.classList.add('scale-100', 'opacity-100');
+            }, 10);
+        }
+    };
+
+    window.closeAccessModal = () => {
+        if (dom.accessModal) {
+            dom.accessModalContent.classList.remove('scale-100', 'opacity-100');
+            dom.accessModalContent.classList.add('scale-95', 'opacity-0');
+            setTimeout(() => {
+                dom.accessModal.classList.add('hidden');
+            }, 200);
+        }
+    };
+
+    // Seller Modal Logic
+    window.openSellerModal = (id) => {
+        const p = window.propertiesById[id];
+        if (!p || !dom.sellerModal) return;
+
+        // Populate Data
+        if (p.seller_info) {
+            dom.sellerName.textContent = `${p.seller_info.first_name} ${p.seller_info.last_name}`;
+            dom.sellerEmail.textContent = p.seller_info.email;
+            dom.sellerPhone.textContent = p.seller_info.phone;
+
+            dom.sellerEmailLink.href = `mailto:${p.seller_info.email}`;
+            dom.sellerPhoneLink.href = `tel:${p.seller_info.phone}`;
+        } else {
+            dom.sellerName.textContent = "Seller Info Unavailable";
+            dom.sellerEmail.textContent = "--";
+            dom.sellerPhone.textContent = "--";
+        }
+
+        dom.sellerModal.classList.remove('hidden');
+        setTimeout(() => {
+            dom.sellerModalContent.classList.remove('scale-95', 'opacity-0');
+            dom.sellerModalContent.classList.add('scale-100', 'opacity-100');
+        }, 10);
+    };
+
+    window.closeSellerModal = () => {
+        if (dom.sellerModal) {
+            dom.sellerModalContent.classList.remove('scale-100', 'opacity-100');
+            dom.sellerModalContent.classList.add('scale-95', 'opacity-0');
+            setTimeout(() => {
+                dom.sellerModal.classList.add('hidden');
+            }, 200);
+        }
+    };
+
+    // Close modal on outside click
+    window.addEventListener('click', (e) => {
+        if (e.target === dom.accessModal) closeAccessModal();
+        if (e.target === dom.sellerModal) closeSellerModal();
+    });
+
+    async function purchaseAccessPass() {
+        const btn = document.getElementById('btn-buy-access-pass-modal');
+        if (btn) {
+            btn.disabled = true;
+            btn.innerHTML = `<span class="loading loading-spinner loading-xs text-white"></span> Redirecting...`;
+        }
+
+        try {
+            const response = await fetch('/api/v1/payment/create-access-pass-session/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken')
+                }
+            });
+
+            const data = await response.json();
+            if (response.ok && data.url) {
+                window.location.href = data.url;
+            } else {
+                alert('Failed to initiate checkout: ' + (data.error || 'Unknown error'));
+                if (btn) {
+                    btn.disabled = false;
+                    btn.innerHTML = "Purchase Access Pass";
+                }
+            }
+        } catch (e) {
+            console.error(e);
+            alert('Error connecting to server');
+            if (btn) {
+                btn.disabled = false;
+                btn.innerHTML = "Purchase Access Pass";
+            }
+        }
     }
 
     // --- API CALLS ---
@@ -417,7 +638,12 @@
         }
 
         properties.forEach(p => {
+            // Store for modal
+            window.propertiesById[p.id] = p;
+
             const isFav = favorites.includes(p.id);
+            const isLocked = p.is_locked;
+
             // Default images handling
             let images = p.images || [];
             if (images.length === 0) {
@@ -437,6 +663,31 @@
 
             const card = document.createElement('div');
             card.className = "bg-[var(--card)] rounded-lg border border-[var(--border)] overflow-hidden hover:shadow-lg transition-shadow group";
+
+            // Title styles
+            const titleClass = "font-semibold text-[var(--foreground)] line-clamp-1 text-lg";
+
+            // Contact Button logic
+            const contactBtn = isLocked
+                ? `<button onclick="openAccessModal()" class="flex-1 px-3 py-2 text-sm font-medium bg-[var(--card)] border border-[var(--border)] text-[var(--foreground)] rounded-md hover:bg-[var(--muted)]/50 transition-colors font-semibold">
+                       <i data-lucide="lock" class="w-4 h-4 inline mr-1"></i> Unlock Info
+                   </button>`
+                : `<button onclick="openSellerModal(${p.id})" class="flex-1 px-3 py-2 text-sm font-medium bg-[var(--accent)] text-[var(--bg)] rounded-md hover:bg-[var(--accent-hover)] transition-colors font-semibold">
+                       Contact Seller
+                   </button>`;
+
+            // Location styles
+            const locationClass = "flex items-center text-sm text-[var(--muted-foreground)] mt-1";
+
+            // Content Logic for Locked Properties
+            const displayTitle = isLocked
+                ? `<span class="flex items-center gap-2 text-[var(--muted-foreground)] opacity-80"><i data-lucide="lock" class="w-4 h-4"></i> Access Pass Required</span>`
+                : p.title;
+
+            const displayLocation = isLocked
+                ? `<span class="italic opacity-80">Location Protected</span>`
+                : p.location;
+
             card.innerHTML = `
                     <div class="relative">
                         <div class="aspect-video bg-gray-700 relative overflow-hidden group/image">
@@ -473,13 +724,13 @@
                     <div class="p-4 space-y-3">
                         <div>
                             <div class="flex justify-between items-start">
-                                <h3 class="font-semibold text-[var(--foreground)] line-clamp-1 text-lg" title="${p.title}">
-                                    ${p.title}
+                                <h3 class="${titleClass}" title="${isLocked ? 'Address hidden' : p.title}">
+                                    ${displayTitle}
                                 </h3>
                             </div>
-                            <div class="flex items-center text-sm text-[var(--muted-foreground)] mt-1">
+                            <div class="${locationClass}">
                                 <i data-lucide="map-pin" class="h-3 w-3 mr-1"></i>
-                                ${p.location}
+                                ${displayLocation}
                             </div>
                         </div>
 
@@ -504,12 +755,10 @@
                         </div>
 
                         <div class="flex space-x-2 pt-2">
-                            <button class="flex-1 px-3 py-2 text-sm font-medium border border-[var(--border)] rounded-md text-[var(--foreground)] hover:bg-[var(--muted)] transition-colors">
+                            <button onclick="window.location.href='/buyer/property/${p.id}'" class="flex-1 px-3 py-2 text-sm font-medium border border-[var(--border)] rounded-md text-[var(--foreground)] hover:bg-[var(--muted)] transition-colors">
                                 View Details
                             </button>
-                            <button class="flex-1 px-3 py-2 text-sm font-medium bg-[var(--accent)] text-[var(--bg)] rounded-md hover:bg-[var(--accent-hover)] transition-colors font-semibold">
-                                Contact Agent
-                            </button>
+                            ${contactBtn}
                         </div>
                     </div>
                 `;

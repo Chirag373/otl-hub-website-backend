@@ -660,23 +660,77 @@ class PropertySearchSerializer(serializers.ModelSerializer):
     dateAdded = serializers.DateTimeField(source='created_at', read_only=True)
     description = serializers.CharField(source='property_description', read_only=True)
     
+    seller_info = serializers.SerializerMethodField()
+    is_locked = serializers.SerializerMethodField()
+
     class Meta:
         model = SellerProfile
         fields = [
             'id', 'title', 'location', 'price', 
             'bedrooms', 'bathrooms', 'sqft', 
             'image', 'images', 'type', 'features', 'dateAdded', 'description',
-            'leaseback_required'
+            'leaseback_required', 'seller_info', 'is_locked'
         ]
 
+    def get_is_locked(self, obj):
+        request = self.context.get('request')
+        if not request or not request.user.is_authenticated:
+            return True
+        
+        user = request.user
+        
+        # If user is the owner (Seller), they can see it
+        if user == obj.user:
+            return False
+
+        # If user is a Buyer, check access pass
+        if user.role == 'BUYER':
+            try:
+                # We access the profile. Since request.user is shared across the request,
+                # this should be efficient enough (cached after first access)
+                if hasattr(user, 'buyer_profile'):
+                     profile = user.buyer_profile
+                     if profile.access_pass_expiry and profile.access_pass_expiry > timezone.now():
+                         return False
+            except BuyerProfile.DoesNotExist:
+                pass
+        
+        # For other roles (e.g. Realtor, Partner, Admin), maybe unlocked?
+        # Assuming for now only Paid Buyers can see details.
+        # If you want Admin to see, add: if user.is_staff: return False
+        if user.is_staff:
+            return False
+
+        return True
+
     def get_title(self, obj):
+        # If locked, hide specific address and city
+        if self.get_is_locked(obj):
+             return "Exclusive Listing"
+
         if obj.street_address:
             return obj.street_address
         return f"Property in {obj.city}" if obj.city else "Unlisted Address"
 
     def get_location(self, obj):
+        # Hide location if locked
+        if self.get_is_locked(obj):
+            return "Location Protected"
+
         parts = [p for p in [obj.city, obj.state] if p]
         return ", ".join(parts) if parts else "Location N/A"
+
+    def get_seller_info(self, obj):
+        if self.get_is_locked(obj):
+            return None
+        
+        u = obj.user
+        return {
+            "first_name": u.first_name,
+            "last_name": u.last_name,
+            "email": u.email,
+            "phone": u.phone_number
+        }
 
     def get_image(self, obj):
         # optimistically get primary image, or first available
@@ -689,6 +743,7 @@ class PropertySearchSerializer(serializers.ModelSerializer):
         return None # Frontend can show placeholder
 
     def get_images(self, obj):
+        # Images might give away location? usually fine.
         return [img.image.url for img in obj.images.all() if img.image]
 
 
