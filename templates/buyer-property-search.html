@@ -694,6 +694,15 @@
                             <img src="${currentImg}" alt="${p.title}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" id="img-${p.id}">
                             <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-60 pointer-events-none"></div>
                             
+                            <!-- Leaseback Badge -->
+                            ${(p.leaseback_required || (p.features && p.features.leaseback_months)) ? `
+                            <div class="absolute top-2 left-2 z-10">
+                                <span class="px-2 py-1 bg-green-600 text-white text-[10px] font-bold rounded shadow-md uppercase tracking-wider">
+                                    ${(p.features && p.features.leaseback_months) ? `Leaseback: ${p.features.leaseback_months} Mos` : 'Leaseback Required'}
+                                </span>
+                            </div>
+                            ` : ''}
+
                             <button onclick="toggleFavorite(${p.id})" class="absolute top-2 right-2 p-2 rounded-full hover:bg-white/20 transition-colors z-10">
                                 <i id="heart-icon-${p.id}" data-lucide="heart" class="w-5 h-5 ${isFav ? 'fill-red-500 text-red-500' : 'text-white'} transition-colors"></i>
                             </button>

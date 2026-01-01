@@ -205,6 +205,18 @@
                                     <span class="text-sm font-medium text-[var(--foreground)]">Leaseback Required</span>
                                 </label>
                             </div>
+                            <!-- Leaseback Months Input -->
+                            <div id="leaseback-months-container" class="hidden pl-8 mb-2">
+                                <label class="text-xs text-[var(--muted-foreground)] font-medium mb-1 block">Months
+                                    Required</label>
+                                <div class="relative max-w-[120px]">
+                                    <input type="number" id="input-leaseback-months" placeholder="#"
+                                        class="input input-sm input-bordered w-full bg-[var(--input)] border-[var(--border)] text-[var(--foreground)] pr-8 focus:outline-none focus:border-[var(--accent)]"
+                                        disabled>
+                                    <span
+                                        class="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-[var(--muted-foreground)]">mos</span>
+                                </div>
+                            </div>
                             <p class="text-xs text-[var(--muted-foreground)] mb-3">
                                 Request to continue living in the property after closing for a specified
                                 period
@@ -361,6 +373,8 @@
 
 
         inputLeaseback: document.getElementById('input-leaseback'),
+        inputLeasebackMonths: document.getElementById('input-leaseback-months'),
+        leasebackMonthsContainer: document.getElementById('leaseback-months-container'),
 
         // Leaseback UI
         leasebackIconContainer: document.getElementById('leaseback-icon-container'),
@@ -527,6 +541,11 @@
 
         if (dom.inputLeaseback) dom.inputLeaseback.checked = profile.leaseback_required;
 
+        if (dom.inputLeasebackMonths) {
+            const feats = profile.property_features || {};
+            dom.inputLeasebackMonths.value = feats.leaseback_months || '';
+        }
+
         updateLeasebackUI(profile.leaseback_required);
 
         // Map Choices (Display -> Key)
@@ -553,12 +572,15 @@
             dom.leasebackIcon.classList.add('text-[var(--accent)]');
             dom.leasebackIcon.classList.remove('text-gray-500');
             dom.leasebackAlert.classList.remove('hidden');
+            dom.leasebackAlert.classList.remove('hidden');
+            if (dom.leasebackMonthsContainer) dom.leasebackMonthsContainer.classList.remove('hidden');
         } else {
             dom.leasebackIconContainer.classList.remove('bg-[var(--accent)]/10');
             dom.leasebackIconContainer.classList.add('bg-gray-100');
             dom.leasebackIcon.classList.remove('text-[var(--accent)]');
             dom.leasebackIcon.classList.add('text-gray-500');
             dom.leasebackAlert.classList.add('hidden');
+            if (dom.leasebackMonthsContainer) dom.leasebackMonthsContainer.classList.add('hidden');
         }
     }
 
@@ -630,6 +652,7 @@
         const inputs = document.querySelectorAll('#profile-form input:not([type="checkbox"]), #profile-form select, #profile-form textarea');
         inputs.forEach(input => input.disabled = !isEditing);
         if (dom.inputLeaseback) dom.inputLeaseback.disabled = !isEditing;
+        if (dom.inputLeasebackMonths) dom.inputLeasebackMonths.disabled = !isEditing;
     }
 
     async function saveProfile() {
@@ -652,6 +675,11 @@
 
             leaseback_required: dom.inputLeaseback.checked
         };
+
+        // Update property features with months
+        const features = profile.property_features || {};
+        features.leaseback_months = dom.inputLeasebackMonths ? dom.inputLeasebackMonths.value : '';
+        payload.property_features = features;
 
         try {
             const response = await fetch('/api/v1/seller/profile/', {
