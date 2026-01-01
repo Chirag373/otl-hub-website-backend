@@ -185,7 +185,11 @@
 
             if (sidebarName && sidebarInitials) {
                 try {
-                    const response = await fetch('/api/v1/buyer/profile/');
+                    const userRole = "{{ user.role }}";
+                    let apiUrl = '/api/v1/buyer/profile/';
+                    if (userRole === 'REALTOR') apiUrl = '/api/v1/realtor/profile/';
+
+                    const response = await fetch(apiUrl);
 
                     if (response.ok) {
                         const data = await response.json();

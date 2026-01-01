@@ -2,7 +2,8 @@ from django.views.generic import TemplateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 import json
 from django.core.serializers.json import DjangoJSONEncoder
-from core.mixins import BuyerRequiredMixin, SellerRequiredMixin, RealtorRequiredMixin, PartnerRequiredMixin, AdminRequiredMixin
+from core.models import User
+from core.mixins import RoleRequiredMixin, BuyerRequiredMixin, SellerRequiredMixin, RealtorRequiredMixin, PartnerRequiredMixin, AdminRequiredMixin
 from api.v1.serializer import SellerProfileSerializer
 from api.models import PropertyView, SellerProfile
 from django.utils import timezone
@@ -30,7 +31,8 @@ class SignupView(TemplateView):
 class BuyerDashboardView(BuyerRequiredMixin, TemplateView):
     template_name = "buyer-dashboard.html"
 
-class BuyerPropertySearchView(BuyerRequiredMixin, TemplateView):
+class BuyerPropertySearchView(RoleRequiredMixin, TemplateView):
+    allowed_roles = [User.UserRole.BUYER, User.UserRole.REALTOR]
     template_name = "buyer-property-search.html"
 
 class PublicPropertySearchView(TemplateView):

@@ -695,7 +695,11 @@ class PropertySearchSerializer(serializers.ModelSerializer):
             except BuyerProfile.DoesNotExist:
                 pass
         
-        # For other roles (e.g. Realtor, Partner, Admin), maybe unlocked?
+        # Realtors have full access
+        if user.role == 'REALTOR':
+            return False
+
+        # For other roles (e.g. Partner, Admin), maybe unlocked?
         # Assuming for now only Paid Buyers can see details.
         # If you want Admin to see, add: if user.is_staff: return False
         if user.is_staff:

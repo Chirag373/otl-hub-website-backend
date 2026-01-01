@@ -28,6 +28,11 @@
         <i data-lucide="users" class="mr-3 h-4 w-4"></i> Clients
     </a>
 
+    <a href="{% url 'buyer_property_search' %}"
+        class="flex items-center w-full px-4 py-2 text-sm font-medium rounded-md {% if active_page == 'search' %}bg-[var(--accent)] text-[var(--bg)]{% else %}text-[var(--foreground)] hover:bg-[var(--accent)] hover:text-black transition-colors{% endif %}">
+        <i data-lucide="search" class="mr-3 h-4 w-4"></i> Search Properties
+    </a>
+
     <a href="{% url 'realtor_settings' %}"
         class="flex items-center w-full px-4 py-2 text-sm font-medium rounded-md {% if active_page == 'settings' %}bg-[var(--accent)] text-[var(--bg)]{% else %}text-[var(--foreground)] hover:bg-[var(--accent)] hover:text-black transition-colors{% endif %}">
         <i data-lucide="settings" class="mr-3 h-4 w-4"></i> Settings

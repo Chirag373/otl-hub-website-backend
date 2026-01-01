@@ -3,7 +3,11 @@
 {% block title %}Property Search | OTL Platform{% endblock %}
 
 {% block sidebar %}
+{% if user.role == "REALTOR" %}
+{% include 'partials/realtor_sidebar.html' with active_page='search' %}
+{% else %}
 {% include 'partials/buyer_sidebar.html' with active_page='search' %}
+{% endif %}
 {% endblock %}
 
 {% block content %}
@@ -764,7 +768,7 @@
                         </div>
 
                         <div class="flex space-x-2 pt-2">
-                            <button onclick="window.location.href='/buyer/property/${p.id}'" class="flex-1 px-3 py-2 text-sm font-medium border border-[var(--border)] rounded-md text-[var(--foreground)] hover:bg-[var(--muted)] transition-colors">
+                            <button onclick="window.location.href='/property/detail?id=${p.id}'" class="flex-1 px-3 py-2 text-sm font-medium border border-[var(--border)] rounded-md text-[var(--foreground)] hover:bg-[var(--muted)] transition-colors">
                                 View Details
                             </button>
                             ${contactBtn}
