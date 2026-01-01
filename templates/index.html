@@ -377,8 +377,8 @@
         return `
             <article class="card bg-[var(--card)] overflow-hidden border border-[var(--border)] shadow-lg rounded-lg flex flex-col h-full">
                 <div class="px-4 pt-4 pb-0.5 ${(p.leaseback_required || (p.features && p.features.leaseback_months)) ? '' : 'invisible'}">
-                     <span class="badge bg-green-600 text-white border-none font-bold text-[10px] px-2 py-0.5 rounded shadow-sm h-auto flex w-fit items-center gap-1 uppercase tracking-wider">
-                        ${(p.features && p.features.leaseback_months) ? `Leaseback Required (${p.features.leaseback_months} Months)` : 'Leaseback Required'}
+                     <span class="badge bg-green-600 text-white border-none font-bold text-[10px] px-3 py-1 rounded-full shadow-sm h-auto flex w-fit items-center gap-1">
+                        ${(p.features && p.features.leaseback_months) ? `Leaseback: ${p.features.leaseback_months} Months` : 'Leaseback Required'}
                     </span>
                 </div>
 

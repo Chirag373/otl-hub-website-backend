@@ -177,11 +177,13 @@
 
                     <div class="divider"></div>
 
-                    <div class="flex gap-2 mb-2">
+                    <div class="flex flex-wrap gap-2 mb-2">
                         <span class="badge badge-lg bg-green-100 text-green-700 border-none font-bold">For Sale</span>
                         <span
                             class="badge badge-lg bg-[var(--muted)] text-[var(--muted-foreground)] border-none font-medium"
                             id="prop-added">-</span>
+                        <span id="prop-leaseback-badge"
+                            class="badge badge-lg bg-green-600 text-white border-none font-bold hidden"></span>
                     </div>
                 </div>
 
@@ -574,6 +576,21 @@
         // Date
         const date = p.dateAdded ? new Date(p.dateAdded).toLocaleDateString() : 'Recently';
         document.getElementById('prop-added').textContent = `Listed ${date}`;
+
+        // Leaseback Badge
+        const leasebackBadge = document.getElementById('prop-leaseback-badge');
+        if (leasebackBadge) {
+            const feats = p.features || {};
+            const months = feats.leaseback_months;
+            const isRequired = p.leaseback_required || (months);
+
+            if (isRequired) {
+                leasebackBadge.textContent = months ? `Leaseback: ${months} Months` : "Leaseback Required";
+                leasebackBadge.classList.remove('hidden');
+            } else {
+                leasebackBadge.classList.add('hidden');
+            }
+        }
 
         // Description - Assuming 'description' field exists or we fallback
         // Description - Assuming 'description' field exists or we fallback
