@@ -385,11 +385,9 @@
         dom.btnSave.innerHTML = `<span class="loading loading-spinner loading-xs"></span> Saving...`;
 
         const payload = {
-            user: {
-                first_name: dom.inputFirstName.value,
-                last_name: dom.inputLastName.value,
-                phone_number: dom.inputPhone.value
-            },
+            first_name: dom.inputFirstName.value,
+            last_name: dom.inputLastName.value,
+            phone_number: dom.inputPhone.value,
             company_name: dom.inputCompany.value,
             partnership_type: dom.inputType.value,
             service_areas: (dom.inputCity && dom.inputState && dom.inputCity.value && dom.inputState.value)
@@ -513,7 +511,7 @@
     }
 
     function setEditMode(isEditing) {
-        dom.btnEdit.parentElement.classList.toggle('hidden', isEditing);
+        dom.btnEdit.classList.toggle('hidden', isEditing);
         dom.editActions.classList.toggle('hidden', !isEditing);
 
         const inputs = document.querySelectorAll('#profile-form input, #profile-form textarea, #profile-form select');
