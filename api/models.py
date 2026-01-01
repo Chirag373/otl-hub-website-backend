@@ -112,6 +112,7 @@ class PartnerProfile(models.Model):
         CONTRACTOR = "CONTRACTOR", "Contractor"
         MOVING_COMPANY = "MOVING_COMPANY", "Moving Company"
         PROPERTY_APPRAISER = "PROPERTY_APPRAISER", "Property Appraiser"
+        TITLE_COMPANY = "TITLE_COMPANY", "Title Company"
         OTHER = "OTHER", "Other"
 
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="partner_profile")
