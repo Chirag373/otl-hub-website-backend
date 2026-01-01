@@ -695,16 +695,22 @@
         if (contactBtn) {
             if (p.is_locked) {
                 contactBtn.innerHTML = '<i data-lucide="lock" class="w-5 h-5 mr-2"></i> Unlock Info';
-                contactBtn.classList.remove('bg-[var(--accent)]', 'hover:bg-[var(--accent-hover)]', 'text-white');
-                contactBtn.classList.add('bg-[var(--muted)]', 'text-[var(--muted-foreground)]', 'cursor-not-allowed');
+
+                // Set to Accent Color (Same as Purchase Pass) & ensure pointer
+                contactBtn.classList.add('bg-[var(--accent)]', 'hover:bg-[var(--accent-hover)]', 'text-white', 'cursor-pointer');
+
+                // Remove specific styles (muted/yellow) if present
+                contactBtn.classList.remove('bg-[var(--muted)]', 'text-[var(--muted-foreground)]', 'cursor-not-allowed', 'bg-yellow-600', 'hover:bg-yellow-700');
+
                 // Use the new modal
                 contactBtn.onclick = () => window.openAccessModal();
             } else {
                 contactBtn.textContent = 'Contact Seller';
                 contactBtn.onclick = () => window.openSellerModal(p);
-                // Restore styles if needed
+
+                // Restore standard styles
                 contactBtn.classList.add('bg-[var(--accent)]', 'hover:bg-[var(--accent-hover)]', 'text-white');
-                contactBtn.classList.remove('bg-[var(--muted)]', 'text-[var(--muted-foreground)]', 'cursor-not-allowed');
+                contactBtn.classList.remove('bg-yellow-600', 'hover:bg-yellow-700', 'bg-[var(--muted)]', 'text-[var(--muted-foreground)]', 'cursor-not-allowed');
             }
             if (window.lucide) lucide.createIcons();
         }
@@ -753,8 +759,18 @@
                         if (data && data.length > 0) {
                             const lat = parseFloat(data[0].lat);
                             const lon = parseFloat(data[0].lon);
-                            window.propMap.setView([lat, lon], 15);
-                            L.marker([lat, lon]).addTo(window.propMap);
+                            window.propMap.setView([lat, lon], 14);
+
+                            // "Circle the zone" - adding a circle instead of a pin for privacy/zone indication
+                            L.circle([lat, lon], {
+                                color: '#16a34a', // Green-600
+                                fillColor: '#16a34a',
+                                fillOpacity: 0.15,
+                                radius: 400 // 400 meters radius
+                            }).addTo(window.propMap);
+
+                            // Optional: Add a subtle center dot or keep it just as a zone
+                            // L.circleMarker([lat, lon], { radius: 3, color: '#16a34a', fill: true }).addTo(window.propMap);
                         }
                     })
                     .catch(err => console.error("Map Geocode Error:", err));
