@@ -95,6 +95,9 @@ class RealtorProfile(models.Model):
     years_of_experience = models.CharField(max_length=20, choices=ExperienceLevel.choices, default=ExperienceLevel.ENTRY)
     
     description = models.TextField(blank=True)
+    location = models.CharField(max_length=255, blank=True, help_text="City, State")
+    rating = models.DecimalField(max_digits=3, decimal_places=1, default=5.0)
+    review_count = models.IntegerField(default=0)
     
     is_active_subscription = models.BooleanField(default=False)
     subscription_start_date = models.DateTimeField(null=True, blank=True)
@@ -145,6 +148,27 @@ class PropertyImage(models.Model):
 
     class Meta:
         db_table = 'property_images'
+
+
+class BuyerRealtorConnection(models.Model):
+    class Status(models.TextChoices):
+        PENDING = 'PENDING', 'Pending'
+        ACCEPTED = 'ACCEPTED', 'Accepted'
+        REJECTED = 'REJECTED', 'Rejected'
+
+    buyer = models.ForeignKey(BuyerProfile, on_delete=models.CASCADE, related_name='realtor_connections')
+    realtor = models.ForeignKey(RealtorProfile, on_delete=models.CASCADE, related_name='buyer_connections')
+    status = models.CharField(max_length=20, choices=Status.choices, default=Status.PENDING)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = "buyer_realtor_connections"
+        unique_together = ('buyer', 'realtor')
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"{self.buyer} -> {self.realtor} ({self.status})"
 
 
 class AccessPassType(models.Model):
@@ -220,3 +244,19 @@ class PropertyView(models.Model):
         indexes = [
             models.Index(fields=["seller_profile", "ip_address"]),
         ]
+
+class BuyerRealtorConnection(models.Model):
+    class Status(models.TextChoices):
+        PENDING = "PENDING", "Pending"
+        ACCEPTED = "ACCEPTED", "Accepted"
+        REJECTED = "REJECTED", "Rejected"
+
+    buyer = models.ForeignKey(BuyerProfile, on_delete=models.CASCADE, related_name="realtor_connections")
+    realtor = models.ForeignKey(RealtorProfile, on_delete=models.CASCADE, related_name="buyer_requests")
+    status = models.CharField(max_length=20, choices=Status.choices, default=Status.PENDING)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = "buyer_realtor_connections"
+        unique_together = ('buyer', 'realtor')

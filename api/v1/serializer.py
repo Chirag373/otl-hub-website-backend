@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from django.db import transaction
 from core.models import User, PendingSignup
-from api.models import BuyerProfile, RealtorProfile, SellerProfile, PartnerProfile, PropertyImage
+from api.models import BuyerProfile, RealtorProfile, SellerProfile, PartnerProfile, PropertyImage, BuyerRealtorConnection
 from django.contrib.auth import authenticate
 from django.contrib.auth.password_validation import validate_password
 from django.utils.translation import gettext_lazy as _
@@ -412,6 +412,7 @@ class RealtorProfileSerializer(serializers.ModelSerializer):
         choices=RealtorProfile.ExperienceLevel.choices, required=False, write_only=True
     )
     description = serializers.CharField(required=False, allow_blank=True)
+    connection_status = serializers.SerializerMethodField()
 
     # Nested serializer for agent
 
@@ -419,6 +420,7 @@ class RealtorProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = RealtorProfile
         fields = [
+            "id",
             "first_name",
             "last_name",
             "email",
@@ -430,8 +432,25 @@ class RealtorProfileSerializer(serializers.ModelSerializer):
             "experience",
             "years_of_experience",
             "description",
-
+            "location",
+            "rating",
+            "review_count",
+            "connection_status",
         ]
+
+    def get_connection_status(self, obj):
+        request = self.context.get('request')
+        if request and request.user.is_authenticated and request.user.role == 'BUYER':
+            try:
+                # Avoid circular import issues if defined in same file
+                # But BuyerRealtorConnection is imported at top of file
+                from api.models import BuyerRealtorConnection
+                conn = BuyerRealtorConnection.objects.filter(buyer__user=request.user, realtor=obj).first()
+                if conn:
+                    return conn.status
+            except Exception:
+                pass
+        return None
 
     def get_experience(self, obj):
         """Get formatted experience level display"""
@@ -827,3 +846,23 @@ class PricingPlanSerializer(serializers.ModelSerializer):
         model = PricingPlan
         fields = '__all__'
 
+
+class BuyerRealtorConnectionSerializer(serializers.ModelSerializer):
+    realtor = RealtorProfileSerializer(read_only=True)
+    realtor_id = serializers.PrimaryKeyRelatedField(
+        queryset=RealtorProfile.objects.all(), source='realtor', write_only=True
+    )
+    buyer = BuyerProfileSerializer(read_only=True)
+    
+    class Meta:
+        model = BuyerRealtorConnection
+        fields = ['id', 'buyer', 'realtor', 'realtor_id', 'status', 'created_at', 'updated_at']
+        read_only_fields = ['id', 'buyer', 'status', 'created_at', 'updated_at']
+
+    def create(self, validated_data):
+        user = self.context['request'].user
+        if not hasattr(user, 'buyer_profile'):
+            raise serializers.ValidationError("Only buyers can make connection requests.")
+        
+        validated_data['buyer'] = user.buyer_profile
+        return super().create(validated_data)

@@ -140,3 +140,11 @@ class PrivacyPolicyView(TemplateView):
 
 class CustomAdminPricingView(AdminRequiredMixin, TemplateView):
     template_name = "custom_admin_pricing.html"
+
+class BuyerAddRealtorView(BuyerRequiredMixin, TemplateView):
+    template_name = "buyer-add-realtor.html"
+    extra_context = {'active_page': 'add_realtor'}
+
+class RealtorRequestsView(RealtorRequiredMixin, TemplateView):
+    template_name = "realtor-requests.html"
+    extra_context = {'active_page': 'requests'}

@@ -136,46 +136,16 @@
 
 <div class="card bg-[var(--card)] border border-[var(--border)] shadow-xl">
     <div class="card-body p-6">
-        <h3 class="text-lg font-semibold text-[var(--foreground)] mb-4">Buyer's Agent</h3>
-
-        <div id="agent-view-mode" class="space-y-3">
+        <div class="flex justify-between items-center mb-4">
+            <h3 class="text-lg font-semibold text-[var(--foreground)]">Buyer's Agent</h3>
+            <a href="{% url 'buyer_add_realtor' %}"
+                class="btn btn-sm bg-[var(--accent)] text-[var(--bg)] border-none hover:bg-[var(--accent-hover)]">
+                <i data-lucide="plus" class="w-4 h-4 mr-1"></i> Add Agent
+            </a>
         </div>
-
-        <div id="agent-edit-mode" class="hidden space-y-4">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div class="form-control w-full md:col-span-2">
-                    <label class="label">
-                        <span class="label-text text-[var(--foreground)] font-medium">Agent Name</span>
-                    </label>
-                    <input type="text" id="agent-input-name" placeholder="Enter agent's full name"
-                        class="input input-bordered w-full bg-[var(--input)] border-[var(--border)] text-[var(--foreground)] focus:outline-none focus:border-[var(--accent)]">
-                </div>
-                <div class="form-control w-full">
-                    <label class="label">
-                        <span class="label-text text-[var(--foreground)] font-medium">Agent Phone</span>
-                    </label>
-                    <input type="tel" id="agent-input-phone" placeholder="Enter agent's phone"
-                        class="input input-bordered w-full bg-[var(--input)] border-[var(--border)] text-[var(--foreground)] focus:outline-none focus:border-[var(--accent)]">
-                </div>
-                <div class="form-control w-full">
-                    <label class="label">
-                        <span class="label-text text-[var(--foreground)] font-medium">Agent Email</span>
-                    </label>
-                    <input type="email" id="agent-input-email" placeholder="Enter agent's email"
-                        class="input input-bordered w-full bg-[var(--input)] border-[var(--border)] text-[var(--foreground)] focus:outline-none focus:border-[var(--accent)]">
-                </div>
-                <div class="form-control w-full md:col-span-2">
-                    <label class="label">
-                        <span class="label-text text-[var(--foreground)] font-medium">Brokerage Company</span>
-                    </label>
-                    <input type="text" id="agent-input-brokerage" placeholder="Enter brokerage company"
-                        class="input input-bordered w-full bg-[var(--input)] border-[var(--border)] text-[var(--foreground)] focus:outline-none focus:border-[var(--accent)]">
-                </div>
-            </div>
-            <div class="alert bg-[var(--muted)]/20 border-none text-sm text-[var(--muted-foreground)]">
-                <div>
-                    <span class="font-medium">Note:</span> Leave fields empty if you don't have buyer representation.
-                </div>
+        <div id="agent-connections-container" class="space-y-4">
+            <div class="flex justify-center py-4">
+                <span class="loading loading-spinner text-[var(--accent)]"></span>
             </div>
         </div>
     </div>
@@ -272,6 +242,7 @@
         checkUrlParams();
         fetchAccessConfig(); // New
         fetchProfile();
+        fetchConnections();
         setupEventListeners();
     }
 
@@ -423,6 +394,81 @@
             console.error('Error fetching profile:', error);
             // Show error toast?
         }
+    }
+
+    async function fetchConnections() {
+        const container = document.getElementById('agent-connections-container');
+        try {
+            const res = await fetch('/api/v1/buyer/connections/');
+            if (res.ok) {
+                const list = await res.json();
+                renderConnections(list);
+            } else {
+                container.innerHTML = '<p class="text-error">Failed to load connections.</p>';
+            }
+        } catch (e) {
+            console.error(e);
+            if (container) container.innerHTML = '<p class="text-error">Error loading connections.</p>';
+        }
+    }
+
+    function renderConnections(list) {
+        const container = document.getElementById('agent-connections-container');
+        if (!container) return;
+
+        if (!list || list.length === 0) {
+            container.innerHTML = '<p class="text-[var(--muted-foreground)]">No agent connections yet.</p>';
+            return;
+        }
+
+        // Check if there is an active connection
+        const activeConnection = list.find(c => c.status === 'ACCEPTED');
+
+        let displayList = list;
+        if (activeConnection) {
+            // If there's an active connection, only show that one
+            displayList = [activeConnection];
+        }
+
+        container.innerHTML = displayList.map(c => {
+            const r = c.realtor;
+            let statusBadge = "badge-ghost";
+            let message = "";
+            let statusText = c.status.toLowerCase();
+
+            if (c.status === 'ACCEPTED') {
+                statusBadge = "badge-success";
+                statusText = "Connected";
+            } else if (c.status === 'REJECTED') {
+                statusBadge = "badge-error";
+                message = '<p class="text-xs text-error mt-1 mt-1 font-semibold">Agent rejected the request. Please find a new realtor.</p>';
+            } else {
+                statusBadge = "badge-warning"; // Pending
+            }
+
+            // Initials
+            const initials = r.first_name && r.last_name ? (r.first_name[0] + r.last_name[0]) : "AG";
+
+            return `
+            <div class="p-4 border border-[var(--border)] rounded-lg flex items-start justify-between bg-[var(--bg)]/50">
+                <div class="flex items-start gap-3">
+                     <div class="w-10 h-10 rounded-full bg-[var(--muted)] flex items-center justify-center font-bold text-[var(--foreground)] shrink-0">
+                        ${initials}
+                     </div>
+                     <div>
+                         <p class="font-bold text-[var(--foreground)]">${r.first_name} ${r.last_name}</p>
+                         <p class="text-xs text-[var(--muted-foreground)]">${r.brokerage_company || 'Realtor'}</p>
+                         ${message}
+                     </div>
+                </div>
+                <div class="flex flex-col items-end gap-1">
+                    <span class="badge ${statusBadge} badge-sm capitalize">${statusText}</span>
+                    <span class="text-[10px] text-[var(--muted-foreground)]">${new Date(c.created_at).toLocaleDateString()}</span>
+                </div>
+            </div>
+            `;
+        }).join('');
+        if (window.lucide) lucide.createIcons();
     }
 
     async function purchaseAccessPass() {

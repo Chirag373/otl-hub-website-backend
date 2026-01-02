@@ -25,7 +25,7 @@ from core.views import (
     RealtorDashboardView, RealtorSettingsView, RealtorClientsView, PartnerDashboardView, PartnerSettingsView,
     PartnersView, BuyerPropertySearchView, BuyerFavoritesView, BuyerSettingsView,
     TermsOfServiceView, PrivacyPolicyView, PropertyDetailView, PublicPropertySearchView,
-    CustomAdminPricingView
+    CustomAdminPricingView, BuyerAddRealtorView, RealtorRequestsView
 )
 
 from django.views.generic import RedirectView
@@ -56,13 +56,17 @@ urlpatterns = [
     path("buyer/dashboard", BuyerDashboardView.as_view(), name="buyer_dashboard"),
     path("buyer/property-search", BuyerPropertySearchView.as_view(), name="buyer_property_search"),
     path("buyer/favorites", BuyerFavoritesView.as_view(), name="buyer_favorites"),
+    path("buyer/favorites", BuyerFavoritesView.as_view(), name="buyer_favorites"),
     path("buyer/settings", BuyerSettingsView.as_view(), name="buyer_settings"),
+    path("buyer/add-realtor", BuyerAddRealtorView.as_view(), name="buyer_add_realtor"),
     path("seller/dashboard", SellerDashboardView.as_view(), name="seller_dashboard"),
     path("seller/property", SellerPropertyView.as_view(), name="seller_property"),
     path("seller/settings", SellerSettingsView.as_view(), name="seller_settings"),
     path("realtor/dashboard", RealtorDashboardView.as_view(), name="realtor_dashboard"),
     path("realtor/clients", RealtorClientsView.as_view(), name="realtor_clients"),
+    path("realtor/clients", RealtorClientsView.as_view(), name="realtor_clients"),
     path("realtor/settings", RealtorSettingsView.as_view(), name="realtor_settings"),
+    path("realtor/requests", RealtorRequestsView.as_view(), name="realtor_requests"),
     path("partner/dashboard", PartnerDashboardView.as_view(), name="partner_dashboard"),
     path("partner/settings", PartnerSettingsView.as_view(), name="partner_settings"),
 ]

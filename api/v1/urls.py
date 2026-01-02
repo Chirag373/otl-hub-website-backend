@@ -5,7 +5,9 @@ from api.v1.views import (
     BuyerProfileView, RealtorProfileView, SellerProfileView, PartnerProfileView, PartnerListView, 
     PropertyImageDeleteView, PropertySearchView, BuyerFavoritesView, BuyerFavoriteToggleView,
     ChangePasswordView, DeleteAccountView, UpdateNotificationSettingsView,
-    PricingPlanListView, PricingPlanUpdateView, AccessPassTypeViewSet
+    PricingPlanListView, PricingPlanUpdateView, AccessPassTypeViewSet,
+    RealtorListView, ConnectionRequestCreateView, RealtorRequestsListView,
+    ConnectionStatusUpdateView, BuyerConnectionsListView
 )
 from api.v1.payment import PaymentSuccessView, BillingPortalView, CreateAccessPassSessionView, AccessPassSuccessView
 
@@ -43,4 +45,11 @@ urlpatterns = [
     # Access Pass Types (Admin)
     path("access-pass-types/", AccessPassTypeViewSet.as_view({'get': 'list', 'post': 'create'}), name="access-pass-types-list"),
     path("access-pass-types/<int:pk>/", AccessPassTypeViewSet.as_view({'get': 'retrieve', 'put': 'update', 'patch': 'partial_update', 'delete': 'destroy'}), name="access-pass-types-detail"),
+
+    # Realtor Connection
+    path("buyer/realtors/", RealtorListView.as_view(), name="realtor-list"),
+    path("buyer/connect/", ConnectionRequestCreateView.as_view(), name="connect-realtor"),
+    path("buyer/connections/", BuyerConnectionsListView.as_view(), name="buyer-connections"),
+    path("realtor/requests/", RealtorRequestsListView.as_view(), name="realtor-requests"),
+    path("realtor/request/<int:pk>/", ConnectionStatusUpdateView.as_view(), name="update-connection-status"),
 ]

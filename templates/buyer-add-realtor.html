@@ -1,0 +1,248 @@
+{% extends 'buyer_base.html' %}
+
+{% block title %}Add Realtor | OTL Platform{% endblock %}
+
+{% block content %}
+<div class="flex flex-col gap-6">
+    <!-- Header -->
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+            <h1 class="text-3xl font-bold text-[var(--foreground)]">Add a Realtor</h1>
+            <p class="text-[var(--muted-foreground)]">Find an agent to help you with your property journey.</p>
+        </div>
+
+        <!-- Search -->
+        <div class="w-full md:w-auto relative">
+            <input type="text" id="realtor-search" placeholder="Search by name, brokerage or location..."
+                class="w-full md:w-80 pl-10 pr-4 py-2 bg-[var(--input)] border border-[var(--border)] rounded-lg focus:outline-none focus:border-[var(--accent)] text-[var(--foreground)]">
+            <i data-lucide="search" class="absolute left-3 top-2.5 w-5 h-5 text-[var(--muted-foreground)]"></i>
+        </div>
+    </div>
+
+    <!-- Realtor Grid -->
+    <div id="realtor-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- Loaded via JS -->
+        <div class="col-span-full py-12 flex justify-center">
+            <span class="loading loading-spinner loading-lg text-[var(--accent)]"></span>
+        </div>
+    </div>
+</div>
+
+<!-- Confirmation Modal -->
+<div id="confirm-modal"
+    class="fixed inset-0 bg-black/60 hidden z-50 flex items-center justify-center p-4 backdrop-blur-sm">
+    <div class="bg-[var(--card)] rounded-xl border border-[var(--border)] p-6 max-w-sm w-full shadow-2xl scale-95 opacity-0 transition-all duration-200"
+        id="confirm-modal-content">
+        <h3 class="text-xl font-bold text-[var(--foreground)] mb-2">Connect with Realtor?</h3>
+        <p class="text-[var(--muted-foreground)] mb-6">A request will be sent to <span id="modal-realtor-name"
+                class="font-semibold text-[var(--accent)]"></span>. They will need to accept it.</p>
+
+        <div class="flex gap-3">
+            <button onclick="closeModal()"
+                class="flex-1 py-2 px-4 rounded-lg border border-[var(--border)] text-[var(--foreground)] hover:bg-[var(--muted)] transition-colors">Cancel</button>
+            <button id="btn-confirm-add" onclick="confirmAddRealtor()"
+                class="flex-1 py-2 px-4 rounded-lg bg-[var(--accent)] text-[var(--bg)] font-bold hover:bg-[var(--accent-hover)] transition-colors">Yes,
+                Send Request</button>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+    let currentRealtors = [];
+    let selectedRealtorId = null;
+
+    document.addEventListener('DOMContentLoaded', () => {
+        fetchRealtors();
+
+        const searchInput = document.getElementById('realtor-search');
+        let debounceTimer;
+        searchInput.addEventListener('input', (e) => {
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(() => {
+                fetchRealtors(e.target.value);
+            }, 300);
+        });
+    });
+
+    async function fetchRealtors(query = "") {
+        const grid = document.getElementById('realtor-grid');
+        grid.innerHTML = '<div class="col-span-full py-12 flex justify-center"><span class="loading loading-spinner loading-lg text-[var(--accent)]"></span></div>';
+
+        try {
+            let url = '/api/v1/buyer/realtors/';
+            if (query) url += `?search=${encodeURIComponent(query)}`;
+
+            const res = await fetch(url);
+            if (res.ok) {
+                const data = await res.json();
+                currentRealtors = data; // results or data? ListAPIView returns array or {count, results} if paginated. 
+                // Using LimitOffsetPagination in views (default for ListAPIView in this project seemingly from PropertySearchView). 
+                // RealtorListView didn't specify pagination class but project defaults might apply. 
+                // Let's assume pagination is off or handle both.
+
+                const list = Array.isArray(data) ? data : (data.results || []);
+                renderGrid(list);
+            } else {
+                grid.innerHTML = '<div class="col-span-full text-center text-red-500">Failed to load realtors</div>';
+            }
+        } catch (e) {
+            console.error(e);
+            grid.innerHTML = '<div class="col-span-full text-center text-red-500">Error loading realtors</div>';
+        }
+    }
+
+    function renderGrid(realtors) {
+        const grid = document.getElementById('realtor-grid');
+        if (realtors.length === 0) {
+            grid.innerHTML = '<div class="col-span-full text-center text-[var(--muted-foreground)] py-12">No realtors found matching your criteria.</div>';
+            return;
+        }
+
+        grid.innerHTML = realtors.map(r => {
+            const initials = r.first_name && r.last_name ? (r.first_name[0] + r.last_name[0]) : "AG";
+            const location = r.location || "Location not specified";
+
+            let btnHtml = '';
+            if (r.connection_status === 'PENDING') {
+                btnHtml = `
+                <button disabled class="w-full py-2 bg-[var(--muted)] text-[var(--muted-foreground)] font-bold rounded-lg cursor-not-allowed border border-[var(--border)]">
+                    Request Pending
+                </button>`;
+            } else if (r.connection_status === 'ACCEPTED') {
+                btnHtml = `
+                <button disabled class="w-full py-2 bg-emerald-600 text-white font-bold rounded-lg cursor-not-allowed">
+                    Connected
+                </button>`;
+            } else if (r.connection_status === 'REJECTED') {
+                btnHtml = `
+                <button onclick="openModal(${r.id}, '${r.first_name} ${r.last_name}')" class="w-full py-2 bg-red-100 text-red-600 border border-red-200 font-bold rounded-lg hover:bg-red-200 transition-colors">
+                    Request Rejected (Retry?)
+                </button>`;
+            } else {
+                btnHtml = `
+                <button onclick="openModal(${r.id}, '${r.first_name} ${r.last_name}')" class="w-full py-2 bg-[var(--primary)] text-[var(--bg)] font-bold rounded-lg hover:bg-[var(--accent-hover)] transition-colors">
+                    Add Realtor
+                </button>`;
+            }
+
+            return `
+            <div class="bg-[var(--card)] border border-[var(--border)] rounded-xl p-6 flex flex-col items-center text-center hover:border-[var(--accent)]/50 transition-colors shadow-sm">
+                <div class="w-20 h-20 rounded-full bg-[var(--accent)]/10 text-[var(--accent)] flex items-center justify-center text-2xl font-bold mb-4">
+                    ${initials}
+                </div>
+                
+                <h3 class="text-xl font-bold text-[var(--foreground)]">${r.first_name} ${r.last_name}</h3>
+                <p class="text-sm text-[var(--muted-foreground)] mb-1">${r.brokerage_company || 'Independent'}</p>
+                <div class="flex items-center gap-1 text-sm text-[var(--muted-foreground)] mb-4">
+                    <i data-lucide="map-pin" class="w-3 h-3"></i> ${location}
+                </div>
+                
+                <div class="w-full flex justify-between items-center text-sm border-t border-b border-[var(--border)] py-3 mb-4">
+                    <div class="flex flex-col">
+                        <span class="font-bold text-[var(--foreground)]">${r.experience || 'N/A'}</span>
+                        <span class="text-[var(--muted-foreground)] text-xs">Experience</span>
+                    </div>
+                     <div class="flex flex-col">
+                        <span class="font-bold text-[var(--accent)] flex items-center justify-center gap-1">
+                             ${r.rating || '5.0'} <i data-lucide="star" class="w-3 h-3 fill-[var(--accent)]"></i>
+                        </span>
+                        <span class="text-[var(--muted-foreground)] text-xs">${r.review_count || 0} Reviews</span>
+                    </div>
+                </div>
+                
+                ${btnHtml}
+            </div>
+            `;
+        }).join('');
+
+        if (window.lucide) lucide.createIcons();
+    }
+
+    function openModal(id, name) {
+        selectedRealtorId = id;
+        document.getElementById('modal-realtor-name').textContent = name;
+        const modal = document.getElementById('confirm-modal');
+        const content = document.getElementById('confirm-modal-content');
+
+        modal.classList.remove('hidden');
+        setTimeout(() => {
+            content.classList.remove('scale-95', 'opacity-0');
+            content.classList.add('scale-100', 'opacity-100');
+        }, 10);
+    }
+
+    function closeModal() {
+        const modal = document.getElementById('confirm-modal');
+        const content = document.getElementById('confirm-modal-content');
+        selectedRealtorId = null;
+
+        content.classList.remove('scale-100', 'opacity-100');
+        content.classList.add('scale-95', 'opacity-0');
+        setTimeout(() => {
+            modal.classList.add('hidden');
+        }, 200);
+    }
+
+    async function confirmAddRealtor() {
+        if (!selectedRealtorId) return;
+
+        const btn = document.getElementById('btn-confirm-add');
+        btn.disabled = true;
+        btn.innerHTML = '<span class="loading loading-spinner loading-xs"></span> Sending...';
+
+        try {
+            const res = await fetch('/api/v1/buyer/connect/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                body: JSON.stringify({ realtor_id: selectedRealtorId })
+            });
+
+            const data = await res.json();
+
+            if (res.ok) {
+                // Success
+                closeModal();
+                Toastify({
+                    text: "Request sent successfully!",
+                    style: { background: "var(--success, #10b981)" }
+                }).showToast();
+                // Refresh grid to update status
+                fetchRealtors(document.getElementById('realtor-search').value);
+            } else {
+                let msg = "Failed to send request.";
+                if (data.error) msg = data.error;
+                else if (data.detail) msg = data.detail;
+                else if (data.non_field_errors) msg = data.non_field_errors[0];
+                alert(msg);
+            }
+        } catch (e) {
+            console.error(e);
+            alert("Error connecting to server.");
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = 'Yes, Send Request';
+        }
+    }
+
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+</script>
+{% endblock %}

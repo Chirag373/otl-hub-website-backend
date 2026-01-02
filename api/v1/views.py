@@ -9,9 +9,10 @@ from api.v1.serializer import (
     PropertySearchSerializer,
     PartnerProfileSerializer,
     PricingPlanSerializer,
+    BuyerRealtorConnectionSerializer,
 )
 from core.permissions import IsBuyer, IsRealtor, IsSeller, IsPartner
-from api.models import BuyerProfile, RealtorProfile, SellerProfile, PartnerProfile, PropertyImage, PricingPlan
+from api.models import BuyerProfile, RealtorProfile, SellerProfile, PartnerProfile, PropertyImage, PricingPlan, BuyerRealtorConnection
 from rest_framework.response import Response
 from rest_framework import status
 from django.shortcuts import get_object_or_404
@@ -314,3 +315,85 @@ class AccessPassTypeViewSet(viewsets.ModelViewSet):
         if self.action in ['list', 'retrieve']:
              return [AllowAny()]
         return super().get_permissions()
+
+
+class RealtorListView(ListAPIView):
+    permission_classes = [IsAuthenticated] 
+    serializer_class = RealtorProfileSerializer
+    queryset = RealtorProfile.objects.all().select_related('user')
+    filter_backends = [OrderingFilter] # Add SearchFilter if using standard search
+    
+    def get_queryset(self):
+        qs = super().get_queryset()
+        query = self.request.query_params.get('search', None)
+        if query:
+            qs = qs.filter(
+                Q(user__first_name__icontains=query) | 
+                Q(user__last_name__icontains=query) |
+                Q(company_brokerage__icontains=query) |
+                Q(location__icontains=query)
+            )
+        return qs
+
+class ConnectionRequestCreateView(APIView):
+    permission_classes = [IsAuthenticated, IsBuyer]
+    
+    def post(self, request):
+        serializer = BuyerRealtorConnectionSerializer(data=request.data, context={'request': request})
+        if serializer.is_valid():
+             try:
+                 serializer.save()
+                 return Response(serializer.data, status=status.HTTP_201_CREATED)
+             except Exception as e:
+                 return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class RealtorRequestsListView(ListAPIView):
+    permission_classes = [IsAuthenticated, IsRealtor]
+    serializer_class = BuyerRealtorConnectionSerializer
+    
+    def get_queryset(self):
+         return BuyerRealtorConnection.objects.filter(realtor__user=self.request.user, status='PENDING')
+
+class ConnectionStatusUpdateView(APIView):
+    permission_classes = [IsAuthenticated, IsRealtor]
+    
+    def post(self, request, pk):
+        conn = get_object_or_404(BuyerRealtorConnection, pk=pk, realtor__user=request.user)
+        action = request.data.get('action') 
+        
+        if action == 'accept':
+            # Check if buyer already has an assigned agent?
+            # Or just overwrite? The requirement says "if one agent accept the request, the other automatically rejected"
+            
+            with transaction.atomic():
+                conn.status = 'ACCEPTED'
+                conn.save()
+                
+                # Update Buyer's assigned agent
+                buyer_profile = conn.buyer
+                buyer_profile.assigned_agent = request.user
+                buyer_profile.save()
+
+                # Automatically reject other PENDING requests for this buyer
+                BuyerRealtorConnection.objects.filter(
+                    buyer=buyer_profile,
+                    status='PENDING'
+                ).exclude(id=conn.id).update(status='REJECTED')
+             
+            
+        elif action == 'reject':
+            conn.status = 'REJECTED'
+            conn.save()
+        else:
+             return Response({"error": "Invalid action"}, status=status.HTTP_400_BAD_REQUEST)
+        
+        return Response({"status": "success", "connection_status": conn.status})
+
+class BuyerConnectionsListView(ListAPIView):
+     permission_classes = [IsAuthenticated, IsBuyer]
+     serializer_class = BuyerRealtorConnectionSerializer
+     
+     def get_queryset(self):
+         return BuyerRealtorConnection.objects.filter(buyer__user=self.request.user).order_by('-updated_at')
+
