@@ -156,8 +156,9 @@
 
             <div class="bg-[var(--accent)]/5 border border-[var(--accent)]/20 p-5 rounded-xl mb-6">
                 <div class="flex justify-between items-end mb-3">
-                    <span class="font-bold text-[var(--accent)] text-3xl">$650</span>
-                    <span class="text-sm font-medium text-[var(--muted-foreground)]">/ 30 Days</span>
+                    <span id="modal-pass-price" class="font-bold text-[var(--accent)] text-3xl">$650</span>
+                    <span id="modal-pass-duration" class="text-sm font-medium text-[var(--muted-foreground)]">/ 30
+                        Days</span>
                 </div>
                 <ul class="text-sm text-[var(--muted-foreground)] space-y-2.5">
                     <li class="flex items-start gap-2">
@@ -377,10 +378,30 @@
         sellerPhoneLink: document.getElementById('seller-phone-link')
     };
 
+    async function fetchAccessConfig() {
+        try {
+            const res = await fetch('/api/v1/access-pass-types/');
+            if (res.ok) {
+                const data = await res.json();
+                const pass = data.find(p => p.slug === 'basic') || data[0];
+                if (pass) {
+                    const priceEl = document.getElementById('modal-pass-price');
+                    const durationEl = document.getElementById('modal-pass-duration');
+                    if (priceEl) priceEl.textContent = `$${parseInt(pass.price)}`;
+                    if (durationEl) durationEl.textContent = `/ ${pass.days_duration} Days`;
+                }
+            }
+        } catch (e) {
+            console.error("Failed to fetch access config", e);
+        }
+    }
+
     // --- INITIALIZATION ---
     function init() {
         if (window.lucide) lucide.createIcons();
         window.propertiesById = {}; // Init storage
+
+        fetchAccessConfig(); // New
 
         // Parse URL params
         const urlParams = new URLSearchParams(window.location.search);

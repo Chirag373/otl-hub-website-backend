@@ -84,17 +84,31 @@ class CreateAccessPassSessionView(APIView):
             return Response({'error': 'Unauthorized'}, status=status.HTTP_401_UNAUTHORIZED)
             
         try:
-            # Determine price from PricingPlan
-            try:
-                from api.models import PricingPlan
-                plan = PricingPlan.objects.get(plan_type='buyer')
-                price_amount = int(plan.buyer_access_pass_price * 100)
-            except (PricingPlan.DoesNotExist, ImportError):
-                price_amount = 65000 # Fallback
-
-            product_name = "Buyer Access Pass"
-            description = "30-Day Access Pass to unlock seller contacts"
+            # Determine price from AccessPassType (Dynamic)
+            # Default to 'basic' or the first available pass
+            from api.models import AccessPassType
             
+            # You might want to let the frontend send which pass ID to buy, 
+            # but for now we'll default to 'basic' if not provided.
+            # If you want to support multiple tiers eventually, get pass_id from request.data
+            
+            pass_type = AccessPassType.objects.filter(slug='basic').first()
+            if not pass_type:
+                # Fallback if no basic pass exists
+                pass_type = AccessPassType.objects.first()
+                
+            if pass_type:
+                price_amount = int(pass_type.price * 100)
+                product_name = pass_type.name
+                description = f"{pass_type.days_duration}-Day Access Pass. Unlocks {pass_type.properties_limit} properties."
+                pass_id = pass_type.id
+            else:
+                # Emergency Fallback (Legacy)
+                price_amount = 65000 
+                product_name = "Buyer Access Pass"
+                description = "30-Day Access Pass"
+                pass_id = None
+
             success_url = request.build_absolute_uri(reverse('access-pass-success')) + "?session_id={CHECKOUT_SESSION_ID}"
             cancel_url = request.build_absolute_uri('/buyer/dashboard')
             
@@ -119,7 +133,8 @@ class CreateAccessPassSessionView(APIView):
                 'client_reference_id': str(request.user.id),
                 'metadata': {
                     'type': 'access_pass',
-                    'user_id': str(request.user.id)
+                    'user_id': str(request.user.id),
+                    'access_pass_id': str(pass_id) if pass_id else ''
                 }
             }
             
@@ -155,28 +170,59 @@ class AccessPassSuccessView(APIView):
              # Verify it's an Access Pass session
              if session.metadata.get('type') == 'access_pass':
                  user_id = session.metadata.get('user_id')
+                 access_pass_id = session.metadata.get('access_pass_id')
+                 
                  try:
                      from core.models import User
-                     from api.models import BuyerProfile
+                     from api.models import BuyerProfile, AccessPassType
                      from django.utils import timezone
                      from datetime import timedelta
                      
                      user = User.objects.get(id=user_id)
                      profile = BuyerProfile.objects.get(user=user)
                      
-                     # 1. Update Expiry Date
-                     # If already active, add 30 days to existing expiry? 
-                     # Or just set to now + 30 days? 
-                     # Requirement: "Extensions ... +15 days". But this is a new pass purchase ($650).
-                     # "Valid for 30 days".
-                     # "Buyer cannot unlock new seller contacts without buying another Access Pass" -> Implies strictly specific durations.
-                     # Let's add 30 days from NOW, or extend if currently active.
+                     # Fetch the pass type used for this purchase
+                     pass_type = None
+                     if access_pass_id:
+                         try:
+                             pass_type = AccessPassType.objects.get(id=access_pass_id)
+                         except AccessPassType.DoesNotExist:
+                             pass
                      
+                     # Default values if pass type missing (fallback)
+                     duration = 30
+                     limit = 10
+                     ext_days = 15
+                     ext_price = 0
+                     
+                     if pass_type:
+                         duration = pass_type.days_duration
+                         limit = pass_type.properties_limit
+                         ext_days = pass_type.extension_days
+                         ext_price = pass_type.extension_price
+                     
+                     # 1. Update Expiry Date
                      now = timezone.now()
                      if profile.access_pass_expiry and profile.access_pass_expiry > now:
-                         profile.access_pass_expiry += timedelta(days=30)
+                         profile.access_pass_expiry += timedelta(days=duration)
                      else:
-                         profile.access_pass_expiry = now + timedelta(days=30)
+                         profile.access_pass_expiry = now + timedelta(days=duration)
+                         
+                     # 2. Update Snapshot Values (Lock in terms for this subscription)
+                     # Only update these on new pass purchase.
+                     # If extending, logic might differ, but "Access Pass" usually means a new block.
+                     # User said: "current subscription will not affect... added in the next month"
+                     # Since this IS the "next month" / new purchase, we update the snapshot.
+                     
+                     profile.current_access_pass_limit = limit
+                     profile.current_access_pass_extension_days = ext_days
+                     profile.current_access_pass_extension_price = ext_price
+                     
+                     # Reset extensions used on new pass? 
+                     # Usually yes, if it's a fresh pass. 
+                     # If it's a stacking purchase, maybe not? 
+                     # Assuming reset for now as it's a "Pass".
+                     profile.access_pass_extensions_used = 0 
                          
                      profile.save()
                      

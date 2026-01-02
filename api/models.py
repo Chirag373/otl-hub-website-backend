@@ -22,6 +22,11 @@ class BuyerProfile(models.Model):
     access_pass_expiry = models.DateTimeField(null=True, blank=True, help_text='Expiration date of the current Access Pass')
     access_pass_extensions_used = models.IntegerField(default=0, help_text='Number of extensions used (max 2)')
     
+    # Snapshot fields for Access Pass (locked in at purchase)
+    current_access_pass_limit = models.IntegerField(default=10, help_text="Snapshot of property limit at time of purchase")
+    current_access_pass_extension_days = models.IntegerField(default=15, help_text="Snapshot of extension days at time of purchase")
+    current_access_pass_extension_price = models.DecimalField(max_digits=10, decimal_places=2, default=0.00, help_text="Snapshot of extension price at time of purchase")
+    
     assigned_agent = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, related_name="assigned_buyers")
     favorites = models.ManyToManyField("SellerProfile", blank=True, related_name="favorited_by")
 

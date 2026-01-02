@@ -266,10 +266,18 @@
     // --- PRICING DATA FETCH ---
     async function initPricing() {
         try {
-            const res = await fetch('/api/v1/pricing-plans/');
-            if (res.ok) {
-                const data = await res.json();
+            const [pricingRes, passRes] = await Promise.all([
+                fetch('/api/v1/pricing-plans/'),
+                fetch('/api/v1/access-pass-types/')
+            ]);
+
+            if (pricingRes.ok) {
+                const data = await pricingRes.json();
                 updatePlanConfigs(data);
+            }
+            if (passRes.ok) {
+                const passData = await passRes.json();
+                updateAccessPassConfig(passData);
             }
         } catch (e) {
             console.error("Failed to load dynamic pricing, using defaults", e);
@@ -285,12 +293,8 @@
                 if (planConfigs.buyer && planConfigs.buyer.membership) {
                     planConfigs.buyer.membership.upfrontPrice = parseFloat(p.buyer_upfront_price);
                     planConfigs.buyer.membership.monthlyPrice = parseFloat(p.buyer_monthly_price);
-                    // Update derived description if it was hardcoded (e.g. "40 * 3")
-                    // But currently description is just text, we might want to update it if logic is tight
                 }
-                if (planConfigs.buyer && planConfigs.buyer.accessPass) {
-                    planConfigs.buyer.accessPass.price = parseFloat(p.buyer_access_pass_price);
-                }
+                // Legacy access pass price ignored here, handled by updateAccessPassConfig
             } else if (p.plan_type === 'seller' && planConfigs.seller) {
                 planConfigs.seller.setupFee = parseFloat(p.setup_fee);
                 planConfigs.seller.listingFee = parseFloat(p.listing_fee);
@@ -305,6 +309,20 @@
                 planConfigs.partner.monthly = parseFloat(p.monthly_fee);
             }
         });
+    }
+
+    function updateAccessPassConfig(data) {
+        if (!data || data.length === 0) return;
+
+        // Find 'basic' or default to first
+        let pass = data.find(p => p.slug === 'basic') || data[0];
+
+        if (pass && planConfigs.buyer && planConfigs.buyer.accessPass) {
+            planConfigs.buyer.accessPass.name = pass.name;
+            planConfigs.buyer.accessPass.price = parseFloat(pass.price);
+            planConfigs.buyer.accessPass.duration = `${pass.days_duration} Days`;
+            planConfigs.buyer.accessPass.description = `Required to unlock, contact & submit offers (${pass.properties_limit} unlocks)`;
+        }
     }
 
     // --- DOM ELEMENTS ---

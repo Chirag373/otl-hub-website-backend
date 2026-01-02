@@ -260,12 +260,108 @@
 
     };
 
+    let passConfig = {
+        price: 650, // default fallback
+        limit: "Unlimited",
+        days: 30
+    };
+
     // --- INITIALIZATION ---
     function init() {
         if (window.lucide) lucide.createIcons();
         checkUrlParams();
+        fetchAccessConfig(); // New
         fetchProfile();
         setupEventListeners();
+    }
+
+    // ... (checkUrlParams unchanged) ...
+
+    async function fetchAccessConfig() {
+        try {
+            const res = await fetch('/api/v1/access-pass-types/');
+            if (res.ok) {
+                const data = await res.json();
+                const pass = data.find(p => p.slug === 'basic') || data[0];
+                if (pass) {
+                    passConfig.price = parseInt(pass.price);
+                    passConfig.days = pass.days_duration;
+                    passConfig.limit = pass.properties_limit; // Display limit logic if needed
+                }
+            }
+        } catch (e) {
+            console.error("Failed to fetch access config", e);
+        }
+    }
+
+    // ... (fetchProfile unchanged) ...
+
+    function calculateStats() {
+        // Access Pass Logic
+        if (!dom.accessCounterContainer) return;
+
+        let html = '';
+        const now = new Date();
+        const expiryStr = stats.accessPassExpiry;
+        const expiry = expiryStr ? new Date(expiryStr) : null;
+
+        const isActive = expiry && expiry > now;
+
+        if (isActive) {
+            const diffTime = expiry - now;
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+            html = `
+                <div class="flex items-center justify-between mb-2">
+                    <div class="flex items-center gap-2 text-success">
+                        <i data-lucide="check-circle" class="h-5 w-5"></i>
+                        <h4 class="font-bold text-lg">Access Pass Active</h4>
+                    </div>
+                     <span class="badge badge-success badge-outline">Active</span>
+                </div>
+                <div class="text-sm text-[var(--muted-foreground)] mb-4">
+                     You can unlock unlimited seller contacts.
+                </div>
+                <div class="bg-[var(--muted)]/20 p-3 rounded-lg flex justify-between items-center">
+                    <span class="text-sm">Days Remaining:</span>
+                    <span class="font-bold font-mono text-lg">${diffDays} Days</span>
+                </div>
+             `;
+        } else {
+            // Not active or expired
+            const isExpired = expiry && expiry <= now;
+
+            html = `
+                <div class="flex items-center justify-between mb-2">
+                     <div class="flex items-center gap-2 ${isExpired ? 'text-error' : 'text-[var(--foreground)]'}">
+                        <i data-lucide="${isExpired ? 'alert-circle' : 'lock'}" class="h-5 w-5"></i>
+                        <h4 class="font-bold text-lg">${isExpired ? 'Access Pass Expired' : 'Buyer Access Pass'}</h4>
+                    </div>
+                    ${isExpired ? '<span class="badge badge-error badge-outline">Expired</span>' : ''}
+                </div>
+                <div class="text-sm text-[var(--muted-foreground)] mb-4">
+                     Unlock seller contacts, submit offers, and contact seller agents directly.
+                </div>
+                
+                <div class="bg-[var(--accent)]/5 border border-[var(--accent)]/20 p-4 rounded-lg mb-4">
+                    <div class="flex justify-between items-end mb-2">
+                        <span class="font-bold text-[var(--accent)] text-xl">$${passConfig.price}</span>
+                        <span class="text-xs text-[var(--muted-foreground)]">${passConfig.days} Days Access</span>
+                    </div>
+                    <ul class="text-xs text-[var(--muted-foreground)] space-y-1 list-disc pl-4">
+                        <li>Unlock up to ${passConfig.limit} properties</li>
+                        <li>Direct offer submission</li>
+                    </ul>
+                </div>
+
+                <button id="btn-buy-access-pass" onclick="purchaseAccessPass()" class="btn btn-primary w-full bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-white border-none">
+                    Purchase Access Pass ($${passConfig.price})
+                </button>
+             `;
+        }
+
+        dom.accessCounterContainer.innerHTML = html;
+        if (window.lucide) lucide.createIcons();
     }
 
     function checkUrlParams() {
@@ -505,82 +601,7 @@
         }
     }
 
-    function calculateStats() {
-        // Access Pass Logic
-        // Logic: 
-        // If expiry date exists and is in future -> Active
-        // If expiry date exists and is in past -> Expired
-        // If no expiry date -> Not Purchased
 
-        if (!dom.accessCounterContainer) return;
-
-        let html = '';
-        const now = new Date();
-        const expiryStr = stats.accessPassExpiry;
-        const expiry = expiryStr ? new Date(expiryStr) : null;
-
-        const isActive = expiry && expiry > now;
-
-        if (isActive) {
-            const diffTime = expiry - now;
-            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-            html = `
-                <div class="flex items-center justify-between mb-2">
-                    <div class="flex items-center gap-2 text-success">
-                        <i data-lucide="check-circle" class="h-5 w-5"></i>
-                        <h4 class="font-bold text-lg">Access Pass Active</h4>
-                    </div>
-                     <span class="badge badge-success badge-outline">Active</span>
-                </div>
-                <div class="text-sm text-[var(--muted-foreground)] mb-4">
-                     You can unlock unlimited seller contacts.
-                </div>
-                <div class="bg-[var(--muted)]/20 p-3 rounded-lg flex justify-between items-center">
-                    <span class="text-sm">Days Remaining:</span>
-                    <span class="font-bold font-mono text-lg">${diffDays} Days</span>
-                </div>
-             `;
-        } else {
-            // Not active or expired
-            const isExpired = expiry && expiry <= now;
-
-            html = `
-                <div class="flex items-center justify-between mb-2">
-                     <div class="flex items-center gap-2 ${isExpired ? 'text-error' : 'text-[var(--foreground)]'}">
-                        <i data-lucide="${isExpired ? 'alert-circle' : 'lock'}" class="h-5 w-5"></i>
-                        <h4 class="font-bold text-lg">${isExpired ? 'Access Pass Expired' : 'Buyer Access Pass'}</h4>
-                    </div>
-                    ${isExpired ? '<span class="badge badge-error badge-outline">Expired</span>' : ''}
-                </div>
-                <div class="text-sm text-[var(--muted-foreground)] mb-4">
-                     Unlock seller contacts, submit offers, and contact seller agents directly.
-                </div>
-                
-                <div class="bg-[var(--accent)]/5 border border-[var(--accent)]/20 p-4 rounded-lg mb-4">
-                    <div class="flex justify-between items-end mb-2">
-                        <span class="font-bold text-[var(--accent)] text-xl">$650</span>
-                        <span class="text-xs text-[var(--muted-foreground)]">30 Days Access</span>
-                    </div>
-                    <ul class="text-xs text-[var(--muted-foreground)] space-y-1 list-disc pl-4">
-                        <li>Unlimited seller contact unlocks</li>
-                        <li>Direct offer submission</li>
-                    </ul>
-                </div>
-
-                <button id="btn-buy-access-pass" onclick="purchaseAccessPass()" class="btn btn-primary w-full bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-white border-none">
-                    Purchase Access Pass ($650)
-                </button>
-             `;
-        }
-
-        dom.accessCounterContainer.innerHTML = html;
-        if (window.lucide) lucide.createIcons();
-    }
-
-    function renderAccessStatus(daysLeft, remainingViews) {
-        // Deprecated/Replaced by calculateStats
-    }
 
     // Helper to get cookies
     function getCookie(name) {
