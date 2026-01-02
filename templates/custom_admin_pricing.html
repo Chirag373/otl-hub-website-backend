@@ -48,10 +48,7 @@
                 class="role-tab flex-1 sm:flex-none px-6 py-2 rounded-md text-sm font-medium transition-all text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--muted)]/50">
                 Partner
             </button>
-            <button onclick="switchTab('access_passes')" id="tab-access_passes"
-                class="role-tab flex-1 sm:flex-none px-6 py-2 rounded-md text-sm font-medium transition-all text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--muted)]/50">
-                Access Passes
-            </button>
+
         </div>
 
         <!-- Content Area -->
@@ -116,8 +113,7 @@
                 <h3 class="pass-name-display text-xl font-bold text-[var(--foreground)]">Basic Access</h3>
                 <p class="text-xs text-[var(--muted-foreground)] uppercase tracking-wider pass-slug">basic</p>
             </div>
-            <button class="btn-delete btn btn-xs btn-ghost text-error hover:bg-error/10"><i data-lucide="trash-2"
-                    class="w-4 h-4"></i></button>
+
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -179,7 +175,6 @@
     let accessPassesData = [];
     let currentTab = 'buyer';
     let hasUnsavedChanges = false;
-    let deletedPasses = [];
 
     // --- INIT ---
     document.addEventListener('DOMContentLoaded', async () => {
@@ -225,8 +220,8 @@
         btn.disabled = true;
 
         try {
-            if (currentTab === 'access_passes') {
-                await saveAccessPasses();
+            if (currentTab === 'buyer') {
+                await Promise.all([savePricingPlan(), saveAccessPasses()]);
             } else {
                 await savePricingPlan();
             }
@@ -241,8 +236,8 @@
             btn.innerHTML = originalText;
             btn.disabled = false;
             // Refetch to ensure sync
-            if (currentTab === 'access_passes') await fetchAccessPasses();
-            else await fetchPricingData();
+            if (currentTab === 'buyer') await fetchAccessPasses();
+            await fetchPricingData();
             renderTopLevel();
         }
     }
@@ -284,36 +279,16 @@
                 slug: el.querySelector('.pass-name-input').value.toLowerCase().replace(/ /g, '-') // Auto slug
             };
 
-            if (id === 'new') {
-                // Post
-                const res = await fetch(PASS_API_BASE + '/', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCookie('csrftoken') },
-                    body: JSON.stringify(payload)
-                });
-                if (!res.ok) throw new Error('Failed to create pass');
-            } else {
-                // Patch
-                const res = await fetch(`${PASS_API_BASE}/${id}/`, {
-                    method: 'PATCH',
-                    headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCookie('csrftoken') },
-                    body: JSON.stringify(payload)
-                });
-                if (!res.ok) throw new Error('Failed to update pass');
-            }
-        });
-
-        // Handle Deletes
-        const delPromises = deletedPasses.map(async (id) => {
+            // Patch
             const res = await fetch(`${PASS_API_BASE}/${id}/`, {
-                method: 'DELETE',
-                headers: { 'X-CSRFToken': getCookie('csrftoken') }
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCookie('csrftoken') },
+                body: JSON.stringify(payload)
             });
-            if (!res.ok) throw new Error('Failed to delete pass');
+            if (!res.ok) throw new Error('Failed to update pass');
         });
 
-        await Promise.all([...promises, ...delPromises]);
-        deletedPasses = [];
+        await Promise.all(promises);
     }
 
     // --- UI LOGIC ---
@@ -334,16 +309,23 @@
             }
         });
 
-        deletedPasses = []; // Reset transient deletes when switching
+
         renderTopLevel();
         setUnsavedChanges(false);
     }
 
     function renderTopLevel() {
-        if (currentTab === 'access_passes') {
-            renderAccessPasses();
+        if (currentTab === 'buyer') {
+            renderForm('buyer', true);
+
+            const container = document.getElementById('forms-container');
+            const divider = document.createElement('div');
+            divider.className = 'my-8 border-t border-[var(--border)]';
+            container.appendChild(divider);
+
+            renderAccessPasses(false);
         } else {
-            renderForm(currentTab);
+            renderForm(currentTab, true);
         }
 
         const spinner = document.getElementById('loading-spinner');
@@ -352,9 +334,9 @@
         container.classList.remove('opacity-0');
     }
 
-    function renderForm(role) {
+    function renderForm(role, shouldClear = true) {
         const container = document.getElementById('forms-container');
-        container.innerHTML = '';
+        if (shouldClear) container.innerHTML = '';
 
         const fields = VIEWS[role];
         const data = pricingData[role] || {};
@@ -400,17 +382,14 @@
         container.appendChild(infoText);
     }
 
-    function renderAccessPasses() {
+    function renderAccessPasses(shouldClear = true) {
         const container = document.getElementById('forms-container');
-        container.innerHTML = '';
+        if (shouldClear) container.innerHTML = '';
 
         const header = document.createElement('div');
         header.className = "flex justify-between items-center mb-6";
         header.innerHTML = `
             <h3 class="text-xl font-bold text-[var(--foreground)]">Access Passes</h3>
-            <button onclick="addNewPass()" class="btn btn-sm bg-[var(--accent)] text-[var(--bg)] hover:bg-[var(--accent-hover)] border-none">
-                <i data-lucide="plus" class="w-4 h-4 mr-1"></i> Add New Pass
-            </button>
         `;
         container.appendChild(header);
 
@@ -437,12 +416,7 @@
 
             inputs.forEach(i => i.addEventListener('input', () => setUnsavedChanges(true)));
 
-            const delBtn = clone.querySelector('.btn-delete');
-            delBtn.onclick = () => {
-                deletedPasses.push(pass.id);
-                setUnsavedChanges(true);
-                card.remove();
-            };
+
 
             grid.appendChild(clone);
         });
@@ -451,35 +425,7 @@
         lucide.createIcons();
     }
 
-    function addNewPass() {
-        const grid = document.getElementById('access-passes-grid');
-        const template = document.getElementById('access-pass-template');
-        const clone = template.content.cloneNode(true);
-        const card = clone.querySelector('.bg-\\[var\\(--bg\\)\\]');
-        card.classList.add('access-pass-card');
-        card.dataset.id = 'new';
 
-        clone.querySelector('.pass-name-display').textContent = 'New Access Pass';
-        clone.querySelector('.pass-slug').textContent = 'pending...';
-
-        clone.querySelector('.pass-name-input').value = 'New Pass';
-        clone.querySelector('.pass-price').value = 0;
-        clone.querySelector('.pass-ext-days').value = 15;
-        clone.querySelector('.pass-limit').value = 10;
-
-        const inputs = clone.querySelectorAll('input');
-        inputs.forEach(i => i.addEventListener('input', () => setUnsavedChanges(true)));
-
-        const delBtn = clone.querySelector('.btn-delete');
-        delBtn.onclick = () => {
-            card.remove();
-            // No need to push to deletedPasses since it wasn't saved yet
-        };
-
-        grid.appendChild(clone);
-        setUnsavedChanges(true);
-        lucide.createIcons();
-    }
 
     function setUnsavedChanges(status) {
         hasUnsavedChanges = status;
