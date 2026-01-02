@@ -374,21 +374,12 @@
                 location: data.location || "",
                 member_since: data.member_since || "",
                 agent: data.agent, // API returns {name, phone, email, brokerage_company} or null
-                // Add access pass info if available in serializer (assuming it is or will be added)
-                // If not in serializer yet, we might need to rely on what's there or update serializer.
-                // Assuming data.access_pass_expiry exists?
-                // Let's assume the serializer returns it. If not, we might need to add it.
-                // Checking BuyerProfileSerializer... it does NOT have access_pass_expiry.
-                // I will need to update BuyerProfileSerializer to return 'access_pass_expiry'.
             };
 
             populateData();
-            // We need to fetch specific access pass stats if not in profile
-            // For now, I'll update the serializer in the next step to include this info.
-            // Assuming it will be there:
-            stats.accessPassExpiry = data.access_pass_expiry; // Expecting ISO string or null
+            stats.accessPassExpiry = data.access_pass_expiry;
 
-            calculateStats(); // Recalculate based on real subscription data if available
+            calculateStats();
 
         } catch (error) {
             console.error('Error fetching profile:', error);
