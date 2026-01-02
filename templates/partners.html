@@ -235,7 +235,7 @@
                 id: p.email, // Use email as unique ID if ID not available
                 firstName: p.first_name,
                 lastName: p.last_name,
-                title: "Partner", // Generic title
+                title: p.partnership_type_display, // Specific title
                 category: p.partnership_type_display,
                 licensedIn: p.business_license_number ? "TX" : "N/A", // Assume TX based on context
                 phone: p.phone_number,
@@ -281,20 +281,9 @@
         });
     }
 
-    function groupPartners(partnersList) {
-        const groups = {};
-        partnersList.forEach(partner => {
-            const key = partner.category || "Other";
-            if (!groups[key]) groups[key] = [];
-            groups[key].push(partner);
-        });
-        return groups;
-    }
-
     // --- RENDERING ---
     function renderPartners() {
         const filtered = getFilteredPartners();
-        const grouped = groupPartners(filtered);
 
         // Update stats
         resultCountSpan.textContent = filtered.length;
@@ -317,36 +306,13 @@
             return;
         }
 
-        // Determine rendering order
-        const availableCategories = Object.keys(grouped);
-        const sortedCategories = [
-            ...categoryOrder.filter(c => availableCategories.includes(c)),
-            ...availableCategories.filter(c => !categoryOrder.includes(c))
-        ];
+        const gridHtml = filtered.map(partner => createPartnerCardHtml(partner)).join('');
 
-        // Render Sections
-        sortedCategories.forEach(category => {
-            const categoryPartners = grouped[category];
-            if (!categoryPartners || categoryPartners.length === 0) return;
-
-            const section = document.createElement('section');
-            section.className = 'mb-12';
-
-            const gridHtml = categoryPartners.map(partner => createPartnerCardHtml(partner)).join('');
-
-            section.innerHTML = `
-                <div class="flex items-baseline justify-between mb-4">
-                    <h2 class="font-heading text-2xl text-[var(--foreground)]">${category}</h2>
-                    <span class="text-sm text-[var(--muted-foreground)]">
-                        ${categoryPartners.length} ${categoryPartners.length === 1 ? 'partner' : 'partners'}
-                    </span>
-                </div>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    ${gridHtml}
-                </div>
-            `;
-            partnersContainer.appendChild(section);
-        });
+        partnersContainer.innerHTML = `
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                ${gridHtml}
+            </div>
+        `;
 
         if (window.lucide) lucide.createIcons();
     }
