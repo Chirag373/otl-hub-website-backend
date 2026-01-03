@@ -709,13 +709,18 @@
                          <span class="text-[var(--muted-foreground)]">Setup Fee</span>
                         <span class="font-medium text-[var(--foreground)]">$${config.setupFee}</span>
                     </div>
+                    <div class="flex justify-between items-center text-sm border-b border-[var(--border)] pb-2">
+                         <span class="text-[var(--muted-foreground)]">First Month</span>
+                        <span class="font-medium text-[var(--foreground)]">$${config.monthly}</span>
+                    </div>
                      <div class="flex justify-between items-center pt-2">
                         <span class="font-bold text-[var(--foreground)]">Initial Total</span>
-                        <span class="text-2xl font-bold text-[var(--foreground)]">$${config.accessFee + config.setupFee}</span>
+                        <span class="text-2xl font-bold text-[var(--foreground)]">$${config.accessFee + config.setupFee + config.monthly}</span>
                     </div>
                     <div class="mt-4 p-3 bg-[var(--accent)]/5 rounded-lg border border-[var(--accent)]/20">
                          <p class="text-sm text-[var(--muted-foreground)]">Monthly Subscription</p>
                          <p class="text-3xl font-bold text-[var(--accent)]">$${config.monthly}<span class="text-sm font-normal text-[var(--muted-foreground)]">/mo</span></p>
+                         <p class="text-xs text-[var(--muted-foreground)] mt-1">(Included in initial total)</p>
                     </div>
                 </div>
             `;
@@ -730,13 +735,18 @@
                          <span class="text-[var(--muted-foreground)]">Setup Fee</span>
                         <span class="font-medium text-[var(--foreground)]">$${config.setupFee}</span>
                     </div>
+                    <div class="flex justify-between items-center text-sm border-b border-[var(--border)] pb-2">
+                         <span class="text-[var(--muted-foreground)]">First Month</span>
+                        <span class="font-medium text-[var(--foreground)]">$${config.monthly}</span>
+                    </div>
                      <div class="flex justify-between items-center pt-2">
                         <span class="font-bold text-[var(--foreground)]">Initial Total</span>
-                        <span class="text-2xl font-bold text-[var(--foreground)]">$${config.accessFee + config.setupFee}</span>
+                        <span class="text-2xl font-bold text-[var(--foreground)]">$${config.accessFee + config.setupFee + config.monthly}</span>
                     </div>
                     <div class="mt-4 p-3 bg-[var(--accent)]/5 rounded-lg border border-[var(--accent)]/20">
                          <p class="text-sm text-[var(--muted-foreground)]">Monthly Subscription</p>
                          <p class="text-3xl font-bold text-[var(--accent)]">$${config.monthly}<span class="text-sm font-normal text-[var(--muted-foreground)]">/mo</span></p>
+                        <p class="text-xs text-[var(--muted-foreground)] mt-1">(Included in initial total)</p>
                     </div>
                 </div>
             `;

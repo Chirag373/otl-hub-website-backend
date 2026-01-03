@@ -43,18 +43,18 @@ def get_product_details(signup_data):
             description = f"Includes ${plan.setup_fee} setup fee + ${plan.listing_fee} listing fee"
             
         elif role == 'realtor':
-            # Setup + Access Fee
-            total = plan.setup_fee + plan.access_fee
+            # Setup + Access Fee + First Month
+            total = plan.setup_fee + plan.access_fee + plan.monthly_fee
             price_cents = int(total * 100)
             product_name = "Realtor Subscription"
-            description = f"Includes ${plan.setup_fee} setup fee + ${plan.access_fee} access fee"
+            description = f"Includes ${plan.setup_fee} setup, ${plan.access_fee} access, + ${plan.monthly_fee} first month"
             
         elif role == 'partner':
-             # Setup + Access Fee
-            total = plan.setup_fee + plan.access_fee
+             # Setup + Access Fee + First Month
+            total = plan.setup_fee + plan.access_fee + plan.monthly_fee
             price_cents = int(total * 100)
             product_name = "Partner Subscription"
-            description = f"Includes ${plan.setup_fee} setup fee + ${plan.access_fee} access fee"
+            description = f"Includes ${plan.setup_fee} setup, ${plan.access_fee} access, + ${plan.monthly_fee} first month"
             
     except PricingPlan.DoesNotExist:
         # Fallback to hardcoded if no DB entry found
@@ -63,9 +63,11 @@ def get_product_details(signup_data):
         elif role == 'seller':
             return 29800, "Seller Account Setup", "Includes $99 setup fee + $199 listing fee"
         elif role == 'realtor':
-             return 19800, "Realtor Subscription", "Includes $99 setup fee + $99 access fee"
+             # 99 + 99 + 49 = 247
+             return 24700, "Realtor Subscription", "Includes $99 setup, $99 access, + $49 first month"
         elif role == 'partner':
-             return 49800, "Partner Subscription", "Includes $199 setup fee + $299 access fee"
+             # 199 + 299 + 99 = 597
+             return 59700, "Partner Subscription", "Includes $199 setup, $299 access, + $99 first month"
         return 1000, "Account Verification Fee", "Standard verification fee"
 
     return price_cents, product_name, description
@@ -234,6 +236,178 @@ class AccessPassSuccessView(APIView):
         return redirect('/buyer/dashboard?error=payment_failed')
 
 
+
+def get_checkout_config(signup_data):
+    """
+    Returns (mode, line_items, subscription_data) based on role and PricingPlan.
+    """
+    role = signup_data.get('role', '').lower()
+    
+    # Defaults
+    mode = 'payment'
+    line_items = []
+    subscription_data = {}
+    
+    # Try to fetch plan from DB
+    try:
+        plan = PricingPlan.objects.get(plan_type=role)
+        
+        if role == 'buyer':
+            # Buyer: Subscription with 90-day "paid upfront" trial
+            # Upfront: $120. Recurring: $40/mo starting after 3 months (90 days).
+            
+            mode = 'subscription'
+            
+            # 1. Recurring Item (Membership)
+            line_items.append({
+                'price_data': {
+                    'currency': 'usd',
+                    'product_data': {
+                        'name': "Buyer Membership (Monthly)",
+                        'description': "Monthly membership after initial 3-month period"
+                    },
+                    'unit_amount': int(plan.buyer_monthly_price * 100),
+                    'recurring': {'interval': 'month'}
+                },
+                'quantity': 1,
+            })
+            
+            # 2. One-time Item (Upfront Payment)
+            line_items.append({
+                'price_data': {
+                    'currency': 'usd',
+                    'product_data': {
+                        'name': "3-Month Membership Prepayment",
+                        'description': "Upfront payment for the first 3 months"
+                    },
+                    'unit_amount': int(plan.buyer_upfront_price * 100),
+                },
+                'quantity': 1,
+            })
+            
+            # 3. Subscription Trial Logic
+            subscription_data = {
+                'trial_period_days': 90 
+            }
+            
+        elif role == 'seller':
+            # Seller: One-time payment (Setup + Listing)
+            mode = 'payment'
+            total = plan.setup_fee + plan.listing_fee
+            
+            line_items.append({
+                'price_data': {
+                    'currency': 'usd',
+                    'product_data': {
+                        'name': "Seller Account Setup",
+                        'description': f"Includes ${plan.setup_fee} setup fee + ${plan.listing_fee} listing fee"
+                    },
+                    'unit_amount': int(total * 100),
+                },
+                'quantity': 1,
+            })
+
+        elif role == 'realtor':
+            # Realtor: Subscription (starts immediately) + One-time Fees
+            # Recurring: Monthly Fee
+            # One-time: Setup + Access
+            
+            mode = 'subscription'
+            
+            # 1. Recurring
+            line_items.append({
+                'price_data': {
+                    'currency': 'usd',
+                    'product_data': {
+                        'name': "Realtor Subscription",
+                        'description': "Monthly subscription fee"
+                    },
+                    'unit_amount': int(plan.monthly_fee * 100),
+                    'recurring': {'interval': 'month'}
+                },
+                'quantity': 1,
+            })
+            
+            # 2. One-time (Setup + Access)
+            one_time_total = plan.setup_fee + plan.access_fee
+            line_items.append({
+                'price_data': {
+                    'currency': 'usd',
+                    'product_data': {
+                        'name': "Initial Setup & Access Fees",
+                        'description': f"One-time setup (${plan.setup_fee}) and access fees (${plan.access_fee})"
+                    },
+                    'unit_amount': int(one_time_total * 100),
+                },
+                'quantity': 1,
+            })
+            
+        elif role == 'partner':
+            # Partner: Subscription + One-time Fees
+            
+            mode = 'subscription'
+            
+            # 1. Recurring
+            line_items.append({
+                'price_data': {
+                    'currency': 'usd',
+                    'product_data': {
+                        'name': "Partner Subscription",
+                        'description': "Monthly subscription fee"
+                    },
+                    'unit_amount': int(plan.monthly_fee * 100),
+                    'recurring': {'interval': 'month'}
+                },
+                'quantity': 1,
+            })
+            
+            # 2. One-time
+            one_time_total = plan.setup_fee + plan.access_fee
+            line_items.append({
+                'price_data': {
+                    'currency': 'usd',
+                    'product_data': {
+                        'name': "Initial Setup & Access Fees",
+                        'description': f"One-time setup (${plan.setup_fee}) and access fees (${plan.access_fee})"
+                    },
+                    'unit_amount': int(one_time_total * 100),
+                },
+                'quantity': 1,
+            })
+            
+    except PricingPlan.DoesNotExist:
+        # Fallback Hardcoded
+        if role == 'buyer':
+            mode = 'subscription'
+            subscription_data = {'trial_period_days': 90}
+            line_items = [
+                {'price_data': {'currency': 'usd', 'product_data': {'name': 'Buyer Membership (Monthly)'}, 'unit_amount': 4000, 'recurring': {'interval': 'month'}}, 'quantity': 1},
+                {'price_data': {'currency': 'usd', 'product_data': {'name': '3-Month Prepayment'}, 'unit_amount': 12000}, 'quantity': 1}
+            ]
+        elif role == 'seller':
+            mode = 'payment'
+            line_items = [{'price_data': {'currency': 'usd', 'product_data': {'name': 'Seller Account Setup'}, 'unit_amount': 29800}, 'quantity': 1}]
+        elif role == 'realtor':
+            mode = 'subscription'
+            # 49 recurring, 198 one-time
+            line_items = [
+                {'price_data': {'currency': 'usd', 'product_data': {'name': 'Realtor Subscription'}, 'unit_amount': 4900, 'recurring': {'interval': 'month'}}, 'quantity': 1},
+                {'price_data': {'currency': 'usd', 'product_data': {'name': 'Initial Setup & Access'}, 'unit_amount': 19800}, 'quantity': 1}
+            ]
+        elif role == 'partner':
+            mode = 'subscription'
+            # 99 recurring, 498 one-time
+            line_items = [
+                {'price_data': {'currency': 'usd', 'product_data': {'name': 'Partner Subscription'}, 'unit_amount': 9900, 'recurring': {'interval': 'month'}}, 'quantity': 1},
+                {'price_data': {'currency': 'usd', 'product_data': {'name': 'Initial Setup & Access'}, 'unit_amount': 49800}, 'quantity': 1}
+            ]
+        else:
+            # Default fallback
+             line_items = [{'price_data': {'currency': 'usd', 'product_data': {'name': 'Account Verification'}, 'unit_amount': 1000}, 'quantity': 1}]
+
+    return mode, line_items, subscription_data
+
+
 class PaymentSuccessView(APIView):
     """
     Handle successful payment
@@ -277,6 +451,10 @@ class PaymentSuccessView(APIView):
                     if session.customer:
                         user.stripe_customer_id = session.customer
                         
+                    # Store Subscription ID if present
+                    if session.subscription:
+                        user.stripe_subscription_id = session.subscription
+                        
                     user.save()
                     print(f"DEBUG: User created successfully: {user.email}")
                     
@@ -316,8 +494,6 @@ class BillingPortalView(APIView):
             return redirect('/login')
             
         if not request.user.stripe_customer_id:
-            # If no customer ID, maybe just redirect to dashboard or show message
-            # For now, simplistic approach:
              return Response({'error': 'No billing account found.'}, status=status.HTTP_404_NOT_FOUND)
 
         try:
@@ -341,38 +517,36 @@ def create_checkout_session(request, pending_signup):
     Create a Stripe Checkout Session for the pending verification
     """
     try:
-        price_amount, product_name, description = get_product_details(pending_signup.signup_data)
+        mode, line_items, subscription_data = get_checkout_config(pending_signup.signup_data)
+        
         success_url = request.build_absolute_uri(reverse('payment-success')) + "?session_id={CHECKOUT_SESSION_ID}"
-        # Cancel URL should point to frontend signup page, not API
         cancel_url = request.build_absolute_uri('/signup') 
-
-        checkout_session = stripe.checkout.Session.create(
-            payment_method_types=['card'],
-            customer_email=pending_signup.email, # USE THE SIGNUP EMAIL
-            line_items=[{
-                'price_data': {
-                    'currency': 'usd',
-                    'product_data': {
-                        'name': product_name,
-                        'description': description, # Optional description
-                    },
-                    'unit_amount': price_amount,
-                },
-                'quantity': 1,
-            }],
-            mode='payment',
-            locale='en', # Attempt to default to English/US context
-            customer_creation='always',
-            invoice_creation={"enabled": True}, 
-            payment_intent_data={'setup_future_usage': 'on_session'},
-            success_url=success_url,
-            cancel_url=cancel_url,
-            client_reference_id=str(pending_signup.id),
-            metadata={
+        
+        session_kwargs = {
+            'payment_method_types': ['card'],
+            'customer_email': pending_signup.email,
+            'line_items': line_items,
+            'mode': mode,
+            'locale': 'en',
+            'success_url': success_url,
+            'cancel_url': cancel_url,
+            'client_reference_id': str(pending_signup.id),
+            'metadata': {
                 'email': pending_signup.email,
                 'role': pending_signup.signup_data.get('role', '')
             }
-        )
+        }
+
+        # Conditionally add parameters valid only for specific modes
+        if mode == 'payment':
+            session_kwargs['customer_creation'] = 'always'
+            session_kwargs['invoice_creation'] = {"enabled": True}
+            session_kwargs['payment_intent_data'] = {'setup_future_usage': 'on_session'}
+        
+        if subscription_data:
+            session_kwargs['subscription_data'] = subscription_data
+
+        checkout_session = stripe.checkout.Session.create(**session_kwargs)
         return checkout_session.url
     except Exception as e:
         raise e
