@@ -138,6 +138,9 @@ class TermsOfServiceView(TemplateView):
 class PrivacyPolicyView(TemplateView):
     template_name = "privacy-policy.html"
 
+class LegalDisclaimerView(TemplateView):
+    template_name = "legal-disclaimer.html"
+
 class CustomAdminPricingView(AdminRequiredMixin, TemplateView):
     template_name = "custom_admin_pricing.html"
 

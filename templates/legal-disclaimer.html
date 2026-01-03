@@ -1,0 +1,166 @@
+{% extends 'base.html' %}
+
+{% block title %}Legal Disclaimer | OTL Platform{% endblock %}
+
+{% block extra_head %}
+<style>
+    .font-body {
+        font-family: "Quicksand", sans-serif;
+        font-size: 16px;
+    }
+
+    /* Custom list styling */
+    .tos-list {
+        list-style-type: disc;
+        padding-left: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .tos-list li {
+        margin-bottom: 0.5rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-[var(--bg)]">
+    <div class="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div class="card bg-[var(--card)] border border-[var(--border)] shadow-xl">
+            <div class="card-body p-8 font-body text-[var(--foreground)] space-y-6 leading-relaxed">
+
+                <div class="mb-8">
+                    <h1 class="card-title font-heading text-3xl text-[var(--foreground)] mb-4">
+                        Legal Disclaimer
+                    </h1>
+                    <p class="font-heading text-xl text-[var(--accent)] mb-6">
+                        Effective Date: January 8, 2026
+                    </p>
+                </div>
+
+                <section>
+                    <h2 class="font-heading text-xl text-[var(--accent)] mb-3">1. Platform Role & How It Works</h2>
+                    <p class="text-lg mb-4">
+                        This platform is operated by SKF Multi Solutions, LLC, doing business as OTLHub (“Company”,
+                        “we,” “us,” or “our”). This platform is a subscription-based real estate marketplace designed to
+                        facilitate communication and connection between/among:
+                    </p>
+                    <ul class="tos-list">
+                        <li>Homeowners, sellers, or property owners.</li>
+                        <li>Buyers and investors.</li>
+                        <li>Licensed real estate professionals (Realtors).</li>
+                        <li>Ancillary real estate services (Title Company, Home Inspector, Appraiser, etc.).</li>
+                    </ul>
+                    <div class="p-4 bg-[var(--muted)]/20 rounded border border-[var(--border)] mb-4">
+                        <p class="font-bold mb-2">Important:</p>
+                        <ul class="tos-list mb-0">
+                            <li>The platform does not act as a real estate broker, agent, lender, or financial advisor.
+                            </li>
+                            <li>The platform does not negotiate, structure, or execute real estate transactions.</li>
+                            <li>All negotiations, contracts, and leaseback arrangements are conducted independently by
+                                users and/or their chosen professionals.</li>
+                            <li>Participation in this platform is voluntary, and use of the platform does not guarantee
+                                any outcome, including property sale, leaseback, or investment return.</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <section>
+                    <h2 class="font-heading text-xl text-[var(--accent)] mb-3">2. General Disclaimers</h2>
+                    <ul class="tos-list">
+                        <li>This platform is not a foreclosure rescue service.</li>
+                        <li>We do not provide legal, tax, or financial advice.</li>
+                        <li>Users are encouraged to consult licensed professionals for all real estate, financial, and
+                            legal matters.</li>
+                        <li>Any participation is voluntary, and no results or outcomes are guaranteed.</li>
+                    </ul>
+                    <p class="text-lg font-bold mb-2">Foreclosure Notice:</p>
+                    <p class="text-lg mb-4">
+                        If you are facing foreclosure, you may have additional rights under state and federal law. You
+                        are encouraged to consult a licensed attorney or a HUD-approved housing counselor.
+                    </p>
+                </section>
+
+                <section>
+                    <h2 class="font-heading text-xl text-[var(--accent)] mb-3">3. Realtor-Specific Disclaimers</h2>
+
+                    <h3 class="font-heading text-lg font-bold text-[var(--foreground)] mt-4 mb-2">Independent
+                        Professionals</h3>
+                    <p class="text-lg mb-4">
+                        All real estate agents and brokers using this platform are independent licensed professionals.
+                        They are not employees, partners, representatives, or agents of the platform. The platform does
+                        not supervise, control, or direct their activities and is not responsible for their performance.
+                    </p>
+
+                    <h3 class="font-heading text-lg font-bold text-[var(--foreground)] mt-4 mb-2">No Endorsement or
+                        Ranking</h3>
+                    <p class="text-lg mb-4">
+                        The platform does not recommend, endorse, or guarantee any real estate professional. Any
+                        decision to engage a professional is made solely by the user.
+                    </p>
+
+                    <h3 class="font-heading text-lg font-bold text-[var(--foreground)] mt-4 mb-2">No Commission or
+                        Referral Fees</h3>
+                    <p class="text-lg mb-4">
+                        The platform does not receive commissions, referral fees, or transaction-based compensation from
+                        any real estate transaction. Realtors pay a flat subscription fee for platform access and
+                        advertising only.
+                    </p>
+                </section>
+
+                <section>
+                    <h2 class="font-heading text-xl text-[var(--accent)] mb-3">4. Realtor Conduct Acknowledgment</h2>
+                    <p class="text-lg mb-4">
+                        When signing up as a real estate professional, you may be required to acknowledge that you
+                        understand you are a licensed real estate professional acting independently and that any
+                        representation, negotiation, or fiduciary duties arise solely between yourself and your client,
+                        not the platform.
+                    </p>
+                </section>
+
+                <section>
+                    <h2 class="font-heading text-xl text-[var(--accent)] mb-3">5. User Responsibilities</h2>
+                    <p class="text-lg mb-4">By using this platform, users agree to:</p>
+                    <ul class="tos-list">
+                        <li>Provide accurate and complete information.</li>
+                        <li>Conduct their own independent due diligence.</li>
+                        <li>Seek advice from licensed real estate, legal, and financial professionals.</li>
+                        <li>Comply with all applicable laws and regulations.</li>
+                        <li>Use the platform in good faith.</li>
+                    </ul>
+                </section>
+
+                <section>
+                    <h2 class="font-heading text-xl text-[var(--accent)] mb-3">6. Limitation of Liability</h2>
+                    <p class="text-lg mb-4">To the maximum extent permitted by law, the platform is not liable for:</p>
+                    <ul class="tos-list">
+                        <li>Financial losses or missed opportunities.</li>
+                        <li>Property condition or value issues.</li>
+                        <li>Leaseback or rental disputes.</li>
+                        <li>Actions taken by users, investors, or Realtors.</li>
+                        <li>Third-party actions or external factors.</li>
+                    </ul>
+                </section>
+
+                <section>
+                    <h2 class="font-heading text-xl text-[var(--accent)] mb-3">7. Governing Law</h2>
+                    <p class="text-lg mb-4">
+                        These disclaimers and any use of the platform are governed by the laws of the State of Texas,
+                        without regard to conflict-of-law principles.
+                    </p>
+                </section>
+
+                <section>
+                    <h2 class="font-heading text-xl text-[var(--accent)] mb-3">8. Acknowledgment of Understanding</h2>
+                    <p class="text-lg mb-4">By using this platform, users and professionals acknowledge that:</p>
+                    <ul class="tos-list">
+                        <li>They have read, understood, and accepted the disclaimers in this page.</li>
+                        <li>The platform serves only as a neutral facilitator.</li>
+                        <li>They enter into any transactions at their own risk.</li>
+                    </ul>
+                </section>
+
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

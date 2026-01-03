@@ -1,7 +1,7 @@
-<footer class="bg-[#3a3a3a] border-t border-[#4a4a4a] py-8 px-4 mt-auto">
+<footer class="bg-[#3a3a3a] border-t border-[#4a4a4a] pt-12 pb-8 px-4 mt-auto">
     <div class="max-w-7xl mx-auto text-center">
-        <p class="font-body text-base sm:text-lg text-[#c0c0c0] mb-4">© 2025 OTL Platform. All Rights Reserved.</p>
-        <nav class="flex flex-wrap justify-center gap-4 font-heading text-sm sm:text-base">
+        <!-- Main Footer Links -->
+        <nav class="flex flex-wrap justify-center gap-4 font-heading text-sm sm:text-base mb-8">
             <a class="text-[#c0c0c0] hover:text-[#f3f4f6]" href="{% url 'index' %}">Home</a>
             <span class="text-[#4a4a4a]">|</span>
             <a class="text-[#c0c0c0] hover:text-[#f3f4f6]" href="{% url 'about' %}">About Us</a>
@@ -11,6 +11,20 @@
             <a class="text-[#c0c0c0] hover:text-[#f3f4f6]" href="{% url 'terms_of_service' %}">Terms of Service</a>
             <span class="text-[#4a4a4a]">|</span>
             <a class="text-[#c0c0c0] hover:text-[#f3f4f6]" href="{% url 'privacy_policy' %}">Privacy Policy</a>
+            <span class="text-[#4a4a4a]">|</span>
+            <a class="text-[#c0c0c0] hover:text-[#f3f4f6]" href="{% url 'legal_disclaimer' %}">Legal Disclaimer</a>
         </nav>
+
+        <!-- Copyright -->
+        <p class="font-body text-base text-[#c0c0c0] mb-6">© 2026 OTL Platform. All Rights Reserved.</p>
+
+        <!-- Legal Disclaimer Text -->
+        <div class="max-w-4xl mx-auto pt-6 border-t border-[#4a4a4a]">
+            <p class="text-xs text-[#9ca3af] leading-relaxed">
+                This platform is a marketplace for connecting users with independent buyer and/or real estate
+                professionals. We do not act as a broker, financial advisor, or foreclosure rescue service. All
+                transactions are conducted independently by users with buyer and/or licensed professionals.
+            </p>
+        </div>
     </div>
 </footer>
