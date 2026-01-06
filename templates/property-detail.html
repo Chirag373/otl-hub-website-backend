@@ -592,11 +592,12 @@
         const leasebackBadge = document.getElementById('prop-leaseback-badge');
         if (leasebackBadge) {
             const feats = p.features || {};
-            const months = feats.leaseback_months;
+            const months = feats.leaseback_months || feats.leasebackMonths;
             const isRequired = p.leaseback_required || (months);
 
             if (isRequired) {
-                leasebackBadge.textContent = months ? `Leaseback: ${months} Months` : "Leaseback Required";
+                const displayMonths = months || 0;
+                leasebackBadge.textContent = `Leaseback: ${displayMonths} Months`;
                 leasebackBadge.classList.remove('hidden');
             } else {
                 leasebackBadge.classList.add('hidden');

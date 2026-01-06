@@ -3,89 +3,93 @@
 {% block title %}Client Management | OTL Platform{% endblock %}
 
 {% block content %}
-<div class="space-y-2">
-    <h1 class="text-3xl font-bold text-[var(--foreground)]">Client Management</h1>
-    <p class="text-[var(--muted-foreground)]">Track and manage your clients' property transactions</p>
+<div class="flex items-center justify-between">
+    <div>
+        <h1 class="text-3xl font-bold text-[var(--foreground)]">Client Management</h1>
+        <p class="text-[var(--muted-foreground)]">Track and manage your clients' property transactions</p>
+    </div>
+    <button onclick="openAddClientModal()"
+        class="flex items-center px-4 py-2 bg-[var(--accent)] text-[var(--bg)] font-bold rounded-lg hover:bg-[var(--accent-hover)] transition-colors">
+        <i data-lucide="plus" class="mr-2 h-5 w-5"></i> Add Client
+    </button>
 </div>
 
 <div id="clients-container" class="space-y-6">
     <!-- Content rendered by JS -->
 </div>
+
+<!-- Add Client Modal -->
+<div id="add-client-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div class="absolute inset-0 bg-black/70 backdrop-blur-sm transition-opacity" onclick="closeAddClientModal()"></div>
+    <div
+        class="relative bg-[var(--card)] rounded-xl border border-[var(--border)] w-full max-w-md shadow-2xl overflow-hidden">
+        <div class="p-6 border-b border-[var(--border)] flex justify-between items-center bg-[var(--muted)]/20">
+            <h2 class="text-xl font-bold text-[var(--foreground)]">Add New Client</h2>
+            <button onclick="closeAddClientModal()"
+                class="p-2 hover:bg-[var(--muted)] rounded-full transition-colors text-[var(--foreground)]">
+                <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
+        </div>
+
+        <div class="p-6">
+            <form method="POST" action="{% url 'realtor_clients' %}">
+                {% csrf_token %}
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-[var(--foreground)] mb-1">Client Email</label>
+                        <input type="email" name="seller_email" placeholder="Enter client's email address" required
+                            class="w-full px-4 py-2 bg-[var(--input)] border border-[var(--border)] rounded-md text-[var(--foreground)] focus:ring-1 focus:ring-[var(--accent)] outline-none">
+                        <p class="text-xs text-[var(--muted-foreground)] mt-2">
+                            Enter the email address of the seller you want to manage. They must have a Seller account.
+                        </p>
+                    </div>
+
+                    <button type="submit"
+                        class="w-full py-2 bg-[var(--accent)] text-[var(--bg)] font-bold rounded-md hover:bg-[var(--accent-hover)] transition-colors">
+                        Add Client
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 {% endblock %}
 
 {% block scripts %}
 <script>
-    // --- DATA MODELS ---
-    const mockClients = [
-        {
-            id: 1,
-            name: "Sarah Johnson",
-            email: "sarah@email.com",
-            phone: "(555) 123-4567",
-            properties: [
-                {
-                    listingId: "PROP-001",
-                    address: "123 Main St, Springfield, IL 62701",
-                    contactedSeller: true,
-                    putInOffer: true,
-                    offerDate: "2024-03-10",
-                    sellerAcceptedOffer: true,
-                    acceptedDate: "2024-03-15",
-                    sellerRejectedOffer: false,
-                    rejectedDate: "",
-                    propertyClosed: false,
-                    closingDate: "",
-                    closingComment: "",
+    // --- NOTIFICATIONS ---
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const messageElements = document.querySelectorAll('#django-messages span');
+
+        messageElements.forEach(el => {
+            const text = el.dataset.text;
+            const tag = el.dataset.tag;
+
+            // Map Django tags to colors
+            let bgColor = "var(--muted)";
+            if (tag === 'success') bgColor = "var(--accent)";
+            if (tag === 'error' || tag === 'danger') bgColor = "var(--destructive)";
+
+            Toastify({
+                text: text,
+                duration: 3000,
+                close: true,
+                gravity: "top",
+                position: "right",
+                style: {
+                    background: bgColor,
                 },
-            ],
-        },
-        {
-            id: 2,
-            name: "Michael Chen",
-            email: "michael@email.com",
-            phone: "(555) 987-6543",
-            properties: [
-                {
-                    listingId: "PROP-002",
-                    address: "456 Oak Avenue, Downtown, IL 62702",
-                    contactedSeller: true,
-                    putInOffer: true,
-                    offerDate: "2024-03-05",
-                    sellerAcceptedOffer: false,
-                    acceptedDate: "",
-                    sellerRejectedOffer: true,
-                    rejectedDate: "2024-03-08",
-                    propertyClosed: false,
-                    closingDate: "",
-                    closingComment: "Buyer financing fell through",
-                },
-                {
-                    listingId: "PROP-003",
-                    address: "789 Pine Road, Suburb Valley, IL 62703",
-                    contactedSeller: true,
-                    putInOffer: false,
-                    offerDate: "",
-                    sellerAcceptedOffer: false,
-                    acceptedDate: "",
-                    sellerRejectedOffer: false,
-                    rejectedDate: "",
-                    propertyClosed: false,
-                    closingDate: "",
-                    closingComment: "",
-                },
-            ],
-        },
-        {
-            id: 3,
-            name: "Emily Davis",
-            email: "emily@email.com",
-            phone: "(555) 456-7890",
-            properties: [],
-        },
-    ];
+                className: "text-[var(--bg)] font-bold",
+                stopOnFocus: true,
+            }).showToast();
+        });
+    });
+
+
 
     // --- STATE ---
-    let clients = JSON.parse(JSON.stringify(mockClients)); // Deep copy
+    let clients = JSON.parse('{{ clients_json|escapejs|default:"[]" }}');
     let editingClientId = null;
     let tempClientData = null;
 
@@ -125,7 +129,7 @@
     function renderViewMode(client) {
         let propertiesHtml = '';
 
-        if (client.properties.length > 0) {
+        if (client.properties && client.properties.length > 0) {
             propertiesHtml = `<div class="space-y-4">
                 <h4 class="text-md font-semibold text-[var(--foreground)]">Properties (${client.properties.length})</h4>
                 ${client.properties.map((prop, idx) => `
@@ -142,55 +146,12 @@
                                 <i data-lucide="map-pin" class="h-4 w-4 text-[var(--muted-foreground)] mt-0.5"></i>
                                 <span class="text-sm text-[var(--foreground)]">${prop.address}</span>
                             </div>
-
-                            <div class="flex items-center space-x-2">
-                                ${prop.contactedSeller
-                    ? `<i data-lucide="check-circle" class="h-4 w-4 text-green-500"></i>`
-                    : `<i data-lucide="x-circle" class="h-4 w-4 text-red-500"></i>`}
-                                <span class="text-sm text-[var(--foreground)]">Contacted: ${prop.contactedSeller ? "Yes" : "No"}</span>
+                            
+                            <!-- Only show detailed status for sellers/buyers if relevant, hiding for simple display if needed but keeping structure -->
+                             <div class="flex items-center space-x-2">
+                                <i data-lucide="check-circle" class="h-4 w-4 text-green-500"></i>
+                                <span class="text-sm text-[var(--foreground)]">Active Client</span>
                             </div>
-
-                            <div class="flex items-center space-x-2">
-                                ${prop.putInOffer
-                    ? `<i data-lucide="check-circle" class="h-4 w-4 text-green-500"></i>`
-                    : `<i data-lucide="x-circle" class="h-4 w-4 text-red-500"></i>`}
-                                <span class="text-sm text-[var(--foreground)]">Offer: ${prop.putInOffer ? "Yes" : "No"}</span>
-                            </div>
-
-                            ${prop.putInOffer && prop.offerDate ? `
-                                <div class="flex items-center space-x-2">
-                                    <i data-lucide="calendar" class="h-4 w-4 text-[var(--muted-foreground)]"></i>
-                                    <span class="text-sm text-[var(--foreground)]">Offer Date: ${prop.offerDate}</span>
-                                </div>
-                            ` : ''}
-
-                            ${prop.sellerAcceptedOffer ? `
-                                <div class="flex items-center space-x-2">
-                                    <i data-lucide="check-circle" class="h-4 w-4 text-green-500"></i>
-                                    <span class="text-sm text-[var(--foreground)]">Accepted: ${prop.acceptedDate}</span>
-                                </div>
-                            ` : ''}
-
-                            ${prop.sellerRejectedOffer ? `
-                                <div class="flex items-center space-x-2">
-                                    <i data-lucide="x-circle" class="h-4 w-4 text-red-500"></i>
-                                    <span class="text-sm text-[var(--foreground)]">Rejected: ${prop.rejectedDate}</span>
-                                </div>
-                            ` : ''}
-
-                            ${prop.propertyClosed ? `
-                                <div class="flex items-center space-x-2">
-                                    <i data-lucide="check-circle" class="h-4 w-4 text-green-500"></i>
-                                    <span class="text-sm text-[var(--foreground)]">Closed: ${prop.closingDate}</span>
-                                </div>
-                            ` : ''}
-
-                            ${prop.closingComment ? `
-                                <div class="flex items-start space-x-2 md:col-span-2 lg:col-span-3">
-                                    <i data-lucide="file-text" class="h-4 w-4 text-[var(--muted-foreground)] mt-0.5"></i>
-                                    <span class="text-sm text-[var(--foreground)]">Comment: ${prop.closingComment}</span>
-                                </div>
-                            ` : ''}
                         </div>
                     </div>
                 `).join('')}
@@ -203,19 +164,27 @@
             <div class="space-y-6">
                 <div class="flex items-start justify-between">
                     <div class="space-y-2">
-                        <h3 class="text-lg font-semibold text-[var(--foreground)]">${client.name}</h3>
+                        <h3 class="text-lg font-semibold text-[var(--foreground)]">${client.name} <span class="text-xs bg-[var(--muted)] px-2 py-1 rounded ml-2 uppercase">${client.type || 'Client'}</span></h3>
                         <div class="text-sm text-[var(--muted-foreground)]">
                             <p>${client.email}</p>
                             <p>${client.phone}</p>
                         </div>
                     </div>
-                    <button class="btn-edit flex items-center px-3 py-2 text-sm border border-[var(--border)] rounded-md hover:bg-[var(--muted)] text-[var(--foreground)] transition-colors" data-id="${client.id}">
-                        <i data-lucide="edit" class="mr-2 h-4 w-4"></i> Edit
+                     <button class="btn-edit p-2 hover:bg-[var(--muted)] rounded-full transition-colors text-[var(--foreground)]" data-id="${client.id}">
+                        <i data-lucide="edit-2" class="w-5 h-5"></i>
                     </button>
                 </div>
                 ${propertiesHtml}
             </div>
         `;
+    }
+
+    function openAddClientModal() {
+        document.getElementById('add-client-modal').classList.remove('hidden');
+    }
+
+    function closeAddClientModal() {
+        document.getElementById('add-client-modal').classList.add('hidden');
     }
 
     function renderEditMode(client) {
@@ -357,6 +326,54 @@
             const idx = clients.findIndex(c => c.id === tempClientData.id);
             if (idx !== -1) {
                 clients[idx] = tempClientData;
+
+                // Persist to backend
+                fetch("{% url 'realtor_client_update' %}", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRFToken": "{{ csrf_token }}"
+                    },
+                    body: JSON.stringify(tempClientData)
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status !== 'success') {
+                            console.error('Save failed:', data);
+                            Toastify({
+                                text: "Failed to save changes: " + (data.message || 'Unknown error'),
+                                duration: 3000,
+                                close: true,
+                                gravity: "top",
+                                position: "right",
+                                backgroundColor: "var(--destructive)",
+                                stopOnFocus: true,
+                            }).showToast();
+                        } else {
+                            Toastify({
+                                text: "Changes saved successfully",
+                                duration: 3000,
+                                close: true,
+                                gravity: "top",
+                                position: "right",
+                                backgroundColor: "var(--accent)",
+                                className: "text-[var(--bg)] font-bold",
+                                stopOnFocus: true,
+                            }).showToast();
+                        }
+                    })
+                    .catch(err => {
+                        console.error('Error saving:', err);
+                        Toastify({
+                            text: "Network error while saving.",
+                            duration: 3000,
+                            close: true,
+                            gravity: "top",
+                            position: "right",
+                            backgroundColor: "var(--destructive)",
+                            stopOnFocus: true,
+                        }).showToast();
+                    });
             }
         }
         editingClientId = null;

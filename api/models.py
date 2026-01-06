@@ -72,6 +72,9 @@ class SellerProfile(models.Model):
     has_active_listing = models.BooleanField(default=False)
     leaseback_required = models.BooleanField(default=False)
     
+    assigned_realtor = models.ForeignKey("RealtorProfile", on_delete=models.SET_NULL, null=True, blank=True, related_name="assigned_sellers")
+    client_status = models.JSONField(default=dict, blank=True, help_text="Tracks realtor's progress with this seller/client")
+    
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -245,18 +248,4 @@ class PropertyView(models.Model):
             models.Index(fields=["seller_profile", "ip_address"]),
         ]
 
-class BuyerRealtorConnection(models.Model):
-    class Status(models.TextChoices):
-        PENDING = "PENDING", "Pending"
-        ACCEPTED = "ACCEPTED", "Accepted"
-        REJECTED = "REJECTED", "Rejected"
 
-    buyer = models.ForeignKey(BuyerProfile, on_delete=models.CASCADE, related_name="realtor_connections")
-    realtor = models.ForeignKey(RealtorProfile, on_delete=models.CASCADE, related_name="buyer_requests")
-    status = models.CharField(max_length=20, choices=Status.choices, default=Status.PENDING)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-    class Meta:
-        db_table = "buyer_realtor_connections"
-        unique_together = ('buyer', 'realtor')

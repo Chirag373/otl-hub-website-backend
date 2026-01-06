@@ -362,11 +362,17 @@
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-sm text-[var(--muted-foreground)] mb-1">Your Realtor</p>
-                    <p id="realtor-name" class="text-lg font-semibold text-[var(--foreground)]">Jennifer Martinez</p>
+                    {% if seller_profile.assigned_realtor %}
+                    <p id="realtor-name" class="text-lg font-semibold text-[var(--foreground)]">{{ seller_profile.assigned_realtor.user.get_full_name|default:seller_profile.assigned_realtor.user.email }}</p>
                     <p class="text-sm text-[var(--muted-foreground)] mt-1">
-                        <span id="realtor-phone">(555) 123-4567</span> • <span
-                            id="realtor-email">jennifer@premierrealty.com</span>
+                        <span id="realtor-phone">{{ seller_profile.assigned_realtor.user.phone_number|default:"No phone" }}</span> • <span id="realtor-email">{{ seller_profile.assigned_realtor.user.email }}</span>
                     </p>
+                    {% else %}
+                    <p id="realtor-name" class="text-lg font-semibold text-[var(--foreground)]">Not Assigned</p>
+                    <p class="text-sm text-[var(--muted-foreground)] mt-1">
+                        Please contact us to get matched with a realtor.
+                    </p>
+                    {% endif %}
                 </div>
             </div>
         </div>
