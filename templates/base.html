@@ -146,10 +146,11 @@
                     class="w-16 h-16 bg-[var(--accent)]/10 rounded-full flex items-center justify-center mb-4 mx-auto text-[var(--accent)]">
                     <i data-lucide="lock" class="w-8 h-8"></i>
                 </div>
-                <h3 class="text-2xl font-bold text-[var(--foreground)]">Login Required</h3>
-                <p class="text-[var(--muted-foreground)] mt-2 mb-6">You must be logged in to unlock property details and
+                <h3 id="login-modal-title" class="text-2xl font-bold text-[var(--foreground)]">Login Required</h3>
+                <p id="login-modal-desc" class="text-[var(--muted-foreground)] mt-2 mb-6">You must be logged in to
+                    unlock property details and
                     view seller information.</p>
-    
+
                 <div class="flex flex-col gap-3">
                     <a href="{% url 'login' %}?next={{ request.get_full_path }}"
                         class="btn btn-primary bg-[var(--accent)] text-[var(--bg)] border-none hover:bg-[var(--accent-hover)] w-full">
@@ -167,9 +168,19 @@
     <script>
         const isUserAuthenticatedGlobal = "{{ user.is_authenticated|yesno:'true,false' }}" === "true";
 
-        function openLoginModal() {
+        function openLoginModal(title, message) {
             const modal = document.getElementById('login-modal');
             const content = document.getElementById('login-modal-content');
+            const titleEl = document.getElementById('login-modal-title');
+            const descEl = document.getElementById('login-modal-desc');
+
+            // Default text
+            const defaultTitle = "Login Required";
+            const defaultDesc = "You must be logged in to unlock property details and view seller information.";
+
+            if (titleEl) titleEl.textContent = title || defaultTitle;
+            if (descEl) descEl.textContent = message || defaultDesc;
+
             if (modal && content) {
                 modal.classList.remove('hidden');
                 setTimeout(() => {
@@ -190,7 +201,7 @@
                 }, 200);
             }
         }
-        
+
         // Close modal on outside click
         window.addEventListener('click', (e) => {
             const modal = document.getElementById('login-modal');

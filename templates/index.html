@@ -456,7 +456,10 @@
             window.location.href = '/buyer/property-search';
         } else {
             if (window.openLoginModal) {
-                window.openLoginModal();
+                window.openLoginModal(
+                    "Join OTL Hub",
+                    "Create an account or log in to explore exclusive real estate opportunities."
+                );
             } else {
                 console.error("openLoginModal function not found");
                 // Fallback
