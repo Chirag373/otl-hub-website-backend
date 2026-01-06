@@ -388,37 +388,7 @@
     </div>
 </div>
 
-<!-- Login Modal -->
-<div id="login-modal"
-    class="fixed inset-0 bg-black/60 hidden z-50 flex items-center justify-center p-4 backdrop-blur-sm">
-    <div class="bg-[var(--card)] rounded-lg shadow-2xl max-w-sm w-full border border-[var(--border)] overflow-hidden scale-95 opacity-0 transition-all duration-200"
-        id="login-modal-content">
-        <div class="p-6 relative text-center">
-            <button onclick="closeLoginModal()"
-                class="absolute top-4 right-4 text-[var(--muted-foreground)] hover:text-[var(--foreground)] transition-colors">
-                <i data-lucide="x" class="w-6 h-6"></i>
-            </button>
-            <div
-                class="w-16 h-16 bg-[var(--accent)]/10 rounded-full flex items-center justify-center mb-4 mx-auto text-[var(--accent)]">
-                <i data-lucide="lock" class="w-8 h-8"></i>
-            </div>
-            <h3 class="text-2xl font-bold text-[var(--foreground)]">Login Required</h3>
-            <p class="text-[var(--muted-foreground)] mt-2 mb-6">You must be logged in to unlock property details and
-                view seller information.</p>
 
-            <div class="flex flex-col gap-3">
-                <a href="{% url 'login' %}?next={{ request.get_full_path }}"
-                    class="btn btn-primary bg-[var(--accent)] text-[var(--bg)] border-none hover:bg-[var(--accent-hover)] w-full">
-                    Log In
-                </a>
-                <a href="{% url 'signup' %}"
-                    class="btn btn-outline border-[var(--border)] text-[var(--foreground)] hover:bg-[var(--muted)] w-full">
-                    Create an Account
-                </a>
-            </div>
-        </div>
-    </div>
-</div>
 {% endblock %}
 
 
@@ -442,11 +412,7 @@
 
         sellerPhone: document.getElementById('seller-phone'),
         sellerEmailLink: document.getElementById('seller-email-link'),
-        sellerPhoneLink: document.getElementById('seller-phone-link'),
-
-        // Login Modal
-        loginModal: document.getElementById('login-modal'),
-        loginModalContent: document.getElementById('login-modal-content')
+        sellerPhoneLink: document.getElementById('seller-phone-link')
     };
 
     // --- UTILS ---
@@ -526,29 +492,10 @@
     window.addEventListener('click', (e) => {
         if (e.target === dom.accessModal) closeAccessModal();
         if (e.target === dom.sellerModal) closeSellerModal();
-        if (e.target === dom.loginModal) closeLoginModal();
+        // Login modal handled globally
     });
 
-    // Login Modal Logic
-    window.openLoginModal = () => {
-        if (dom.loginModal) {
-            dom.loginModal.classList.remove('hidden');
-            setTimeout(() => {
-                dom.loginModalContent.classList.remove('scale-95', 'opacity-0');
-                dom.loginModalContent.classList.add('scale-100', 'opacity-100');
-            }, 10);
-        }
-    };
 
-    window.closeLoginModal = () => {
-        if (dom.loginModal) {
-            dom.loginModalContent.classList.remove('scale-100', 'opacity-100');
-            dom.loginModalContent.classList.add('scale-95', 'opacity-0');
-            setTimeout(() => {
-                dom.loginModal.classList.add('hidden');
-            }, 200);
-        }
-    };
 
     async function purchaseAccessPass() {
         const btn = document.getElementById('btn-buy-access-pass-modal');

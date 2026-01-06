@@ -165,10 +165,7 @@ class SignupSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError(
                     {"service_areas": "Service areas required for partners."}
                 )
-            if not data.get("website_url"):
-                raise serializers.ValidationError(
-                    {"website_url": "Website URL required for partners."}
-                )
+
             if not data.get("business_license_number"):
                 raise serializers.ValidationError(
                     {

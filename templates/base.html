@@ -132,6 +132,73 @@
 
     {% include 'partials/footer.html' %}
 
+    <!-- Login Modal -->
+    <div id="login-modal"
+        class="fixed inset-0 bg-black/60 hidden z-50 flex items-center justify-center p-4 backdrop-blur-sm">
+        <div class="bg-[var(--card)] rounded-lg shadow-2xl max-w-sm w-full border border-[var(--border)] overflow-hidden scale-95 opacity-0 transition-all duration-200"
+            id="login-modal-content">
+            <div class="p-6 relative text-center">
+                <button onclick="closeLoginModal()"
+                    class="absolute top-4 right-4 text-[var(--muted-foreground)] hover:text-[var(--foreground)] transition-colors">
+                    <i data-lucide="x" class="w-6 h-6"></i>
+                </button>
+                <div
+                    class="w-16 h-16 bg-[var(--accent)]/10 rounded-full flex items-center justify-center mb-4 mx-auto text-[var(--accent)]">
+                    <i data-lucide="lock" class="w-8 h-8"></i>
+                </div>
+                <h3 class="text-2xl font-bold text-[var(--foreground)]">Login Required</h3>
+                <p class="text-[var(--muted-foreground)] mt-2 mb-6">You must be logged in to unlock property details and
+                    view seller information.</p>
+    
+                <div class="flex flex-col gap-3">
+                    <a href="{% url 'login' %}?next={{ request.get_full_path }}"
+                        class="btn btn-primary bg-[var(--accent)] text-[var(--bg)] border-none hover:bg-[var(--accent-hover)] w-full">
+                        Log In
+                    </a>
+                    <a href="{% url 'signup' %}"
+                        class="btn btn-outline border-[var(--border)] text-[var(--foreground)] hover:bg-[var(--muted)] w-full">
+                        Create an Account
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const isUserAuthenticatedGlobal = "{{ user.is_authenticated|yesno:'true,false' }}" === "true";
+
+        function openLoginModal() {
+            const modal = document.getElementById('login-modal');
+            const content = document.getElementById('login-modal-content');
+            if (modal && content) {
+                modal.classList.remove('hidden');
+                setTimeout(() => {
+                    content.classList.remove('scale-95', 'opacity-0');
+                    content.classList.add('scale-100', 'opacity-100');
+                }, 10);
+            }
+        }
+
+        function closeLoginModal() {
+            const modal = document.getElementById('login-modal');
+            const content = document.getElementById('login-modal-content');
+            if (modal && content) {
+                content.classList.remove('scale-100', 'opacity-100');
+                content.classList.add('scale-95', 'opacity-0');
+                setTimeout(() => {
+                    modal.classList.add('hidden');
+                }, 200);
+            }
+        }
+        
+        // Close modal on outside click
+        window.addEventListener('click', (e) => {
+            const modal = document.getElementById('login-modal');
+            if (e.target === modal) closeLoginModal();
+        });
+    </script>
+
+
     <script>
         lucide.createIcons();
     </script>
